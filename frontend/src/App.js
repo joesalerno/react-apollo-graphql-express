@@ -26,15 +26,20 @@ import RolesPage from "./components/RolesPage"
 import FormsPage from "./components/FormsPage"
 import ValidatorsPage from "./components/ValidatorsPage"
 import CommentsPage from "./components/CommentsPage"
+import CreateRolePage from "./components/CreateRolePage"
+import CreateValidatorPage from "./components/CreateValidatorPage"
+import CreateFormPage from "./components/CreateFormPage"
 import CreateJobPage from "./components/CreateJobPage"
 import CreatePartPage from "./components/CreatePartPage"
 import CreateCustomerPage from "./components/CreateCustomerPage"
+import CreateStepTypePage from "./components/CreateStepTypePage"
+import Test from "./components/Test"
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(["auth", "currentPage"])
   const [auth, setAuth] = useState(cookies.auth ? cookies.auth : 0)
   const [currentPage, setCurrentPage] = useState(
-    cookies.currentPage ? cookies.currentPage : 0
+    cookies.currentPage ? cookies.currentPage : homepage
   )
 
   const client = new ApolloClient({
@@ -42,34 +47,10 @@ function App() {
     headers: { Authorization: `Bearer ${auth}` }
   })
 
-  const validAuth = () => {
-    try {
-      return jwt.decode(auth).exp >= new Date().getTime() / 1000
-    } catch (e) {
-      return false
-    }
-  }
-
   const changePage = path => {
     setCurrentPage(path)
     setCookie("currentPage", path, "/")
     window.location.assign(path)
-  }
-
-  const register = async (user, email, pass, employeeId) => {
-    try {
-      await axios.post(`${serverUrl}/register`, {
-        username: user,
-        email: email,
-        employeeId: employeeId,
-        password: pass
-      })
-      await login(user, pass)
-    } catch (e) {
-      if (e.message === "Request failed with status code 400")
-        alert("Username or email already in use.")
-      else alert(e.message)
-    }
   }
 
   const login = async (user, pass) => {
@@ -79,10 +60,26 @@ function App() {
       })
       setCookie("auth", res.data, "/")
       setAuth(res.data)
-      changePage(homepage)
+      changePage(currentPage ? currentPage : homepage)
     } catch (e) {
       if (e.message === "Request failed with status code 401")
         alert("Invalid username or password.")
+      else alert(e.message)
+    }
+  }
+
+  const register = async ( user, employeeId, email, pass ) => {
+    try {
+      await axios.post(`${serverUrl}/register`, {
+        username: user,
+        employeeId: employeeId,
+        email: email,
+        password: pass,
+      })
+      await login(user, pass)
+    } catch (e) {
+      if (e.message === "Request failed with status code 400")
+        alert("Username or email already in use.")
       else alert(e.message)
     }
   }
@@ -94,96 +91,127 @@ function App() {
     setCurrentPage(0)
   }
 
-  return (
-    <ApolloProvider client={client}>
-        <Router>
-          <Switch>
+  const validAuth = () => {
+    try {
+      return jwt.decode(auth).exp >= new Date().getTime() / 1000
+    } catch (e) {
+      return false
+    }
+  }
 
-            <Route path="/" exact render={props =>
-                validAuth()
-                 ? <Redirect to = {currentPage} {...props} logout={logout} />
-                 : <LoginPage {...props} login={login} logout={logout} />
-              }
-            />
+  return <ApolloProvider client={client}>
+    <Router>
+      <Switch>
+        <Route exact path="/" render={props =>
+            validAuth()
+              ? <Redirect to = {currentPage} {...props} logout={logout} />
+              : <LoginPage {...props} login={login} logout={logout} />
+          }
+        />
 
-            <Route path="/register" exact render={props => 
-              <RegisterPage {...props} register={register} changePage={changePage} logout={logout} auth={auth}/>
-            }/>
+        <Route exact path="/register" render={props => 
+          <RegisterPage {...props} register={register} changePage={changePage} logout={logout} auth={auth}/>
+        }/>
 
-            <Route path="/jobs" exact render={props => validAuth() 
-              ? <JobsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/jobs" render={props => validAuth() 
+          ? <JobsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/createjob" exact render={props => validAuth()
-              ? <CreateJobPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/createjob" render={props => validAuth()
+          ? <CreateJobPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/jobs/:jobid" render={props => validAuth()
-              ? <JobPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route path="/jobs/:jobNo" render={props => validAuth()
+          ? <JobPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/customers" exact render={props => validAuth()
-              ? <CustomersPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/customers" render={props => validAuth()
+          ? <CustomersPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/createcustomer" exact render={props => validAuth()
-              ? <CreateCustomerPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/createcustomer" render={props => validAuth()
+          ? <CreateCustomerPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/parts" exact render={props => validAuth()
-              ? <PartsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/parts" render={props => validAuth()
+          ? <PartsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/steps" exact render={props => validAuth()
-              ? <StepsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/steps" render={props => validAuth()
+          ? <StepsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/users" exact render={props => validAuth()
-              ? <UsersPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/createsteptype" render={props => validAuth()
+          ? <CreateStepTypePage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/roles" exact render={props => validAuth()
-              ? <RolesPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/users" render={props => validAuth()
+          ? <UsersPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/forms" exact render={props => validAuth()
-              ? <FormsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route  exact path="/roles"render={props => validAuth()
+          ? <RolesPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/validators" exact render={props => validAuth()
-              ? <ValidatorsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/createrole" render={props => validAuth()
+          ? <CreateRolePage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          :  <Redirect to="/"/>
+        }/>
 
-            <Route path="/comments" exact render={props => validAuth()
-              ? <CommentsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route  exact path="/forms"render={props => validAuth()
+          ? <FormsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route path="/createpart" exact render={props => validAuth()
-              ? <CreatePartPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
+        <Route exact path="/createform" render={props => validAuth()
+          ? <CreateFormPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
 
-            <Route render={props => validAuth() 
-              ? <NotFoundPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-              : <Redirect to="/" />
-            }/>
-            
-          </Switch>
-        </Router>
-    </ApolloProvider>
-  )
+        <Route exact path="/validators" render={props => validAuth()
+          ? <ValidatorsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+
+        
+        <Route exact path="/createvalidator" render={props => validAuth()
+          ? <CreateValidatorPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+
+        <Route exact path="/comments" render={props => validAuth()
+          ? <CommentsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+
+        <Route exact path="/createpart" render={props => validAuth()
+          ? <CreatePartPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+
+        <Route exact path="/test" render={props => validAuth()
+          ? <Test {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+
+        <Route render={props => validAuth() 
+          ? <NotFoundPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+        
+      </Switch>
+    </Router>
+  </ApolloProvider>
 }
 
 export default App

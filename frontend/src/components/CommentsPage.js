@@ -1,4 +1,4 @@
-import React, { Fragment } from "react"
+import React from "react"
 import gql from "graphql-tag"
 import { useQuery } from "@apollo/react-hooks"
 import NavBar from "./NavBar"
@@ -48,49 +48,45 @@ const SortLabel = ({ onSort, children, direction }) => (
 export default props => {
   const Comments = useQuery(GET_COMMENTS)
 
-  return (
-    <Background>
-      <Fragment>
-          <NavBar {...props} pageName="Comments" />
-          <Button
-            onClick={() => props.changePage("/createcomment")}
-            variant="outlined"
-            style={{ color: "#FFF", margin: "4px 8px -4px 8px" }}
-          >
-            <AddCircle style={{ margin: "0 8px" }} /> Create New Comment
-          </Button>
-          <Paper style={{ flex: "auto", margin: "8px", backgroundColor: "rgba(255, 255, 255, .95)", }}>
-            <Grid
-              rows={Comments.data ? Comments.data.comments : []}
-              columns={[
-                { name: "data", title: "Comment" },
-                { name: "user", title: "Posted By", getCellValue: ref => {
-                    return ref.user.username
-                }},
-                { name: "subject", title: "Subject ID" },
-              ]}
-            >
-              <DragDropProvider />
-              <SortingState defaultSorting={[{ columnName: "subject", direction: "desc" }]}/>
-              <IntegratedSorting />
-              <FilteringState defaultFilters={[]} />
-              <IntegratedFiltering />
-              <Table />
-              <TableColumnReordering
-                defaultOrder={[
-                  "data",
-                  "user",
-                  "subject"
-                ]}
-              />
-              <TableHeaderRow
-                showSortingControls
-                sortLabelComponent={SortLabel}
-              />
-              <TableFilterRow />
-            </Grid>
-          </Paper>
-        </Fragment>
-    </Background>
-  )
+  return <Background>
+    <NavBar {...props} pageName="Comments" />
+    <Button
+      onClick={() => props.changePage("/createcomment")}
+      variant="outlined"
+      style={{ color: "#FFF", margin: "4px 8px -4px 8px" }}
+    >
+      <AddCircle style={{ margin: "0 8px" }} /> Create New Comment
+    </Button>
+    <Paper style={{ flex: "auto", margin: "8px", backgroundColor: "rgba(255, 255, 255, .95)", }}>
+      <Grid
+        rows={Comments.data ? Comments.data.comments : []}
+        columns={[
+          { name: "data", title: "Comment" },
+          { name: "user", title: "Posted By", getCellValue: ref => {
+              return ref.user.username
+          }},
+          { name: "subject", title: "Subject ID" },
+        ]}
+      >
+        <DragDropProvider />
+        <SortingState defaultSorting={[{ columnName: "subject", direction: "desc" }]}/>
+        <IntegratedSorting />
+        <FilteringState defaultFilters={[]} />
+        <IntegratedFiltering />
+        <Table />
+        <TableColumnReordering
+          defaultOrder={[
+            "data",
+            "user",
+            "subject"
+          ]}
+        />
+        <TableHeaderRow
+          showSortingControls
+          sortLabelComponent={SortLabel}
+        />
+        <TableFilterRow />
+      </Grid>
+    </Paper>
+  </Background>
 }

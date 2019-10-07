@@ -24,12 +24,12 @@ const CREATE_CUSTOMER = gql`
 `
 
 export default props => {
-  const [createCustomer, {data}] = useMutation(CREATE_CUSTOMER, {
+  const [createCustomer] = useMutation(CREATE_CUSTOMER, {
     onCompleted: () => props.changePage("/customers"),
-    onError: e => alert(`Error creating customer: ${e}`)
+    onError: error => alert(`Error creating customer: ${error}`)
   })
   const Customers = useQuery(GET_CUSTOMERS)
-  const [name, setName] = useState(0)
+  const [name, setName] = useState("")
   const [dialogOpen, setDialogOpen] = useState(false)
   const [inputRefs, setInputRefs] = useState({})
 
@@ -39,21 +39,27 @@ export default props => {
 
   const handleDialogSubmit = (username, password) => {
     setDialogOpen(false)
-    createCustomer({variables: {validName}})
+    createCustomer({variables: {name}})
   }
 
   const handleDialogCancel = () => {
     setDialogOpen(false)
   }
 
-  const handleChange = e => { 
-    const { target: { id, value } } = e
+  const handleChange = event => { 
+    const { target: { id, value } } = event
     if (id === "name") setName(value)
   }
 
-  const validName = () => name.length > 0
-    ? {valid: true}
-    : {err: "Please enter a valid name (Unique name with 1 or more characters)"}
+  const validName = () => {
+    if (!Customers.loading && Customers.data)
+      for(var customer of Customers.data.customers) 
+        if (customer.name.toLowerCase() === name.toLowerCase())
+          return {error: "Please enter a unique customer name"}
+    return name.length > 0
+      ? {valid: true}
+      : {error: "Please enter a valid name (Unique name with 1 or more characters)"}
+  }
 
   const validInput = validName().valid
 
@@ -61,61 +67,55 @@ export default props => {
     if (!validName().valid) inputRefs.name.focus()
   }
 
-  const handleKeyPress = e => { if (e.key === "Enter") 
+  const handleKeyPress = event => { if (event.key === "Enter") 
     validInput ? handleSubmit() : focusNextInput()
   }
 
-  return (
-    <SmallWindowView {...props} pageName="Create Customer">
-      <div
-          style={{
-            margin: "16px",
-            width: "430px",
-            maxWidth: "100vw",
-            textAlign: "center"
-          }}
-        >
-          <Typography
-            component="h1"
-            variant="h5"
-            style={{ textAlign: "center", margin: "0 0 8px 0" }}
-          > New Customer </Typography>
+  return <SmallWindowView {...props}  width="375px" pageName="Create Customer">
+    <div style={{
+      margin: "16px",
+      textAlign: "center"
+    }}>
+      <Typography
+        component="h1"
+        variant="h5"
+        style={{ textAlign: "center", margin: "0 0 8px 0" }}
+      > New Customer </Typography>
 
-          <TextField
-            id="name"
-            inputRef={ref => {setInputRefs(Object.assign(inputRefs, {name: ref}))}}
-            label="Enter Name"
-            variant="outlined"
-            margin="dense"
-            autoFocus
-            required
-            fullWidth
-            onKeyPress={handleKeyPress}
-            onChange={handleChange}
-            style={{backgroundColor: "white"}}
-          />
+      <TextField
+        id="name"
+        inputRef={ref => {setInputRefs(Object.assign(inputRefs, {name: ref}))}}
+        label="Enter Name"
+        variant="outlined"
+        margin="dense"
+        autoFocus
+        required
+        fullWidth
+        onKeyPress={handleKeyPress}
+        onChange={handleChange}
+        style={{backgroundColor: "white"}}
+      />
 
-          <Button
-            id="create"
-            color="primary"
-            variant="contained"
-            disabled={!validName().valid}
-            fullWidth
-            style={{margin: "12px 0"}}
-            onClick={handleSubmit}
-          > Create </Button>
+      <Button
+        id="create"
+        color="primary"
+        variant="contained"
+        disabled={ !validInput }
+        fullWidth
+        style={{margin: "12px 0"}}
+        onClick={handleSubmit}
+      > Create </Button>
 
-          <Button
-            id="cancel"
-            variant="contained"
-            fullWidth
-            style={{margin: "0"}}
-            onClick={() => props.changePage("/customers")}
-          > Cancel </Button>
+      <Button
+        id="cancel"
+        variant="contained"
+        fullWidth
+        style={{margin: "0"}}
+        onClick={() => props.changePage("/customers")}
+      > Cancel </Button>
 
-          <SignatureDialog open={dialogOpen} submit={handleDialogSubmit} cancel={handleDialogCancel} />
+      <SignatureDialog open={dialogOpen} submit={handleDialogSubmit} cancel={handleDialogCancel} />
 
-        </div>
-    </SmallWindowView>
-  )
+    </div>
+  </SmallWindowView>
 }

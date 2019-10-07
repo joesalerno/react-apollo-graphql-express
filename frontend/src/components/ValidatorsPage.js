@@ -1,4 +1,4 @@
-import React, { Fragment } from "react"
+import React from "react"
 import gql from "graphql-tag"
 import { useQuery } from "@apollo/react-hooks"
 import NavBar from "./NavBar"
@@ -32,7 +32,9 @@ const GET_VALIDATORS = gql`
       name
       stepTypes {
         jobSteps {
-          job
+          job {
+            jobNo
+          }
         }
       }
     }
@@ -54,59 +56,55 @@ const SortLabel = ({ onSort, children, direction }) => (
 export default props => {
   const Validators = useQuery(GET_VALIDATORS)
 
-  return (
-    <Background>
-      <Fragment>
-          <NavBar {...props} pageName="Validators" />
-          <Button
-            onClick={() => props.changePage("/createvalidator")}
-            variant="outlined"
-            style={{ color: "#FFF", margin: "4px 8px -4px 8px" }}
-          >
-            <AddCircle style={{ margin: "0 8px" }} /> Create New Validator
-          </Button>
-          <Paper style={{ flex: "auto", margin: "8px", backgroundColor: "rgba(255, 255, 255, .95)", }}>
-            <Grid
-              rows={Validators.data ? Validators.data.validators : []}
-              columns={[
-                { name: "moduleName", title: "Module" },
-                { name: "description", title: "Description" },
-                { name: "forms", title: "Forms", getCellValue: ref => {
-                    "Forms, TODO"
-                }},
-                { name: "steps", title: "Steps", getCellValue: ref => {
-                    "Steps, TODO"
-                }},
-                { name: "jobs", title: "Jobs", getCellValue: ref => {
-                    "Jobs, TODO"
-                }},
-                { name: "enabled", title: "enabled" },
-              ]}
-            >
-              <DragDropProvider />
-              <SortingState defaultSorting={[{ columnName: "Module", direction: "desc" }]}/>
-              <IntegratedSorting />
-              <FilteringState defaultFilters={[]} />
-              <IntegratedFiltering />
-              <Table />
-              <TableColumnReordering
-                defaultOrder={[
-                  "moduleName",
-                  "description",
-                  "forms",
-                  "steps",
-                  "jobs",
-                  "enabled"
-                ]}
-              />
-              <TableHeaderRow
-                showSortingControls
-                sortLabelComponent={SortLabel}
-              />
-              <TableFilterRow />
-            </Grid>
-          </Paper>
-        </Fragment>
-    </Background>
-  )
+  return <Background>
+    <NavBar {...props} pageName="Validators" />
+    <Button
+      onClick={() => props.changePage("/createvalidator")}
+      variant="outlined"
+      style={{ color: "#FFF", margin: "4px 8px -4px 8px" }}
+    >
+      <AddCircle style={{ margin: "0 8px" }} /> Create New Validator
+    </Button>
+    <Paper style={{ flex: "auto", margin: "8px", backgroundColor: "rgba(255, 255, 255, .95)", }}>
+      <Grid
+        rows={Validators.data ? Validators.data.validators : []}
+        columns={[
+          { name: "moduleName", title: "Module" },
+          { name: "description", title: "Description" },
+          { name: "forms", title: "Forms", getCellValue: ref => {
+              "Forms, TODO"
+          }},
+          { name: "steps", title: "Steps", getCellValue: ref => {
+              "Steps, TODO"
+          }},
+          { name: "jobs", title: "Jobs", getCellValue: ref => {
+              "Jobs, TODO"
+          }},
+          { name: "enabled", title: "enabled" },
+        ]}
+      >
+        <DragDropProvider />
+        <SortingState defaultSorting={[{ columnName: "Module", direction: "desc" }]}/>
+        <IntegratedSorting />
+        <FilteringState defaultFilters={[]} />
+        <IntegratedFiltering />
+        <Table />
+        <TableColumnReordering
+          defaultOrder={[
+            "moduleName",
+            "description",
+            "forms",
+            "steps",
+            "jobs",
+            "enabled"
+          ]}
+        />
+        <TableHeaderRow
+          showSortingControls
+          sortLabelComponent={SortLabel}
+        />
+        <TableFilterRow />
+      </Grid>
+    </Paper>
+  </Background>
 }

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { memo } from "react"
 import Background from "../img/CircuitBoard.jpg"
 
 export default props => (
@@ -7,11 +7,12 @@ export default props => (
     backgroundImage: `url(${Background})`,
     backgroundSize: "cover",
     backgroundAttachment: "fixed",
-    minHeight: "100vh",
-    maxWidth: "100vw",
+    height: "100vh",
+    width: "100vw",
     overflowX: "hidden",
+    position: "absolute",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
   }}>
     {props.children}
   </div>

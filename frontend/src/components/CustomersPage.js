@@ -1,4 +1,4 @@
-import React, { Fragment } from "react"
+import React from "react"
 import gql from "graphql-tag"
 import { useQuery } from "@apollo/react-hooks"
 import NavBar from "./NavBar"
@@ -47,47 +47,43 @@ const SortLabel = ({ onSort, children, direction }) => (
 export default props => {
   const Customers = useQuery(GET_CUSTOMERS)
 
-  return (
-    <Background>
-      <Fragment>
-          <NavBar {...props} pageName="Customers" />
-          <Button
-            onClick={() => props.changePage("/createcustomer")}
-            variant="outlined"
-            style={{ color: "#FFF", margin: "4px 8px -4px 8px" }}
-          >
-            <AddCircle style={{ margin: "0 8px" }} /> Create New Customer
-          </Button>
-          <Paper style={{ flex: "auto", margin: "8px", backgroundColor: "rgba(255, 255, 255, .95)", }}>
-            <Grid
-              rows={Customers.data ? Customers.data.customers : []}
-              columns={[
-                { name: "name", title: "Name" },
-                { name: "noParts", title: "Number of Parts", getCellValue: row =>
-                    row.parts ? row.parts.length : undefined
-                }
-              ]}
-            >
-              <DragDropProvider />
-              <SortingState defaultSorting={[{ columnName: "name", direction: "desc" }]}/>
-              <IntegratedSorting />
-              <FilteringState defaultFilters={[]} />
-              <IntegratedFiltering />
-              <Table />
-              <TableColumnReordering
-                defaultOrder={[
-                  "name",
-                  "noParts",
-                ]}
-              />
-              <TableHeaderRow
-                showSortingControls
-                sortLabelComponent={SortLabel}
-              />
-              <TableFilterRow />
-            </Grid>
-          </Paper>
-        </Fragment>
-    </Background>
-  )
+  return <Background>
+    <NavBar {...props} pageName="Customers" />
+    <Button
+      onClick={() => props.changePage("/createcustomer")}
+      variant="outlined"
+      style={{ color: "#FFF", margin: "4px 8px -4px 8px" }}
+    >
+      <AddCircle style={{ margin: "0 8px" }} /> Create New Customer
+    </Button>
+    <Paper style={{ flex: "auto", margin: "8px", backgroundColor: "rgba(255, 255, 255, .95)", }}>
+      <Grid
+        rows={Customers.data ? Customers.data.customers : []}
+        columns={[
+          { name: "name", title: "Name" },
+          { name: "noParts", title: "Number of Parts", getCellValue: row =>
+              row.parts ? row.parts.length : undefined
+          }
+        ]}
+      >
+        <DragDropProvider />
+        <SortingState defaultSorting={[{ columnName: "name", direction: "asc" }]}/>
+        <IntegratedSorting />
+        <FilteringState defaultFilters={[]} />
+        <IntegratedFiltering />
+        <Table />
+        <TableColumnReordering
+          defaultOrder={[
+            "name",
+            "noParts",
+          ]}
+        />
+        <TableHeaderRow
+          showSortingControls
+          sortLabelComponent={SortLabel}
+        />
+        <TableFilterRow />
+      </Grid>
+    </Paper>
+  </Background>
 }

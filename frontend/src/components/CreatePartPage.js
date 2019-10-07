@@ -14,6 +14,7 @@ const GET_CUSTOMERS = gql` {
   }
 }
 `
+
 const CREATE_PART = gql`
   mutation CreatePart($name: String!, $customer: String!) {
     createPart(name: $name, customer: $customer) {
@@ -21,10 +22,11 @@ const CREATE_PART = gql`
     }
   }
 `
+
 export default props => {
-  const [createPart, {data}] = useMutation(CREATE_PART, {
+  const [createPart] = useMutation(CREATE_PART, {
     onCompleted: () => props.changePage("/parts"),
-    onError: e => alert(`Error creating part: ${e}`)
+    onError: error => alert(`Error creating part: ${error}`)
   })
   const Customers = useQuery(GET_CUSTOMERS)
   const [customer, setCustomer] = useState(0)
@@ -32,32 +34,28 @@ export default props => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [inputRefs, setInputRefs] = useState({})
 
-  const handleSubmit = () => {
-    setDialogOpen(true)
-  }
+  const handleSubmit = () => setDialogOpen(true)
 
   const handleDialogSubmit = (username, password) => {
     setDialogOpen(false)
     createPart({variables: {name, customer}})
   }
 
-  const handleDialogCancel = () => {
-    setDialogOpen(false)
-  }
+  const handleDialogCancel = () => setDialogOpen(false)
 
-  const handleChange = e => {
-    const { target: { id, value } } = e
+  const handleChange = event => {
+    const { target: { id, value } } = event
     if (id === "name") setName(value)
     if (id === "customer") setCustomer(value)
   }
 
   const validName = () => name.length > 0
-   ? {valid: true}
-   : "Please enter a valid name (Unique name with 1 or more characters)"
+    ? {valid: true}
+    : {error: "Please enter a valid name (Unique name with 1 or more characters)"}
 
   const validCustomer = () => customer.length > 0 
     ? {valid: true}
-    : {err: "Please enter a valid customer" }
+    : {error: "Please enter a valid customer" }
 
   const validInput = validName().valid && validCustomer().valid
 
@@ -66,66 +64,58 @@ export default props => {
     else if (!validCustomer().valid) inputRefs.customer.focus()
   }
 
-  const handleKeyPress = e => { if (e.key === "Enter")
+  const handleKeyPress = event => { if (event.key === "Enter")
     validInput ? handleSubmit() : focusNextInput()
   }
 
-  return (
-    <SmallWindowView {...props} pageName="Create Part">
-      <div style={{
-          margin: "16px",
-          width: "430px",
-          maxWidth: "100vw",
-          textAlign: "center"
-        }}>
-          <Typography
-            variant="h5"
-            style={{ textAlign: "center", margin: "0 0 8px 0" }}
-          > New Part </Typography>
+  return <SmallWindowView {...props} pageName="Create Part">
+    <div style={{ margin: "16px", textAlign: "center" }}>
+      <Typography
+        variant="h5"
+        style={{ textAlign: "center", margin: "0 0 8px 0" }}
+      > New Part </Typography>
 
-          <TextField
-            id="name"
-            label="Enter name"
-            autoFocus
-            required
-            inputRef={ref => setInputRefs(Object.assign(inputRefs, {name: ref}))}
-            variant="outlined"
-            margin="dense"
-            fullWidth
-            onKeyPress={handleKeyPress}
-            onChange={handleChange}
-            style={{ backgroundColor: "white" }}
-          />
+      <TextField
+        id="name"
+        label="Enter name"
+        autoFocus
+        required
+        inputRef={ref => setInputRefs(Object.assign(inputRefs, {name: ref}))}
+        variant="outlined"
+        margin="dense"
+        fullWidth
+        onKeyPress={handleKeyPress}
+        onChange={handleChange}
+        style={{ backgroundColor: "white" }}
+      />
 
-          <Dropdown
-            id="customer"
-            query={Customers}
-            displayField="name"
-            onSelect={ selection => {
-              setCustomer(selection.name)
-              focusNextInput()
-            }}
-            handleKeyPress={handleKeyPress}
-            inputRef={ref => setInputRefs(Object.assign(inputRefs, {customer: ref}))}
-          />
+      <Dropdown
+        id="customer"
+        data={ Customers.data ? Customers.data.customer : []}
+        displayField="name"
+        onSelect={ selection => {
+          setCustomer(selection.name)
+          focusNextInput()
+        }}
+        onKeyPress={ handleKeyPress }
+        inputRef={ref => setInputRefs(Object.assign(inputRefs, {customer: ref}))}
+      />
 
-          <Button
-            id="create"
-            color="primary"
-            variant="contained"
-            disabled={ !validName().valid || !validCustomer().valid }
-            fullWidth
-            style={{ margin: "12px 0" }}
-            onClick={handleSubmit}
-          > Create </Button>
+      <Button
+        id="create"
+        color="primary"
+        variant="contained"
+        disabled={ !validInput }
+        fullWidth
+        style={{ margin: "12px 0" }}
+        onClick={ handleSubmit }
+      > Create </Button>
 
-          <Button id="cancel" variant="contained" fullWidth onClick={() => props.changePage("/parts")}
-            style={{ margin: "8px 0" }}
-          > Cancel </Button>
+      <Button id="cancel" variant="contained" fullWidth onClick={() => props.changePage("/parts")}
+        style={{ margin: "8px 0" }}
+      > Cancel </Button>
 
-          <SignatureDialog open={dialogOpen} submit={handleDialogSubmit} cancel={handleDialogCancel} />
-
-        </div>
-    </SmallWindowView>
-  )
+      <SignatureDialog open={dialogOpen} submit={handleDialogSubmit} cancel={handleDialogCancel} />
+    </div>
+  </SmallWindowView>
 }

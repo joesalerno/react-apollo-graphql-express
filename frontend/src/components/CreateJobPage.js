@@ -1,20 +1,8 @@
-import React, { Fragment } from "react"
-import Background from "./Background"
-import NavBar from "./NavBar"
-import Paper from "@material-ui/core/Paper"
-import TextField from "@material-ui/core/TextField"
-import Button from "@material-ui/core/Button"
+import React from "react"
+import SmallWindowView from "./SmallWindowView"
 
+export default props => <SmallWindowView {...props} width="375px" pageName="Create Job">
+  <div style={{ margin: "16px", textAlign: "center"}}>
 
-export default props => {
-  return (
-    <Background>
-      <Fragment>
-          <NavBar {...props} pageName="Create Job" />
-          <Paper style={{ flex: "auto", margin: "8px", opacity: "0.95" }}>
-            
-          </Paper>
-        </Fragment>
-    </Background>
-  )
-}
+  </div>
+</SmallWindowView>
