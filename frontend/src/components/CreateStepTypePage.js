@@ -27,15 +27,8 @@ const GET_ROLES = gql`{
   }
 }`
 
-const CREATE_STEPTYPE = gql`
-mutation CreateStepType(
-  $name: String!,
-  $description: String!,
-  $instructions: [FormInput]!,
-  $form: String,
-  $requiredRoles: [String!]
-){
-  createStepType(name: $name, description: $description, instructions:$instructions, form:$form, requiredRoles:$requiredRoles){
+const CREATE_STEPTYPE = gql` mutation CreateStepType( $input: CreateStepTypeInput!) {
+  createStepType(input: $input){
     id
   }
 }`
@@ -89,15 +82,14 @@ export default props => {
     ? { valid: true }
     : { error: "Please enter valid instructions (10 or more characters"}
 
-  const validForm = () => !form || Forms.loading || !Forms.data.forms.some( foundForm => foundForm.name === form)
+  const validForm = () => !form || Forms.loading || Forms.data.forms.some(foundForm => foundForm.name === form)
     ? { valid: true }
     : { error: "Please enter valid form (must exist) or no form"}
 
   const validRoles = () => requiredRoles.length === 0 || Roles.loading || 
-   requiredRoles.every(rr => Roles.data.roles.some(r => r.name === rr))
+   requiredRoles.every(rr => Roles.data.roles.some(r => r.name === rr.name))
     ? { valid: true }
     : { error: "Please enter valid roles (must exist) or no roles"}
-
   const validInput = validName().valid && validDescription().valid && validInstructions().valid && validForm().valid && validRoles().valid
 
   const focusNextInput = () => {

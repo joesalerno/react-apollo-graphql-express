@@ -7,7 +7,6 @@ const PartStepSchema = new Schema({
   stepTypeId: { type: Schema.Types.ObjectId, ref: "StepType", required: true },
   prevStepIds: { type: [Schema.Types.ObjectId], ref: "PartStep" },
   enabled: { type: Schema.Types.Boolean, required: true, default: true },
-  timeCreated: {type: Schema.Types.Date, required: true, default: Date.now}
 })
 
 module.exports = mongoose.model("PartStep", PartStepSchema)

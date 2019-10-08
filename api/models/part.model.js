@@ -6,7 +6,6 @@ const PartSchema = new Schema({
     name: {type: Schema.Types.String, required: true},
     stepTypeIds: {type: [Schema.Types.String]},
     enabled: {type: Schema.Types.Boolean, required: true, default: true},
-    timeCreated: {type: Schema.Types.Date, required: true, default: Date.now}
 })
 
 module.exports = mongoose.model('Part', PartSchema)

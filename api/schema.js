@@ -50,6 +50,13 @@ module.exports = gql`
     timeCreated: String!
   }
 
+  type Location {
+    name: String!
+    jobs: [Job]
+    stepTypes: [StepType]
+    timeCreated: String!
+  }
+
   "A single job ordered by a customer"
   type Job {
     id: String!
@@ -57,6 +64,7 @@ module.exports = gql`
     customer: Customer!
     part: Part!
     status: String!
+    location: Location!
     enabled: Boolean!
     steps: [JobStep]
     currentSteps: [JobStep]
@@ -99,6 +107,7 @@ module.exports = gql`
     form: Form
     requiredRoles: [Role]
     enabled: Boolean!
+    locations: [Location]
     jobs: [Job]
     jobSteps: [JobStep]
     parts: [Part]
@@ -114,13 +123,6 @@ module.exports = gql`
     validator: Validator
   }
 
-  "Input object type for form data"
-  input FormInput {
-    instructions: String!
-    regEx: String
-    validator: String
-  }
-
   "A set of data inputs required to complete a step"
   type Form {
     id: String!
@@ -133,6 +135,11 @@ module.exports = gql`
     stepTypes: [StepType]
     comments: [Comment]
     timeCreated: String!
+  }
+
+  type ValidatorModule {
+    filename: String!
+    validator: Validator
   }
 
   "A validator function that can be used to ensure form input is valid"
@@ -164,19 +171,19 @@ module.exports = gql`
     me: User
 
     "A single registered user. Must provide user id or username"
-    user(id: String, username: String): User
+    user(id: String username: String): User
 
     "List of all users"
     users: [User]
 
     "A single user role. Must provide role id or name"
-    role(id: String, name: String): Role
+    role(id: String name: String): Role
 
     "List of all user roles"
     roles: [Role]
 
     "A single customer. Must provide customer id or name"
-    customer(id: String, name: String): Customer
+    customer(id: String name: String): Customer
 
     "List of all customers"
     customers: [Customer]
@@ -188,10 +195,16 @@ module.exports = gql`
     parts: [Part]
 
     "A single job order. Must provide job id or jobNo"
-    job(id: String, jobNo: String): Job
+    job(id: String jobNo: String): Job
 
     "A list of all job orders."
     jobs: [Job]
+
+    "A single work location. Must id or name"
+    location(id: String name: String): Location
+
+    "A list of all work locations."
+    locations: [Location]
 
     "A single step in the process of a job. Must provide jobStep id"
     jobStep(id: String): JobStep
@@ -206,22 +219,25 @@ module.exports = gql`
     partSteps: [PartStep]
 
     "A single job step type. Must provide stepType id or name"
-    stepType(id: String, name: String): StepType
+    stepType(id: String name: String): StepType
 
     "List of all job step types"
     stepTypes: [StepType]
 
     "A single input form type. Must provide form id or name"
-    form(id: String, name: String): Form
+    form(id: String name: String): Form
 
     "List of all input form types"
     forms: [Form]
 
     "A single input validator type. Must provide validator id or moduleName"
-    validator(id: String, moduleName: String): Validator
+    validator(id: String moduleName: String): Validator
 
     "List of all input validator types"
     validators: [Validator]
+
+    "List of all files in validators directory"
+    validatorModules: [ValidatorModule]
 
     "A single comment. Must provide comment id"
     comment(id: String): Comment
@@ -230,146 +246,320 @@ module.exports = gql`
     comments: [Comment]
   }
 
+  "Input object type for createUser() mutation"
+  input CreateUserInput { username: String! employeeId: String! email: String! password: String! }
+
+  "Input object type for editUser() mutation"
+  input EditUserInput { username: String employeeId: String email: String password: String enabled: Boolean }
+
+  "Input object type for disableUser() mutation"
+  input DisableUserInput { user: String }
+
+  "Input object type for enableUser() mutation"
+  input EnableUserInput { user: String }
+
+  "Input object type for createRole() mutation"
+  input CreateRoleInput { name: String! users: [String!] }
+
+  "Input object type for editRole() mutation"
+  input EditRoleInput { role: String! name: String users: [String!] }
+
+  "Input object type for addUserToRole() mutation"
+  input AddUserToRoleInput { user: String! role: String! }
+
+  "Input object type for removeUserFromRole() mutation"
+  input RemoveUserFromRoleInput { user: String! role: String! }
+
+  "Input object type for createCustomer() mutation"
+  input CreateCustomerInput { name: String! }
+
+  "Input object type for editCustomer() mutation"
+  input EditCustomerInput { customer: String! name: String enabled: Boolean }
+
+  "Input object type for disableCustomer() mutation"
+  input DisableCustomerInput { customer: String! }
+
+  "Input object type for enableCustomer() mutation"
+  input EnableCustomerInput { customer: String! }
+
+  "Input object type for createPart() mutation"
+  input CreatePartInput { name: String! customer: String! }
+
+  "Input object type for editPart() mutation"
+  input EditPartInput { id: String! name: String customer: String enabled: Boolean }
+
+  "Input object type foraddStepToPart() mutation"
+  input AddStepToPartInput { stepType: String! part: String! prevStepIds: [String!] }
+
+  "Input object type for removeStepFromPart() mutation"
+  input RemoveStepFromPartInput { id: String stepType: String }
+
+  "Input object type for disablePartStep() mutation"
+  input DisablePartStepInput { id: String! }
+
+  "Input object type for enablePartStep() mutation"
+  input EnablePartStepInput { id: String! }
+
+  "Input object type for disablePart() mutation"
+  input DisablePartInput { id: String! }  
+
+  "Input object type for enablePart() mutation"
+  input EnablePartInput { id: String! }
+
+  "Input object type for createLocation() mutation"
+  input CreateLocationInput { name: String! stepTypes: [String] }
+
+  "Input object type for editLocation() mutation"
+  input EditLocationInput { location: String! name: String stepTypes: [String] enabled: Boolean }
+
+  "Input object type for disableLocation() mutation"
+  input DisableLocationInput { location: String! }
+
+  "Input object type for enableLocation() mutation"
+  input EnableLocationInput { location: String! }
+
+  "Input object type for createJob() mutation"
+  input CreateJobInput { jobNo: String! customer: String! partId: String! }
+
+   "Input object type for editJob() mutation"
+  input EditJobInput { job: String! jobNo: String customer: String partId: String enabled: Boolean location: String }
+
+  "Input object type for moveJob() mutation"
+  input MoveJobInput { job: String! location: String!}
+
+   "Input object type for addStepToJob() mutation"
+  input AddStepToJobInput { stepType: String! job: String! prevStepIds: [String!] }
+
+   "Input object type for removeStepFromJob() mutation"
+  input RemoveStepFromJobInput { jobStepId: String stepType: String }
+
+   "Input object type for disableJobStep() mutation"
+  input DisableJobStepInput { id: String! }
+
+   "Input object type for enableJobStep() mutation"
+  input EnableJobStepInput { id: String! }
+
+   "Input object type for completeJobStep() mutation"
+  input CompleteJobStepInput { id: String! data: [String!]! }
+
+   "Input object type for disableJob() mutation"
+  input DisableJobInput { job: String! }
+
+   "Input object type for enableJob() mutation"
+  input EnableJobInput { job: String! }
+
+   "Input object type for createStepType() mutation"
+  input CreateStepTypeInput { name: String! description: String! instructions: String! form: String requiredRoles: [String] }
+
+   "Input object type for editStepType() mutation"
+  input EditStepTypeInput { stepType: String! name: String description: String instructions: String form: String requiredRoles: [String] enabled: Boolean }
+
+   "Input object type for addRoleToStepType() mutation"
+  input AddRoleToStepTypeInput { role: String! stepType: String! }
+
+   "Input object type for removeRoleFromStepType() mutation"
+  input RemoveRoleFromStepTypeInput { role: String! stepType: String! }
+
+   "Input object type for disableStepType() mutation"
+  input DisableStepTypeInput { stepType: String! }
+
+   "Input object type for enableStepType() mutation"
+  input EnableStepTypeInput { stepType: String! }
+
+  "Input object type for Form mutations"
+  input FormInputData { instructions: String! regex: String validator: String }
+
+   "Input object type for createForm() mutation"
+  input CreateFormInput { name: String! description: String! data: [FormInputData]! }
+
+   "Input object type for editForm() mutation"
+  input EditFormInput { form: String! name: String description: String data: [FormInputData] enabled: Boolean }
+
+   "Input object type for disableForm() mutation"
+  input DisableFormInput { form: String! }
+
+   "Input object type for enableForm() mutation"
+  input EnableFormInput { form: String! }
+
+   "Input object type for createValidator() mutation"
+  input CreateValidatorInput { moduleName: String! description: String! }
+
+   "Input object type for editValidator() mutation"
+  input EditValidatorInput { validator: String! moduleName: String description: String enabled: Boolean }
+
+   "Input object type for disableValidator() mutation"
+  input DisableValidatorInput { validator: String! }
+
+   "Input object type for enableValidator() mutation"
+  input EnableValidatorInput { validator: String! }
+
+   "Input object type for createComment() mutation"
+  input CreateCommentInput { subjectId: String! data: String! }
+
+   "Input object type for editComment() mutation"
+  input EditCommentInput { id: String! data: String! enabled: Boolean }
+
+   "Input editCommentobject type for disableComment() mutation"
+  input DisableCommentInput { id: String! }
+
+   "Input object type for enableComment() mutation"
+  input EnableCommentInput { id: String! }
+
   type Mutation {
-    "Create a new registered user. Must provide username, employeeID, email, and password args"
-    createUser(username: String! employeeId: String! email: String! password: String!): User
+    "Create a new registered user."
+    createUser(input: CreateUserInput!) : User
 
-    "Edit a registered user. Must provide a user arg with id or username as well as fields to replace"
-    editUser(user: String username: String employeeId: String email: String password: String, enabled: Boolean): User
+    "Edit a registered user."
+    editUser(input: EditUserInput!) : User
 
-    "Disable a user. User can no longer log in or perform any actions. Must provide user arg with id or username"
-    disableUser(user: String): User
+    "Disable a user. User can no longer log in or perform any actions."
+    disableUser(input: DisableUserInput!) : User
 
-    "Enable a user. User can log in and perform actions normally. Must provide user arg with id or username"
-    enableUser(user: String): User
+    "Enable a user. User can log in and perform actions normally."
+    enableUser(input: EnableUserInput!) : User
 
-    "Create a new user role"
-    createRole(name: String! users: [String!]): Role
+    "Create a new user role."
+    createRole(input: CreateRoleInput!) : Role
 
-    "Edit a user role. Must provide a role arg with id or name as well as fields to replace"
-    editRole(role: String! name: String users: [String!]): Role
+    "Edit a user role"
+    editRole(input: EditRoleInput!) : Role
 
-    "Assign a role to a given user. Must provide user and role args with id or name of user and role"
-    addUserToRole(user: String! role: String!): Role
+    "Assign a role to a given user."
+    addUserToRole(input: AddUserToRoleInput!) : Role
 
-    "Remove a role from a given user. Must provide user and role args with id or name of user and role"
-    removeUserFromRole(user: String! role: String!): Role
+    "Remove a role from a given user."
+    removeUserFromRole(input: RemoveUserFromRoleInput!) : Role
 
-    "Creat a new customer. Must provide customer name"
-    createCustomer(name: String!): Customer
+    "Creat a new customer."
+    createCustomer(input: CreateCustomerInput!) : Customer
 
-    "Edit a given customer. Must provide customer arg with id or name as well as fields to replace"
-    editCustomer(customer: String! name: String enabled: Boolean): Customer
+    "Edit a given customer."
+    editCustomer(input: EditCustomerInput!) : Customer
 
-    "Disable a customer. Customer cannot have new jobs or new parts created for it. Must provide customer arg with name or id"
-    disableCustomer(customer: String!): Customer
+    "Disable a customer. Customer cannot have new jobs or new parts created for it."
+    disableCustomer(input: DisableCustomerInput!) : Customer
 
-    "Enable a customer. Customer can have new jobs or new parts created for it. Must provide customer arg with name or id"
-    enableCustomer(customer: String!): Customer
+    "Enable a customer. Customer can have new jobs or new parts created for it."
+    enableCustomer(input: EnableCustomerInput!) : Customer
 
-    "Create a new part type. Must provide part name and customer name or id"
-    createPart(name: String! customer: String!): Part
+    "Create a new part type."
+    createPart(input: CreatePartInput!) : Part
 
-    "Edit a given part type. Must provide part id as well as fields to replace"
-    editPart(id: String! name: String customer: String enabled: Boolean): Part
+    "Edit a given part type."
+    editPart(input: EditPartInput!) : Part
 
-    "Add a step to the standard process for making a part. Must provide stepType and part args with id or name and optional prevStepIds array"
-    addStepToPart(stepType: String! part: String! prevStepIds: [String!]): Part
+    "Add a step to the standard process for making a part."
+    addStepToPart(input: AddStepToPartInput!) : Part
 
-    "Remove a step from the standard process for making a part. Replaces the prevStepIds of any steps referencing the removed step with the prevStepIds of removed. Must provide partStepId or stepType to remove"
-    removeStepFromPart(id: String, stepType: String): Part
+    "Remove a step from the standard process for making a part. Replaces the prevStepIds of any steps referencing the removed step with the prevStepIds of removed."
+    removeStepFromPart(input: RemoveStepFromPartInput!) : Part
 
-    "Disable a part step. Part step will not be added to new jobs created for part. Must provide partStepId"
-    disablePartStep(id: String!): PartStep
+    "Disable a part step. Part step will not be added to new jobs created for part."
+    disablePartStep(input: DisablePartStepInput!) : PartStep
 
-    "Enable a part step. Part step will be added to new jobs created for part. Must provide partStepId"
-    enablePartStep(id: String!): PartStep
+    "Enable a part step. Part step will be added to new jobs created for part."
+    enablePartStep(input: EnablePartStepInput!) : PartStep
 
-    "Disable a part. Part cannot be ordered in new jobs. Must provide part id"
-    disablePart(id: String!): Part
+    "Disable a part. Part cannot be ordered in new jobs."
+    disablePart(input: DisablePartInput!) : Part
 
-    "Enable a part. Part can be ordered in new jobs. Must provide part id"
-    enablePart(id: String!): Part
+    "Enable a part. Part can be ordered in new jobs."
+    enablePart(input: EnablePartInput!) : Part
 
-    "Create a new job order. Must provide job jobNo, customer, and partId"
-    createJob(jobNo: String! customer: String! partId: String!): Job
+    "Create a new work location."
+    createLocation(input: CreateLocationInput!) : Location
 
-    "Edit a given job order. Must provide job arg with id or jobNo as well as fields to replace"
-    editJob(job: String! jobNo: String customer: String partId: String enabled: Boolean): Job
+    "Edit a given work location."
+    editLocation(input: EditLocationInput!) : Location
 
-    "Add a step to the process for completing a job. Must provide stepType and job args with id or name/jobNo and optional prevStepIds array"
-    addStepToJob(stepType: String! job: String! prevStepIds: [String!]): Job
+    "Disable a work location. Jobs can no longer be moved to the location."
+    disableLocation(input: EnableLocationInput!) : Location
 
-    "Remove a step from the process for completing a job. Replaces the prevStepIds of any steps referencing the removed step with the prevStepIds of removed. Must provide jobStepId or stepType to remove"
-    removeStepFromJob(jobStepId: String, stepType: String): Job
+    "Enable a work location. Jobs can be moved to the location."
+    enableLocation(input: DisableLocationInput!) : Location
 
-    "Disable a job step. Job step no longer must be completed to complete the job. Must provide jobStepId"
-    disableJobStep(id: String!): JobStep
+    "Create a new job order."
+    createJob(input: CreateJobInput!) : Job
 
-    "Enable a job step. Job step must be completed to finish the job. Must provide jobStepId"
-    enableJobStep(id: String!): JobStep
+    "Edit a given job order."
+    editJob(input: EditJobInput!) : Job
 
-    "Complete a step of the process of a job. Must provide step id and data for the step's form if any"
-    completeJobStep(id: String! data: [String!]!): Job
+    "Move a job to a work location"
+    moveJob(input: MoveJobInput!) : Job
 
-    "Disable a job. Job steps can no longer be completed. Must provide job arg with id or jobNo"
-    disableJob(job: String!): Job
+    "Add a step to the process for completing a job."
+    addStepToJob(input: AddStepToJobInput!) : Job
 
-    "Enable a job. Job steps can now be completed. Must provide job arg with id or jobNo"
-    enableJob(job: String!): Job
+    "Remove a step from the process for completing a job. Replaces the prevStepIds of any steps referencing the removed step with the prevStepIds of removed."
+    removeStepFromJob(input: RemoveStepFromJobInput!) : Job
 
-    "Create a new job step type. Must provide name, description, instructions. Optional form arg with id or name and requiredRoles arg with array of id or name"
-    createStepType(name: String! description: String! instructions: String! form: String requiredRoles: [String]): StepType
+    "Disable a job step. Job step no longer must be completed to complete the job."
+    disableJobStep(input: DisableJobStepInput!) : JobStep
 
-    "Edit a specific job step type. Must provide stepType arg with name or id as well as fields to replace"
-    editStepType(stepType: String! name: String description: String instructions: String form: String requiredRoles: [String], enabled: Boolean): StepType
+    "Enable a job step. Job step must be completed to finish the job."
+    enableJobStep(input: EnableJobStepInput!) : JobStep
 
-    "Add a role to the list of required roles for a specific step type. Must provide role and stepType args with name or id"
-    addRoleToStepType(role: String! stepType: String!): StepType
+    "Complete a step of the process of a job."
+    completeJobStep(input: CompleteJobStepInput!) : Job
 
-    "Remove a role from the list of required roles for a specific step type. Must provide role and stepType args with name or id"
-    removeRoleFromStepType(role: String! stepType: String!): StepType
+    "Disable a job. Job steps can no longer be completed."
+    disableJob(input: DisableJobInput!) : Job
 
-    "Disable a StepType. StepType can no longer be added to the processes of jobs and is no longer required in order to complete jobs with steps having the type. Must provide stepType arg with name or id"
-    disableStepType(stepType: String!): StepType
+    "Enable a job. Job steps can now be completed."
+    enableJob(input: EnableJobInput!) : Job
 
-    "Enable a StepType. StepType can be added to the processes of jobs and is required in order to complete jobs with the step having the type. Must provide stepType arg with name or id"
-    enableStepType(stepType: String!): StepType
+    "Create a new job step type."
+    createStepType(input: CreateStepTypeInput!) : StepType
 
-    "Create a new data input form. Must provide name, description, and data with FormInput type"
-    createForm(name: String! description: String! data: [FormInput]!): Form
+    "Edit a specific job step type."
+    editStepType(input: EditStepTypeInput!) : StepType
 
-    "Edit a specific data input form. Must provide form arg with name or id as well as fields to replace"
-    editForm(form: String! name: String description: String data: [FormInput] enabled: Boolean): Form
+    "Add a role to the list of required roles for a specific step type."
+    addRoleToStepType(input: AddRoleToStepTypeInput!) : StepType
 
-    "Disable a specific data input form. Form will no longer be required to complete job steps and can't be added to job step types. Must provide form arg with name or id"
-    disableForm(form: String!): Form
+    "Remove a role from the list of required roles for a specific step type."
+    removeRoleFromStepType(input: RemoveRoleFromStepTypeInput!) : StepType
 
-    "Enable a specific data input form. Form can be required to complete job steps and can be added to job step types. Must provide form arg with name or id"
-    enableForm(form: String!): Form
+    "Disable a StepType. StepType can no longer be added to the processes of jobs and is no longer required in order to complete jobs with steps having the type."
+    disableStepType(input: DisableStepTypeInput!) : StepType
 
-    "Create a new data input validator. Must provide moduleName and description. Module will attempt to load from /validators/moduleName"
-    createValidator(moduleName: String! description: String!): Validator
+    "Enable a StepType. StepType can be added to the processes of jobs and is required in order to complete jobs with the step having the type."
+    enableStepType(input: EnableStepTypeInput!) : StepType
 
-    "Edit a specific validator. Must provide validator arg with moduleName or id as well as fields to replace"
-    editValidator(validator: String! moduleName: String description: String enabled: Boolean): Validator
+    "Create a new data input form."
+    createForm(input: CreateFormInput!) : Form
 
-    "Disable a specific validator. Validator can't be added to forms and will no longer validate form input. In its place /validators/default.js will be used. Must provide validator arg with moduleName or id"
-    disableValidator(validator: String!): Validator
+    "Edit a specific data input form."
+    editForm(input: EditFormInput!) : Form
 
-    "Enable a specific validator. Validator can be added to forms and be used to validate form input. Must provide validator arg with moduleName or id"
-    enableValidator(validator: String!): Validator
+    "Disable a specific data input form. Form will no longer be required to complete job steps and can't be added to job step types."
+    disableForm(input: DisableFormInput!) : Form
 
-    "Create a new comment about a subject. Must provide subjectId and data"
-    createComment(subjectId: String! data: String!): Comment
+    "Enable a specific data input form. Form can be required to complete job steps and can be added to job step types."
+    enableForm(input: EnableFormInput!) : Form
 
-    "Edit a specific comment. Must provide comment id and data to replace comment with"
-    editComment(id: String! data: String! enabled: Boolean): Comment
+    "Create a new data input validator. Module will attempt to load from /validators/{moduleName}."
+    createValidator(input: CreateValidatorInput!) : Validator
 
-    "Disables a specific comment. Comment can no longer be replied to and will show -deleted- instead of its data. Must provide comment id"
-    disableComment(id: String!): Comment
+    "Edit a specific validator. Must provide validator arg with moduleName or id as well as fields to replace."
+    editValidator(input: EditValidatorInput!) : Validator
 
-    "Enables a specific comment. Comment can be replied to and its data can be read. Must provide comment id"
-    enableComment(id: String!): Comment
+    "Disable a specific validator. Validator can't be added to forms and will no longer validate form input. In its place /validators/default.js will be used."
+    disableValidator(input: DisableValidatorInput!) : Validator
+
+    "Enable a specific validator. Validator can be added to forms and be used to validate form input."
+    enableValidator(input: EnableValidatorInput!) : Validator
+
+    "Create a new comment about a subject."
+    createComment(input: CreateCommentInput!) : Comment
+
+    "Edit a specific comment."
+    editComment(input: EditCommentInput!) : Comment
+
+    "Disables a specific comment. Comment can no longer be replied to and will show -deleted- instead of its data."
+    disableComment(input: DisableCommentInput!) : Comment
+
+    "Enables a specific comment. Comment can be replied to and its data can be read."
+    enableComment(input: EnableCommentInput!) : Comment
   }
 `

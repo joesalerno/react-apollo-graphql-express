@@ -7,21 +7,17 @@ import TextField from "@material-ui/core/TextField"
 import Typography from "@material-ui/core/Typography"
 import Button from "@material-ui/core/Button"
 
-const GET_CUSTOMERS = gql`
-  {
-    customers {
-      name
-    } 
-  }
-`
+const GET_CUSTOMERS = gql` {
+  customers {
+    name
+  } 
+}`
 
-const CREATE_CUSTOMER = gql`
-  mutation CreateCustomer($name: String!) {
-    createCustomer(name: $name) {
-      id
-    }
+const CREATE_CUSTOMER = gql` mutation CreateCustomer($input: CreateCustomerInput!) {
+  createCustomer(input: $input) {
+    id
   }
-`
+}`
 
 export default props => {
   const [createCustomer] = useMutation(CREATE_CUSTOMER, {
@@ -39,7 +35,7 @@ export default props => {
 
   const handleDialogSubmit = (username, password) => {
     setDialogOpen(false)
-    createCustomer({variables: {name}})
+    createCustomer({variables: {input: {name}}})
   }
 
   const handleDialogCancel = () => {

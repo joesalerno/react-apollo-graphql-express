@@ -13,7 +13,6 @@ const FormSchema = new Schema({
     required: true
   },
   enabled: {type: Schema.Types.Boolean, required: true, default: true},
-  timeCreated: {type: Schema.Types.Date, required: true, default: Date.now}
 })
 
 FormSchema.statics.findByIdOrName = async function(form) {

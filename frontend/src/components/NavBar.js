@@ -19,8 +19,8 @@ export default props => {
   const handleUserMenuClick = event => setUserMenuAnchor(event.currentTarget)
   const handleUserMenuClose = () => setUserMenuAnchor(null)
   
-  const largeScreen = useMediaQuery('(min-width:1083px)') //hide buttons
-  const tinyScreen = useMediaQuery('(max-width:521px)') //move title to bottom of navbar
+  const largeScreen = useMediaQuery('(min-width:1201px)') //hide buttons where they otherwise could wrap to next line
+  const tinyScreen = useMediaQuery('(max-width:521px)') //move title to bottom of navbar where it would otherwise wrap above
   const reallyTinyScreen = useMediaQuery('(max-width:275px)') //make navBar bigger
 
   return <div

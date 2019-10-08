@@ -23,8 +23,7 @@ import {
   TableColumnReordering
 } from "@devexpress/dx-react-grid-material-ui"
 
-const GET_COMMENTS = gql`
-{
+const GET_COMMENTS = gql` {
   comments {
     subject
     user {
@@ -32,8 +31,8 @@ const GET_COMMENTS = gql`
     }
     data
   }
-}
-`
+}`
+
 const SortingIcon = ({ direction }) => direction === "asc" 
   ? <ArrowUpward style={{ fontSize: "18px" }} />
   : <ArrowDownward style={{ fontSize: "18px" }} />

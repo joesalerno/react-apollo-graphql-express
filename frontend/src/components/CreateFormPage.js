@@ -23,17 +23,11 @@ const GET_VALIDATORS = gql`{
   }
 }`
 
-const CREATE_FORM = gql`
-  mutation CreateForm (
-    $name: String!,
-    $description: String!,
-    $data: [FormInput]!,
-  ){
-    createForm(name: $name, description: $description, data: $data) {
-      id
-    }
+const CREATE_FORM = gql` mutation CreateForm ( $input: CreateFormInput! ) {
+  createForm(input: $input) {
+    id
   }
-`
+}`
 
 export default props => {
   const [createForm] = useMutation(CREATE_FORM, {
@@ -70,7 +64,7 @@ export default props => {
   const handleDialogSubmit = (username, password) => {
     setDialogOpen(false)
     //TODO: use username and password ....
-    createForm({ variables: { name, description, data } })
+    createForm({ variables: { input: {name, description, data} } })
   }
 
   const handleDialogCancel = () => setDialogOpen(false)

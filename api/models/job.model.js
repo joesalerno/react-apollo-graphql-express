@@ -5,6 +5,7 @@ const JobSchema = new Schema({
   jobNo: { type: String, lowercase: true, required: true, unique: true },
   customerId: { type: Schema.Types.ObjectId, ref: "Customer", required: true },
   partId: { type: Schema.Types.ObjectId, ref: "Part", required: true },
+  locationId: { type: Schema.Types.ObjectId, ref:"Location"},
   status: { 
     type: Schema.Types.String, 
     enum: ["WORKING","STOPPED","DONE"],
@@ -12,7 +13,6 @@ const JobSchema = new Schema({
     default:"WORKING"
   },
   enabled: {type: Schema.Types.Boolean, required: true, default: true},
-  timeCreated: {type: Schema.Types.Date, required: true, default: Date.now}
 })
 
 JobSchema.statics.findByIdOrNo = async function(job) {

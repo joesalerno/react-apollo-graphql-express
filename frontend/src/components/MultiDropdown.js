@@ -22,12 +22,12 @@ export default props => {
       setSelectedItem(selectedItem.slice(0, selectedItem.length - 1))
     props.onKeyPress(event)
   }
-  
-  const toggleSelection = selection =>
-    selectedItem.includes(selection) 
-      ? setSelectedItem(selectedItem.filter(item => item.id !== selection.id))
-      : setSelectedItem([...selectedItem, selection])
-  
+
+  const toggleSelection = selection => selectedItem.some(selected =>
+   selected[props.idField || props.id] === selection[props.idField || props.id])
+    ? setSelectedItem(selectedItem.filter(item => item[props.idField || props.id] !== selection[props.idField || props.id]))
+    : setSelectedItem([...selectedItem, selection])
+
   const handleSelect = selection => {
     toggleSelection(selection)
     setInputValue("")
@@ -57,7 +57,6 @@ export default props => {
       selectedItem,
       highlightedIndex
     })=>(<div style={{width: "100%"}}>
-      {console.log(selectedItem)}
       <TextField
         {...getInputProps()}
         id={props.id}
@@ -65,9 +64,9 @@ export default props => {
         inputRef={ref => props.inputRefs(ref)}
         required={props.required ? props.required : false}
         label={`Select multiple ${props.name ? props.name : props.id}`}
-        InputProps={{ startAdornment: selectedItem ? selectedItem.map(item =>
+        InputProps={{ startAdornment: selectedItem ? selectedItem.map((item, index) =>
           (<Chip
-            key={item.id}
+            key={`${props.name || props.id}-chip-${index}`}
             tabIndex={-1}
             label={props.displayField ? item[props.displayField] : item[props.idField]}
             onDelete={() => toggleSelection(item)}
@@ -82,26 +81,26 @@ export default props => {
         onClick={openMenu}
         style={{ backgroundColor: "white" }}
       />
-      {console.log(props)}
-      {console.log(props.data[props.idField])}
       {!isOpen || !props.data ? null : (
       <Paper {...getMenuProps()} style={{maxHeight: 200, overflow: "auto"}}>
         { 
           props.data
           .filter(item => item[props.displayField].toLowerCase().includes(inputValue.toLowerCase()))
           .filter(props.filter ? props.filter : () => true)
-          .map((item, index) => (
-            <MenuItem 
+          .map((item, index) => <MenuItem 
               {...getItemProps({
                 item,
                 index,
                 key:`${props.name || props.id}-dropdown-menu-${index}`,
                 style: {
                   backgroundColor: highlightedIndex === index ? "lightgray" : null,
-                  fontWeight: selectedItem.some(selected => selected.id === item.id) ? "bold" : "normal",  
+                  fontWeight: selectedItem.some(selected =>
+                     selected[props.idField || props.id] === item[props.idField || props.id])
+                       ? "bold" 
+                       : "normal",  
                 }
               })}
-            > {item[props.displayField]} </MenuItem>))
+            > {item[props.displayField]} </MenuItem>)
         }
       </Paper>
       )}

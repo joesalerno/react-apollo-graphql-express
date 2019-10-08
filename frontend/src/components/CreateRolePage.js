@@ -12,24 +12,20 @@ const GET_ROLES = gql` {
   roles {
     name
   }
-}
-`
+}`
 
 const GET_USERS = gql` {
   users {
     id
     username
   }
-}
-`
+}`
 
-const CREATE_ROLE = gql`
-  mutation CreateRole($name: String!, $users: [String!]) {
-    createRole(name: $name, users: $users) {
-      id
-    }
+const CREATE_ROLE = gql` mutation CreateRole($input: CreateRoleInput!) {
+  createRole(input: $input) {
+    id
   }
-`
+}`
 
 export default props => {
   const [createRole] = useMutation(CREATE_ROLE, {

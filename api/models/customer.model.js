@@ -4,7 +4,6 @@ const Schema = mongoose.Schema
 const CustomerSchema = new Schema({
     name: {type: String, required: true, unique: true, uppercase: true},
     enabled: {type: Schema.Types.Boolean, required: true, default: true},
-    timeCreated: {type: Schema.Types.Date, required: true, default: Date.now}
 })
 
 CustomerSchema.statics.findByIdOrName = async function(customer) {

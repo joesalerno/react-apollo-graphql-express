@@ -11,7 +11,6 @@ const JobStepSchema = new Schema({
   timeCompleted: { type: Schema.Types.Date },
   formData: { type: [Schema.Types.String] },
   enabled: { type: Schema.Types.Boolean, required: true, default: true },
-  timeCreated: { type: Schema.Types.Date, required: true, default: Date.now }
 })
 
 JobStepSchema.methods.prevStepsCompleted = async function() {

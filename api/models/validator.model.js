@@ -5,7 +5,6 @@ const ValidatorSchema = new Schema({
   moduleName: { type: Schema.Types.String, uppercase: true, required: true, unique: true },
   description: { type: Schema.Types.String, required: true },
   enabled: {type: Schema.Types.Boolean, required: true, default: true},
-  timeCreated: {type: Schema.Types.Date, required: true, default: Date.now},
 })
 
 ValidatorSchema.methods.execute = function(userInput) {

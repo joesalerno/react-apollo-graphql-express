@@ -17,13 +17,11 @@ const GET_VALIDATOR_MODULES = gql`{
   }
 }`
 
-const CREATE_VALIDATOR = gql`
-  mutation CreateValidator($moduleName: String!, $description: String!) {
-    createValidator(moduleName: $moduleName, description: $description) {
-      id
-    }
+const CREATE_VALIDATOR = gql` mutation CreateValidator($input: CreateValidatorInput!) {
+  createValidator(input: $input) {
+    id
   }
-`
+}`
 
 export default props => {
   const [createValidator] = useMutation(CREATE_VALIDATOR, {

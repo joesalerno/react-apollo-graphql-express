@@ -23,8 +23,7 @@ import {
   TableColumnReordering
 } from "@devexpress/dx-react-grid-material-ui"
 
-const GET_STEPS = gql`
-{
+const GET_STEPS = gql` {
   stepTypes {
     name
     description
@@ -43,8 +42,8 @@ const GET_STEPS = gql`
       name
     }
   }
-}
-`
+}`
+
 const SortingIcon = ({ direction }) => direction === "asc" 
   ? <ArrowUpward style={{ fontSize: "18px" }} />
   : <ArrowDownward style={{ fontSize: "18px" }} />

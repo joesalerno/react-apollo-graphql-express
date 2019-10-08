@@ -12,16 +12,13 @@ const GET_CUSTOMERS = gql` {
   customers {
     name
   }
-}
-`
+}`
 
-const CREATE_PART = gql`
-  mutation CreatePart($name: String!, $customer: String!) {
-    createPart(name: $name, customer: $customer) {
-      id
-    }
+const CREATE_PART = gql` mutation CreatePart($input: CreatePartInput!) {
+  createPart(input: $input) {
+    id
   }
-`
+}`
 
 export default props => {
   const [createPart] = useMutation(CREATE_PART, {

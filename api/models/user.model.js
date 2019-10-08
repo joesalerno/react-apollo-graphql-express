@@ -4,12 +4,11 @@ const bcrypt = require("bcrypt")
 const salt_work_factor = 12
 
 const UserSchema = new Schema({
-  username: { type: Schema.Types.String, required: true },
+  username: { type: Schema.Types.String, required: true, unique: true},
   employeeId: { type: Schema.Types.String, required: true, unique: true },
   email: { type: Schema.Types.String, required: true, unique: true },
   password: { type: Schema.Types.String, required: true },
   enabled: { type: Schema.Types.Boolean, required: true, default: true },
-  timeCreated: { type: Schema.Types.Date, required: true, default: Date.now }
 })
 
 UserSchema.pre("save", async function(done) {

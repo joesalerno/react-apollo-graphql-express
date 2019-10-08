@@ -23,8 +23,7 @@ import {
   TableColumnReordering
 } from "@devexpress/dx-react-grid-material-ui"
 
-const GET_FORMS = gql`
-{
+const GET_FORMS = gql` {
   forms {
     name
     description
@@ -35,8 +34,8 @@ const GET_FORMS = gql`
       name
     }
   }
-}
-`
+}`
+
 const SortingIcon = ({ direction }) => direction === "asc" 
   ? <ArrowUpward style={{ fontSize: "18px" }} />
   : <ArrowDownward style={{ fontSize: "18px" }} />

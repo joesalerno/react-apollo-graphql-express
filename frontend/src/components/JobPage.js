@@ -8,34 +8,32 @@ import Checkbox from "@material-ui/core/Checkbox"
 import Divider from "@material-ui/core/Divider"
 import FormControlLabel from "@material-ui/core/FormControlLabel"
 
-const GET_JOB = gql`
-  query GetJob($jobNo: String!) {
-    job(jobNo:$jobNo){
-      jobNo
+const GET_JOB = gql` query GetJob($jobNo: String!) {
+  job(jobNo:$jobNo){
+    jobNo
+    customer {
+      name
+    }
+    part {
+      name
       customer {
         name
       }
-      part {
+    }
+    status
+    currentSteps {
+      stepType {
         name
-        customer {
-          name
-        }
-      }
-      status
-      currentSteps {
-        stepType {
-          name
-          description
-          instructions
-        }
-      }
-      comments {
-        subject
-        data
+        description
+        instructions
       }
     }
+    comments {
+      subject
+      data
+    }
   }
-`
+}`
 
 export default props => {
   const Job = useQuery(GET_JOB, {variables: {jobNo: props.match.params.jobNo}})

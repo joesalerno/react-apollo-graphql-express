@@ -23,8 +23,7 @@ import {
   TableColumnReordering
 } from "@devexpress/dx-react-grid-material-ui"
 
-const GET_USERS = gql`
-{
+const GET_USERS = gql` {
   users {
     username
     employeeId
@@ -42,8 +41,8 @@ const GET_USERS = gql`
       completedTime
     }
   }
-}
-`
+}`
+
 const SortingIcon = ({ direction }) => direction === "asc" 
   ? <ArrowUpward style={{ fontSize: "18px" }} />
   : <ArrowDownward style={{ fontSize: "18px" }} />

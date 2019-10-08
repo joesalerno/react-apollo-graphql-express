@@ -10,6 +10,7 @@ module.exports = {
   Customer: require("./customer.model"),
   Job: require("./job.model"),
   Part: require("./part.model"),
+  Location: require("./location.model"),
   User: require("./user.model"),
   Role: require("./role.model"),
   Comment: require("./comment.model"),

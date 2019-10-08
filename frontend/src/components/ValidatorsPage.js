@@ -23,8 +23,7 @@ import {
   TableColumnReordering
 } from "@devexpress/dx-react-grid-material-ui"
 
-const GET_VALIDATORS = gql`
-{
+const GET_VALIDATORS = gql` {
   validators {
     moduleName
     description
@@ -40,8 +39,8 @@ const GET_VALIDATORS = gql`
     }
     enabled
   }
-}
-`
+}`
+
 const SortingIcon = ({ direction }) => direction === "asc" 
   ? <ArrowUpward style={{ fontSize: "18px" }} />
   : <ArrowDownward style={{ fontSize: "18px" }} />
