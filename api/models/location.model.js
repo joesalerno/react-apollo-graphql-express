@@ -7,6 +7,8 @@ const LocationSchema = new Schema({
   enabled: {type: Schema.Types.Boolean, required: true, default: true }
 })
 
+LocationSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 LocationSchema.statics.findByIdOrName = async function(location) {
   try { return await this.findById(location) } 
   catch { return await this.findOne({name: location}) }

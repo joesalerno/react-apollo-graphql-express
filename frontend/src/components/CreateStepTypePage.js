@@ -57,7 +57,7 @@ export default props => {
   const handleDialogSubmit = (username, password) => {
     setDialogOpen(false)
     //TODO: use username and password ....
-    createStepType({ variables: { name, description, instructions, form, requiredRoles } })
+    createStepType({ input: { name, description, instructions, form, requiredRoles } })
   }
 
   const handleDialogCancel = () => setDialogOpen(false)
@@ -69,10 +69,10 @@ export default props => {
     if (id === "instructions") setInstructions(value)
   }
 
-  const validName = () => name.length > 3 &&
+  const validName = () => name.length > 2 &&
    (StepTypes.loading || !StepTypes.data.stepTypes.some( stepType => stepType.name === name ))
     ? { valid: true }
-    : {error: "Please enter a valid name (A unique name with 3 or more characters)"}
+    : { error: "Please enter a valid name (A unique name with 3 or more characters)"}
   
   const validDescription = () => description.length > 9
     ? { valid: true }
@@ -90,6 +90,7 @@ export default props => {
    requiredRoles.every(rr => Roles.data.roles.some(r => r.name === rr.name))
     ? { valid: true }
     : { error: "Please enter valid roles (must exist) or no roles"}
+    
   const validInput = validName().valid && validDescription().valid && validInstructions().valid && validForm().valid && validRoles().valid
 
   const focusNextInput = () => {

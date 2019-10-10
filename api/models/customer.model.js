@@ -6,6 +6,8 @@ const CustomerSchema = new Schema({
     enabled: {type: Schema.Types.Boolean, required: true, default: true},
 })
 
+CustomerSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 CustomerSchema.statics.findByIdOrName = async function(customer) {
     try { return await this.findById(customer) } 
     catch { return await this.findOne({name: customer}) }

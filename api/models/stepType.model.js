@@ -10,6 +10,8 @@ const StepTypeSchema = new Schema({
     enabled: {type: Schema.Types.Boolean, required: true, default: true},
 })
 
+StepTypeSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 StepTypeSchema.statics.findByIdOrName = async function(stepType) {
     try { return await this.findById(stepType) } 
     catch { return await this.findOne({ name: stepType }) }

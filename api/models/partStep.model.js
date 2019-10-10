@@ -9,4 +9,6 @@ const PartStepSchema = new Schema({
   enabled: { type: Schema.Types.Boolean, required: true, default: true },
 })
 
+PartStepSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 module.exports = mongoose.model("PartStep", PartStepSchema)

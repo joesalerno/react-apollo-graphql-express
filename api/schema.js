@@ -247,7 +247,7 @@ module.exports = gql`
   }
 
   "Input object type for createUser() mutation"
-  input CreateUserInput { username: String! employeeId: String! email: String! password: String! }
+  input CreateUserInput { username: String! employeeId: String! email: String! password: String!, roles: [String!] }
 
   "Input object type for editUser() mutation"
   input EditUserInput { username: String employeeId: String email: String password: String enabled: Boolean }
@@ -367,7 +367,7 @@ module.exports = gql`
   input EnableStepTypeInput { stepType: String! }
 
   "Input object type for Form mutations"
-  input FormInputData { instructions: String! regex: String validator: String }
+  input FormInputData { instructions: String! regEx: String validator: String }
 
    "Input object type for createForm() mutation"
   input CreateFormInput { name: String! description: String! data: [FormInputData]! }

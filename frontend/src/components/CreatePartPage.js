@@ -35,7 +35,7 @@ export default props => {
 
   const handleDialogSubmit = (username, password) => {
     setDialogOpen(false)
-    createPart({variables: {name, customer}})
+    createPart({variables: {input: {name, customer}}})
   }
 
   const handleDialogCancel = () => setDialogOpen(false)
@@ -88,7 +88,7 @@ export default props => {
 
       <Dropdown
         id="customer"
-        data={ Customers.data ? Customers.data.customer : []}
+        data={ Customers.data ? Customers.data.customers : []}
         displayField="name"
         onSelect={ selection => {
           setCustomer(selection.name)

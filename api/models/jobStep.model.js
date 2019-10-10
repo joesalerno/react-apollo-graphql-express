@@ -13,6 +13,8 @@ const JobStepSchema = new Schema({
   enabled: { type: Schema.Types.Boolean, required: true, default: true },
 })
 
+JobStepSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 JobStepSchema.methods.prevStepsCompleted = async function() {
   for (var prevStep of await this.model("JobStep").find({ _id: { $in: this.prevStepIds } }))
     if (!prevStep.completed && prevStep.enabled) {

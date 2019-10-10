@@ -11,6 +11,8 @@ const UserSchema = new Schema({
   enabled: { type: Schema.Types.Boolean, required: true, default: true },
 })
 
+UserSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 UserSchema.pre("save", async function(done) {
   if (!this.isModified("password")) return done()
   try {

@@ -15,6 +15,8 @@ const FormSchema = new Schema({
   enabled: {type: Schema.Types.Boolean, required: true, default: true},
 })
 
+FormSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 FormSchema.statics.findByIdOrName = async function(form) {
   try { return await this.findById(form) }
   catch { return await this.findOne({ name: form }) }

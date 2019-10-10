@@ -6,6 +6,8 @@ const RoleSchema = new Schema({
   userIds: { type: [Schema.Types.ObjectId], ref: "User", required: true },
 })
 
+RoleSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 RoleSchema.statics.findByIdOrName = async function(role) {
   try { return await this.findById(role) } 
   catch { return await this.findOne({name: role}) }

@@ -43,7 +43,7 @@ export default props => {
   const [name, setName] = useState(0)
   const [description, setDescription] = useState(0)
   const [data, setData] = useState([{instructions:"", regEx:"", validator:""}])
-  const [increment, forceUpdate] = useState(0) //forceUpdate(increment+1) because React doesn't see changes to arrays in objects? is there a functional component version of shouldComponentUpdate()?
+  const [increment, forceUpdate] = useState(0) //forceUpdate(increment+1) when React doesn't see changes to arrays in objects? is there a functional component version of shouldComponentUpdate()?
   const [inputDataRefs, setInputDataRefs] = useState([{instructions:0, regEx:0, validator:0}])
   const [inputRefs, setInputRefs] = useState({name:0, description:0})
 

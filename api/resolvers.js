@@ -351,7 +351,7 @@ module.exports = {
     },
 
     enableCustomer: async (root, { input }, { self }) => {
-      const { customer } = input
+      var { customer } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       customer = await Customer.findByIdOrName(customer)
       if (!customer) throw Error("Customer not found")
@@ -360,7 +360,7 @@ module.exports = {
     },
 
     createPart: async (root, { input }, { self }) => {
-      const { name, customer } = input
+      var { name, customer } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       customer = await Customer.findByIdOrName(customer)
       if (!customer) throw Error("Customer not found")
@@ -368,7 +368,7 @@ module.exports = {
     },
 
     editPart: async (root, { input }, { self }) => {
-      const { id, name, customer, enabled } = input
+      var { id, name, customer, enabled } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       const part = await Part.findById(id)
       if (!part) throw Error("Part not found")
@@ -383,7 +383,7 @@ module.exports = {
     },
 
     disablePart: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       const part = await Part.findById(id)
       if (!part) throw Error("Part Not Found")
@@ -392,7 +392,7 @@ module.exports = {
     },
 
     enablePart: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       const part = await Part.findById(id)
       if (!part) throw Error("Part not found")
@@ -401,7 +401,7 @@ module.exports = {
     },
 
     addStepToPart: async (root, { input }, { self }) => {
-      const { part, stepType, prevStepIds } = input
+      var { part, stepType, prevStepIds } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
 
       part = await Part.findByIdOrNo(part)
@@ -428,7 +428,7 @@ module.exports = {
     },
 
     removeStepFromPart: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
 
       const stepToRemove = await PartStep.findById(id)
@@ -447,7 +447,7 @@ module.exports = {
     },
 
     disablePartStep: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       const partStep = await PartStep.findByIdOrName(id)
       if (!partStep) throw Error("PartStep not found")
@@ -456,7 +456,7 @@ module.exports = {
     },
 
     enablePartStep: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       const partStep = await PartStep.findByIdOrName(id)
       if (!partStep) throw Error("PartStep not found")
@@ -465,7 +465,7 @@ module.exports = {
     },
 
     createJob: async (root, { input }, { self }) => {
-      const { jobNo, customer, partId } = input
+      var { jobNo, customer, partId } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
 
       const part = await Part.findById(partId)
@@ -485,7 +485,7 @@ module.exports = {
 
     editJob: async (root, { input }, { self }) => {
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
-      const { job, jobNo, customer, partId, status, enabled, location } = input
+      var { job, jobNo, customer, partId, status, enabled, location } = input
 
       job = await Job.findByIdOrNo(job)
       if (!job) throw Error("Job not found")
@@ -511,7 +511,7 @@ module.exports = {
     },
 
     moveJob: async (root, { input }, { self }) => {
-      const { job, location } = input
+      var { job, location } = input
       job = await Job.findByIdOrNo(job)
       if(!job) throw Error("Job not found")
       location = await Location.findByIdOrName(location)
@@ -521,7 +521,7 @@ module.exports = {
     },
 
     disableJob: async (root, { input }, { self }) => {
-      const { job } = input
+      var { job } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       job = await Job.findByIdOrNo(job)
       if (!job) throw Error("Job not found")
@@ -530,7 +530,7 @@ module.exports = {
     },
 
     enableJob: async (root, { input } , { self }) => {
-      const { job } = input
+      var { job } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       job = await Job.findByIdOrNo(job)
       if (!job) throw Error("Job not found")
@@ -539,7 +539,7 @@ module.exports = {
     },
 
     addStepToJob: async (root, { input }, { self }) => {
-      const { job, stepType, prevStepIds } = input
+      var { job, stepType, prevStepIds } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
 
       job = await Job.findByIdOrNo(job)
@@ -566,7 +566,7 @@ module.exports = {
     },
 
     removeStepFromJob: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
 
       const stepToRemove = await JobStep.findById(id)
@@ -584,7 +584,7 @@ module.exports = {
     },
 
     completeJobStep: async (root, { input }, { self }) => {
-      const { id, data } = input
+      var { id, data } = input
       if (!self) throw Error("Must be logged in to complete job steps")
 
       const jobStep = await JobStep.findById(id)
@@ -633,7 +633,7 @@ module.exports = {
     },
 
     disableJobStep: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       const jobStep = await JobStep.findByIdOrName(id)
       if (!jobStep) throw Error("JobStep not found")
@@ -642,7 +642,7 @@ module.exports = {
     },
 
     enableJobStep: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       const jobStep = await JobStep.findByIdOrName(id)
       if (!jobStep) throw Error("JobStep not found")
@@ -651,7 +651,7 @@ module.exports = {
     },
 
     createStepType: async (root, { input }, { self }) => {
-      const { name, description, instructions, form, requiredRoles } = input
+      var { name, description, instructions, form, requiredRoles } = input
       if (!(await userHasRoles(self, ["admin", "engineer"]))) throw Error("Not authorized")
       const stepType = {
         name,
@@ -675,7 +675,7 @@ module.exports = {
     },
 
     editStepType: async (root, { input }, { self }) => {
-      const { stepType, name, description, instructions, form, requiredRoles, enabled } = input
+      var { stepType, name, description, instructions, form, requiredRoles, enabled } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
 
       stepType = await StepType.findByIdOrName(stepType)
@@ -704,7 +704,7 @@ module.exports = {
     },
 
     addRoleToStepType: async (root, { input }, { self }) => {
-      const { stepType, role } = input
+      var { stepType, role } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       stepType = await StepType.findByIdOrName(stepType)
       if (!stepType) throw Error("StepType not found")
@@ -716,7 +716,7 @@ module.exports = {
     },
 
     removeRoleFromStepType: async (root, { input }, { self }) => {
-      const { stepType, role } = input
+      var { stepType, role } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       stepType = await StepType.findByIdOrName(stepType)
       if (!stepType) throw Error("StepType not found")
@@ -728,7 +728,7 @@ module.exports = {
     },
 
     disableStepType: async (root, { input }, { self }) => {
-      const { stepType } = input
+      var { stepType } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       stepType = await StepType.findByIdOrName(stepType)
       if (!stepType) throw Error("StepType not found")
@@ -737,7 +737,7 @@ module.exports = {
     },
 
     enableStepType: async (root, { input }, { self }) => {
-      const { stepType } = input
+      var { stepType } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       stepType = await StepType.findByIdOrName(stepType)
       if (!stepType) throw Error("StepType not found")
@@ -746,7 +746,7 @@ module.exports = {
     },
 
     createForm: async (root, { input }, { self }) => {
-      const { name, data, description } = input
+      var { name, data, description } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       if (data.length == 0) throw Error("Must provide FormInput type to data argument")
       for (var dataItem of data) {
@@ -762,7 +762,7 @@ module.exports = {
     },
 
     editForm: async (root, { input }, { self }) => {
-      const { form, name, data, description, enabled } = input
+      var { form, name, data, description, enabled } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
 
       form = await Form.findByIdOrName(form)
@@ -789,7 +789,7 @@ module.exports = {
     },
 
     disableForm: async (root, { input }, { self }) => {
-      const { form } = input
+      var { form } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       form = await Form.findByIdOrName(form)
       if (!form) throw Error("Form not found")
@@ -798,7 +798,7 @@ module.exports = {
     },
 
     enableForm: async (root, { input }, { self }) => {
-      const { form } = input
+      var { form } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       form = await Form.findByIdOrName(form)
       if (!form) throw Error("Form not found")
@@ -807,7 +807,7 @@ module.exports = {
     },
 
     createValidator: async (root, { input }, { self }) => {
-      const { moduleName, description } = input
+      var { moduleName, description } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       try {
         const validatorModule = require(`./validators/${moduleName}`)
@@ -819,7 +819,7 @@ module.exports = {
     },
 
     editValidator: async (root, { input }, { self }) => {
-      const { validator, moduleName, description, enabled } = input
+      var { validator, moduleName, description, enabled } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       validator = await Validator.findByIdOrName(validator)
       if (!validator) throw Error("Validator not found")
@@ -838,7 +838,7 @@ module.exports = {
     },
 
     disableValidator: async (root, { input }, { self }) => {
-      const { validator } = input
+      var { validator } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       validator = await Validator.findByIdOrName(validator)
       if (!validator) throw Error("Validator not found")
@@ -847,7 +847,7 @@ module.exports = {
     },
 
     enableValidator: async (root, { input }, { self }) => {
-      const { validator } = input
+      var { validator } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       validator = await Validator.findByIdOrName(validator)
       if (!validator) throw Error("Validator not found")
@@ -856,7 +856,7 @@ module.exports = {
     },
 
     createComment: async (root, { input }, { self }) => {
-      const { subjectId, data } = input
+      var { subjectId, data } = input
       if (!self) throw Error("User not found")
       const comment = await Comment.findOne({_id: subjectId})
       if (comment && !comment.enabled) throw Error("Cannot reply to comment. Comment is disabled")
@@ -864,7 +864,7 @@ module.exports = {
     },
 
     editComment: async (root, { input }, { self }) => {
-      const { id, data, enabled } = input
+      var { id, data, enabled } = input
       const comment = await Comment.findById(id)
       if (!comment) throw Error("Comment not found")
 
@@ -881,7 +881,7 @@ module.exports = {
     },
 
     disableComment: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       const comment = await Comment.findById(id)
       if (!comment) throw Error("Comment not found")
       if (comment.userId != self.id && !await userHasRoles(self, "admin")) throw Error("Not authorized")
@@ -890,7 +890,7 @@ module.exports = {
     },
 
     enableComment: async (root, { input }, { self }) => {
-      const { id } = input
+      var { id } = input
       const comment = await Comment.findById(id)
       if (!comment) throw Error("Comment not found")
       if (comment.userId != self.id && !await userHasRoles(self, "admin")) throw Error("Not authorized")

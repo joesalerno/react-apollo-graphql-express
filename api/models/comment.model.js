@@ -8,7 +8,8 @@ const CommentSchema = new Schema({
     edits: {type: [Schema.Types.String]},
     editTimes: {type: [Schema.Types.Date]},
     enabled: {type: Schema.Types.Boolean, required: true, default: true},
-    timeCreated: {type: Schema.Types.Date, required: true, default: Date.now},
 })
+
+CommentSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
 
 module.exports = mongoose.model('Comment', CommentSchema)

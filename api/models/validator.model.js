@@ -7,6 +7,8 @@ const ValidatorSchema = new Schema({
   enabled: {type: Schema.Types.Boolean, required: true, default: true},
 })
 
+ValidatorSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 ValidatorSchema.methods.execute = function(userInput) {
     try {
       const validator = require(`../validators/${this.moduleName}`)

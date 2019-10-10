@@ -1,12 +1,12 @@
 import React, { useState } from "react"
-import SmallWindowView from "./SmallWindowView"
-import { useQuery } from "@apollo/react-hooks"
 import gql from "graphql-tag"
+import { useQuery } from "@apollo/react-hooks"
+import SmallWindowView from "./SmallWindowView"
 import Typography from "@material-ui/core/Typography"
-import Button from "@material-ui/core/Button"
-import Checkbox from "@material-ui/core/Checkbox"
 import Divider from "@material-ui/core/Divider"
 import FormControlLabel from "@material-ui/core/FormControlLabel"
+import Checkbox from "@material-ui/core/Checkbox"
+import Button from "@material-ui/core/Button"
 
 const GET_JOB = gql` query GetJob($jobNo: String!) {
   job(jobNo:$jobNo){

@@ -26,6 +26,7 @@ import RolesPage from "./components/RolesPage"
 import FormsPage from "./components/FormsPage"
 import ValidatorsPage from "./components/ValidatorsPage"
 import CommentsPage from "./components/CommentsPage"
+import CreateUserPage from "./components/CreateUserPage"
 import CreateRolePage from "./components/CreateRolePage"
 import CreateValidatorPage from "./components/CreateValidatorPage"
 import CreateFormPage from "./components/CreateFormPage"
@@ -155,6 +156,11 @@ function App() {
 
         <Route exact path="/users" render={props => validAuth()
           ? <UsersPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+
+        <Route exact path="/createuser" render={props => validAuth()
+          ? <CreateUserPage {...props} changePage={changePage} logout={logout} auth={auth}/>
           : <Redirect to="/" />
         }/>
 

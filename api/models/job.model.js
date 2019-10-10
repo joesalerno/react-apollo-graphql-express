@@ -15,6 +15,8 @@ const JobSchema = new Schema({
   enabled: {type: Schema.Types.Boolean, required: true, default: true},
 })
 
+JobSchema.virtual("timeCreated").get(function() { return this._id.getTimestamp() })
+
 JobSchema.statics.findByIdOrNo = async function(job) {
   try { return await this.findById(job) }
   catch { return await this.findOne({ jobNo: job }) }
