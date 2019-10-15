@@ -28,6 +28,7 @@ import {
 
 const GET_PARTS = gql` {
   parts {
+    id
     name
     customer {
         name
@@ -46,14 +47,12 @@ const SortLabel = ({ onSort, children, direction }) => (
   </Button>
 )
 
-
 const PartFormatter = ({value}) => {
-  if (value) return <Link href={`/part/${value}`}>{value}</Link>
+  if (value) return <Link href={`/parts/${value.id}`}>{value.name}</Link>
   return <b>"-"</b>
 }
 
 const PartTypeProvider = props => <DataTypeProvider formatterComponent={PartFormatter} {...props}/>
-
 
 export default props => {
   const Parts = useQuery(GET_PARTS)
@@ -67,13 +66,18 @@ export default props => {
     >
       <AddCircle style={{ margin: "0 8px" }} /> Create New Part
     </Button>
+    
     <Paper style={{ flex: "auto", margin: "8px", backgroundColor: "rgba(255, 255, 255, .95)", }}>
       <Grid
         rows={Parts.data ? Parts.data.parts : []}
         columns={[
-          { name: "name", title: "Name" },
+          { name: "name", title: "Name", getCellValue: row => {
+            console.log(row)
+            return row ? row : undefined
+          } 
+          },
           { name: "customer", title: "Customer", getCellValue: row =>
-              row.customer ? row.customer.name : undefined
+            row.customer ? row.customer.name : undefined
           }
         ]}
       >

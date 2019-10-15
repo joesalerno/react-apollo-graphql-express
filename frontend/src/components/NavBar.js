@@ -10,7 +10,7 @@ import MenuItem from "@material-ui/core/MenuItem"
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import TTMLogo from "../img/ttmsmallvectorlogo.svg"
 
-export default props => {
+export default memo(props => {
   const [navMenuAnchor, setNavMenuAnchor] = React.useState(null)
   const handleNavMenuClick = event => setNavMenuAnchor(event.currentTarget)
   const handleNavMenuClose = () => setNavMenuAnchor(null)
@@ -152,4 +152,4 @@ export default props => {
       <MenuItem onClick={props.logout}> Logout </MenuItem>
     </Menu>
   </div>
-}
+})

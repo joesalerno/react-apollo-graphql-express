@@ -43,6 +43,8 @@ module.exports = gql`
     id: String!
     name: String!
     customer: Customer!
+    image: String
+    blueprint: String
     steps: [PartStep]
     enabled: Boolean!
     jobs: [Job]
@@ -283,10 +285,10 @@ module.exports = gql`
   input EnableCustomerInput { customer: String! }
 
   "Input object type for createPart() mutation"
-  input CreatePartInput { name: String! customer: String! }
+  input CreatePartInput { name: String! customer: String! image: String blueprint: String }
 
   "Input object type for editPart() mutation"
-  input EditPartInput { id: String! name: String customer: String enabled: Boolean }
+  input EditPartInput { id: String! name: String customer: String image: String blueprint: String enabled: Boolean }
 
   "Input object type foraddStepToPart() mutation"
   input AddStepToPartInput { stepType: String! part: String! prevStepIds: [String!] }

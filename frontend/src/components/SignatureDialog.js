@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
 import InputAdornment from "@material-ui/core/InputAdornment"
@@ -11,9 +11,9 @@ import DialogContentText from "@material-ui/core/DialogContentText"
 import DialogTitle from "@material-ui/core/DialogTitle"
 
 export default props => {
-  const [username, setUsername] = React.useState(0)
-  const [password, setPassword] = React.useState(0)
-  const [showPassword, setShowPassword] = React.useState(false)
+  const [username, setUsername] = useState(0)
+  const [password, setPassword] = useState(0)
+  const [showPassword, setShowPassword] = useState(false)
 
   const validUsername = () => username.length > 0
     ? {valid: true}
@@ -40,7 +40,7 @@ export default props => {
 
   const handleClickShowPassword = () => setShowPassword(!showPassword)
 
-  const handleKeyPress = event => { if (event.key === "Enter")
+  const handleKeyDown = event => { if (event.key === "Enter")
     validInput ? props.submit(username, password) : focusNextInput()
   }
 
@@ -52,7 +52,7 @@ export default props => {
       setUsername(0)
       setPassword(0)
     }}
-    
+    scroll="body"
   >
     <DialogTitle id="signature-dialog-title"> Signature required </DialogTitle>
     <DialogContent>
@@ -71,7 +71,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white", margin:"8px 0" }}
       />
@@ -85,7 +85,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         InputProps={{ type: showPassword ? "text" : "password",
           endAdornment: (

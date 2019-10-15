@@ -4,18 +4,15 @@ import TTMLogo from "../img/ttmvectorlogo.svg"
 import Paper from "@material-ui/core/Paper"
 import NavBar from "./NavBar"
 
-export default props => <Background>
+export default memo(props => <Background>
   {props.auth ? <NavBar {...props} /> : ""}
-  <div
-    style={{
+  <div style={{
       display: "flex",
       flex: "auto",
       flexDirection: "column",
       margin: "8px 0",
-    }}
-  >
-    { !props.logo ? null : 
-      <div style={{
+  }}>
+    { !props.logo ? null : <div style={{
         margin: "auto auto 6px auto",
         background: `url(${TTMLogo})`,
         backgroundSize: "contain",
@@ -26,8 +23,8 @@ export default props => <Background>
         width: `${props.width ? props.width : "500px"}`,
         maxWidth: "100vw",
         filter: "drop-shadow( 3px 3px 2px rgba(0, 0, 0, .7))"
-      }}/>
-    }
+    }}/>}
+
     <Paper
       component="main"
       style={{
@@ -43,4 +40,4 @@ export default props => <Background>
       {props.children}
     </Paper>
   </div>
-</Background>
+</Background>)

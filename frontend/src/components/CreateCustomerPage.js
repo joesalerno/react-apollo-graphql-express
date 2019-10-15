@@ -63,7 +63,7 @@ export default props => {
     if (!validName().valid) inputRefs.name.focus()
   }
 
-  const handleKeyPress = event => { if (event.key === "Enter") 
+  const handleKeyDown = event => { if (event.key === "Enter") 
     validInput ? handleSubmit() : focusNextInput()
   }
 
@@ -87,7 +87,7 @@ export default props => {
         autoFocus
         required
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{backgroundColor: "white"}}
       />

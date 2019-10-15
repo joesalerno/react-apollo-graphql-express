@@ -101,7 +101,7 @@ export default props => {
     else if (!validRoles().valid) inputRefs.roles.focus()
   }
 
-  const handleKeyPress = event => { if (event.key === "Enter")
+  const handleKeyDown = event => { if (event.key === "Enter")
     validInput ? handleSubmit() : focusNextInput()
   }
 
@@ -122,7 +122,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -135,7 +135,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -148,7 +148,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -158,11 +158,12 @@ export default props => {
         data={ Forms.data ? Forms.data.forms : []}
         idField="name"
         displayField="name"
+        clearOnClick
         onSelect={ selection => {
           setForm(selection.name)
           focusNextInput()
         }}
-        onKeyPress={ handleKeyPress }
+        onKeyDown={ handleKeyDown }
         inputRef={ref => setInputRefs(Object.assign(inputRefs, {form: ref}))}
       />
 
@@ -176,7 +177,7 @@ export default props => {
         setSelectedItem = {setRequiredRoles}
         inputRefs={ref => setInputRefs(Object.assign(inputRefs, {roles: ref}))}
         onSelect={focusNextInput}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
       />
 
       <Button

@@ -360,15 +360,18 @@ module.exports = {
     },
 
     createPart: async (root, { input }, { self }) => {
-      var { name, customer } = input
+      var { name, customer, image, blueprint } = input
+      console.log(input)
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       customer = await Customer.findByIdOrName(customer)
       if (!customer) throw Error("Customer not found")
-      return new Part({ customerId: customer.id, name }).save()
+      if (image && !image.includes("data:image/")) throw Error("Invalid image format")
+      if (blueprint && !blueprint.includes("data:image/") && !blueprint.includes("data:application/pdf")) throw Error("Invalid blueprint format")
+      return new Part({ customerId: customer.id, name, image, blueprint }).save()
     },
 
     editPart: async (root, { input }, { self }) => {
-      var { id, name, customer, enabled } = input
+      var { id, name, customer, image, blueprint, enabled } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
       const part = await Part.findById(id)
       if (!part) throw Error("Part not found")
@@ -376,6 +379,14 @@ module.exports = {
         customer = await Customer.findByIdOrName(customer)
         if (!customer) throw Error("Customer not found")
         part.customerId = customer.id
+      }
+      if (image) {
+        if (!image.includes("data:image/")) throw Error("Invalid image format")
+        part.image = image
+      }
+      if (blueprint) {
+        if (!blueprint.includes("data:image/") && !blueprint.includes("application/pdf")) throw Error("Invalid blueprint format")
+        part.blueprint = blueprint
       }
       if (name) part.name = name
       if (enabled) part.enabled = enabled

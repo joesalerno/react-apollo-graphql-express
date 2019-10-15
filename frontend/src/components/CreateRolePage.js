@@ -87,7 +87,7 @@ export default props => {
     else if (!validUsers().valid) inputRefs.users.focus()
   }
 
-  const handleKeyPress = event => { if (event.key === "Enter")
+  const handleKeyDown = event => { if (event.key === "Enter")
     validInput ? handleSubmit() : focusNextInput()
   }
 
@@ -107,7 +107,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -121,7 +121,7 @@ export default props => {
         setSelectedItem = {setUsers}
         inputRefs={ref => setInputRefs(Object.assign(inputRefs, {users: ref}))}
         onSelect={focusNextInput}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
       />
 
       <Button

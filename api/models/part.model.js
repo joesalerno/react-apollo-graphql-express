@@ -4,6 +4,8 @@ const Schema = mongoose.Schema
 const PartSchema = new Schema({
     customerId: {type: Schema.Types.ObjectId, ref: 'Customer', required: true},
     name: {type: Schema.Types.String, required: true},
+    image: {type: Schema.Types.String},
+    blueprint: {type: Schema.Types.String},
     enabled: {type: Schema.Types.Boolean, required: true, default: true},
 })
 

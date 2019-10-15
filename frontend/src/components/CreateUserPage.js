@@ -83,7 +83,7 @@ export default props => {
     else if (!validPassword().valid) inputRefs.password.focus()
   }
 
-  const handleKeyPress = event => { if (event.key === "Enter")
+  const handleKeyDown = event => { if (event.key === "Enter")
     validInput ? handleSubmit() : focusNextInput()
   }
 
@@ -103,7 +103,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -117,7 +117,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -131,7 +131,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -145,7 +145,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />

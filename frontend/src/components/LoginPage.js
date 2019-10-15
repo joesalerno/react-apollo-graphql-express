@@ -41,7 +41,7 @@ export default props => {
     else if (!validPassword().valid) inputRefs.password.focus()
   }
 
-  const handleKeyPress = event => { if (event.key === "Enter")
+  const handleKeyDown = event => { if (event.key === "Enter")
     validInput ? props.login(username, password) : focusNextInput()
   }
 
@@ -68,7 +68,7 @@ export default props => {
         autoFocus
         required
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -82,7 +82,7 @@ export default props => {
         autoComplete="password"
         required
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         InputProps={{ type: showPassword ? "text" : "password",
         endAdornment: (

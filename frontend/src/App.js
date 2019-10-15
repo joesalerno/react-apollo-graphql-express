@@ -16,10 +16,11 @@ import jwt from "jsonwebtoken"
 import LoginPage from "./components/LoginPage"
 import RegisterPage from "./components/RegisterPage"
 import NotFoundPage from "./components/NotFoundPage"
-import JobPage from "./components/JobPage"
 import JobsPage from "./components/JobsPage"
+import JobPage from "./components/JobPage"
 import CustomersPage from "./components/CustomersPage"
 import PartsPage from "./components/PartsPage"
+import PartPage from "./components/PartPage"
 import StepsPage from "./components/StepsPage"
 import UsersPage from "./components/UsersPage"
 import RolesPage from "./components/RolesPage"
@@ -45,7 +46,7 @@ function App() {
 
   const client = new ApolloClient({
     uri: `${serverUrl}/api`,
-    headers: { Authorization: `Bearer ${auth}` }
+    headers: { Authorization: `Bearer ${auth}` },
   })
 
   const changePage = path => {
@@ -144,6 +145,16 @@ function App() {
           : <Redirect to="/" />
         }/>
 
+        <Route exact path="/createpart" render={props => validAuth()
+          ? <CreatePartPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+
+        <Route path="/parts/:id" render={props => validAuth()
+          ? <PartPage {...props} changePage={changePage} logout={logout} auth={auth}/>
+          : <Redirect to="/" />
+        }/>
+
         <Route exact path="/steps" render={props => validAuth()
           ? <StepsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
           : <Redirect to="/" />
@@ -197,11 +208,6 @@ function App() {
 
         <Route exact path="/comments" render={props => validAuth()
           ? <CommentsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
-          : <Redirect to="/" />
-        }/>
-
-        <Route exact path="/createpart" render={props => validAuth()
-          ? <CreatePartPage {...props} changePage={changePage} logout={logout} auth={auth}/>
           : <Redirect to="/" />
         }/>
 

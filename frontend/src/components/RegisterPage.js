@@ -55,7 +55,7 @@ export default props => {
     else if (!validPassword().valid) inputRefs.password.focus()
   }
 
-  const handleKeyPress = event => { if (event.key === "Enter")
+  const handleKeyDown = event => { if (event.key === "Enter")
     validInput ? props.register( username, employeeId, email, password  ) : focusNextInput()
   }
 
@@ -80,7 +80,7 @@ export default props => {
         autoFocus
         required
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{backgroundColor: "white"}}
       />
@@ -94,7 +94,7 @@ export default props => {
         autoComplete="username"
         required
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{backgroundColor: "white"}}
       />
@@ -108,7 +108,7 @@ export default props => {
         autoComplete="email"
         required
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{backgroundColor: "white"}}
       />
@@ -122,7 +122,7 @@ export default props => {
         autoComplete="password"
         required
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}  
         InputProps={{ type: showPassword ? "text" : "password",
         endAdornment: (

@@ -17,10 +17,11 @@ export default props => {
     ? [props.selectedItem, props.setSelectedItem]
     : useState([])
 
-  const handleKeyPress = event => {
+  const handleKeyDown = event => {
+    console.log(event)
     if (selectedItem.length && !inputValue.length && event.key === 'Backspace') 
       setSelectedItem(selectedItem.slice(0, selectedItem.length - 1))
-    props.onKeyPress(event)
+    if (props.onKeyDown) props.onKeyDown(event)
   }
 
   const toggleSelection = selection => selectedItem.some(selected =>
@@ -34,16 +35,16 @@ export default props => {
   }
 
   return <Downshift
-    onSelect={selection=> {
+    onSelect={selection => {
       handleSelect(selection)
-      return props.onSelect(selection)}}
-    itemToString={item => (
-      item 
-        ? props.displayField 
-          ? item[props.displayField]
-          : item[props.idField]
-        : ""
-    )}
+      return props.onSelect(selection)
+    }}
+    itemToString={item => item 
+      ? props.displayField 
+        ? item[props.displayField]
+        : item[props.idField]
+      : ""
+    }
     selectedItem = {selectedItem}
     inputValue = {inputValue}
   >
@@ -56,7 +57,7 @@ export default props => {
       inputValue,
       selectedItem,
       highlightedIndex
-    })=>(<div style={{width: "100%"}}>
+    }) => <div style={{width: "100%"}}>
       <TextField
         {...getInputProps()}
         id={props.id}
@@ -64,30 +65,32 @@ export default props => {
         inputRef={ref => props.inputRefs(ref)}
         required={props.required ? props.required : false}
         label={`Select multiple ${props.name ? props.name : props.id}`}
-        InputProps={{ startAdornment: selectedItem ? selectedItem.map((item, index) =>
-          (<Chip
+        InputProps={{ startAdornment: !selectedItem ? null :
+          selectedItem.map((item, index) => <Chip
             key={`${props.name || props.id}-chip-${index}`}
             tabIndex={-1}
             label={props.displayField ? item[props.displayField] : item[props.idField]}
             onDelete={() => toggleSelection(item)}
           />)
-        ) : null}}
+        }}
         variant="outlined"
         margin="dense"
         fullWidth
         onChange={handleInputChange}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onFocus={openMenu}
-        onClick={openMenu}
+        onClick={() => {
+          if(props.onClick) props.onClick()
+          openMenu()
+        }}
         style={{ backgroundColor: "white" }}
       />
-      {!isOpen || !props.data ? null : (
-      <Paper {...getMenuProps()} style={{maxHeight: 200, overflow: "auto"}}>
-        { 
-          props.data
-          .filter(item => item[props.displayField].toLowerCase().includes(inputValue.toLowerCase()))
-          .filter(props.filter ? props.filter : () => true)
-          .map((item, index) => <MenuItem 
+      {!isOpen || !props.data ? null : 
+        <Paper {...getMenuProps()} style={{maxHeight: 200, overflow: "auto"}}>
+          { props.data
+            .filter(item => item[props.displayField].toLowerCase().includes(inputValue.toLowerCase()))
+            .filter(props.filter ? props.filter : () => true)
+            .map((item, index) => <MenuItem 
               {...getItemProps({
                 item,
                 index,
@@ -95,15 +98,15 @@ export default props => {
                 style: {
                   backgroundColor: highlightedIndex === index ? "lightgray" : null,
                   fontWeight: selectedItem.some(selected =>
-                     selected[props.idField || props.id] === item[props.idField || props.id])
-                       ? "bold" 
-                       : "normal",  
+                    selected[props.idField || props.id] === item[props.idField || props.id])
+                      ? "bold"
+                      : "normal",
                 }
               })}
             > {item[props.displayField]} </MenuItem>)
-        }
-      </Paper>
-      )}
-    </div>)}
+          }
+        </Paper>
+      }
+    </div>}
   </Downshift>
 }

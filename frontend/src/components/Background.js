@@ -1,7 +1,7 @@
 import React, { memo } from "react"
 import Background from "../img/CircuitBoard.jpg"
 
-export default props => (
+export default memo(props => (
   <div style={{
     backgroundColor: "#8991B6",
     backgroundImage: `url(${Background})`,
@@ -16,4 +16,4 @@ export default props => (
   }}>
     {props.children}
   </div>
-)
+))

@@ -39,13 +39,20 @@ export default props => {
   })
   const Forms = useQuery(GET_FORMS)
   const Validators = useQuery(GET_VALIDATORS)
-  const [dialogOpen, setDialogOpen] = useState(false)  
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [name, setName] = useState(0)
   const [description, setDescription] = useState(0)
   const [data, setData] = useState([{instructions:"", regEx:"", validator:""}])
   const [increment, forceUpdate] = useState(0) //forceUpdate(increment+1) when React doesn't see changes to arrays in objects? is there a functional component version of shouldComponentUpdate()?
   const [inputDataRefs, setInputDataRefs] = useState([{instructions:0, regEx:0, validator:0}])
   const [inputRefs, setInputRefs] = useState({name:0, description:0})
+
+  const setValidator = (index, moduleName) => {
+    const newData = data
+    newData[index].validator = moduleName
+    setData(newData)
+    forceUpdate(increment+1)
+  }
 
   const handleAddInput = () => {
     setInputDataRefs([...inputDataRefs, {instructions:0, regEx:0, validator:0}])
@@ -125,19 +132,14 @@ export default props => {
     if (!validName().valid) inputRefs.name.focus()
     else if (!validDescription().valid) inputRefs.description.focus()
     else {
-      console.log("hi")
       for (var [index, dataItem] of data.entries())
-      console.log(`index ${index}`)
-      console.log(`dataItem`)
-      console.log(dataItem)
-
         if(!validInstructions(dataItem.instructions).valid) inputDataRefs[index].instructions.focus()
         if(!validRegEx(dataItem.regEx).valid) inputDataRefs[index].regEx.focus()
         if(!validValidator(dataItem.validator).valid) inputDataRefs[index].regEx.focus()
     }
   }
 
-  const handleKeyPress = event => { if (event.key === "Enter")
+  const handleKeyDown = event => { if (event.key === "Enter")
     validInput ? handleSubmit() : focusNextInput()
   }
 
@@ -160,7 +162,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -173,7 +175,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -216,7 +218,7 @@ export default props => {
           variant="outlined"
           margin="dense"
           fullWidth
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           onChange={handleChange}
           style={{ backgroundColor: "white" }}
         />
@@ -234,7 +236,7 @@ export default props => {
           variant="outlined"
           margin="dense"
           fullWidth
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           onChange={handleChange}
           style={{ backgroundColor: "white" }}
         />
@@ -242,20 +244,16 @@ export default props => {
         <Dropdown
           name="validator"
           id={`validator${index}`}
-          key={`validator${index}`}
           value={data[index].validator}
           data={ Validators.data ? Validators.data.validators : [] }
-          idField="moduleName"
           displayField="moduleName"
           filter={item => item.enabled === true}
+          clearOnClick
           onSelect={ selection => {
-            const newData = data
-            newData[index].validator = selection.moduleName
-            setData(newData)
-            forceUpdate(increment+1)
-            focusNextInput()
+            setValidator(index, selection? selection.moduleName : "")
+            if (selection) focusNextInput()
           }}
-          onKeyPress={ handleKeyPress }
+          onKeyDown={ handleKeyDown }
           inputRef={ref => { 
             const newRefs = inputDataRefs
             newRefs[index].validator = ref

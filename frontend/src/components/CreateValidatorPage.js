@@ -71,7 +71,7 @@ export default props => {
     else if (!validModuleName().valid) inputRefs.moduleName.focus()
   }
 
-  const handleKeyPress = event => { if (event.key === "Enter")
+  const handleKeyDown = event => { if (event.key === "Enter")
     validInput ? handleSubmit() : focusNextInput()
   }
 
@@ -91,7 +91,7 @@ export default props => {
         variant="outlined"
         margin="dense"
         fullWidth
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         style={{ backgroundColor: "white" }}
       />
@@ -102,11 +102,12 @@ export default props => {
         idField="fileName"
         displayField="fileName"
         filter={item => item.validator === null}
+        clearOnClick
         onSelect={ selection => {
           setModuleName( selection.fileName )
           focusNextInput()
         }}
-        onKeyPress={ handleKeyPress }
+        onKeyDown={ handleKeyDown }
         inputRef={ref => setInputRefs(Object.assign(inputRefs, {moduleName: ref}))}
       />
 
