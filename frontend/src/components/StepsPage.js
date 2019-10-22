@@ -104,7 +104,7 @@ export default props => {
             if (!row.parts) return undefined
             var string = ""
             for (var [index, part] of row.parts.entries()) {
-              string = string.concat(part.nameo)
+              string = string.concat(part.name)
               if (index < row.parts.length - 1) string = string.concat(", ")
             }
             return string

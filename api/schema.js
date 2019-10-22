@@ -291,7 +291,7 @@ module.exports = gql`
   input EditPartInput { id: String! name: String customer: String image: String blueprint: String enabled: Boolean }
 
   "Input object type foraddStepToPart() mutation"
-  input AddStepToPartInput { stepType: String! part: String! prevStepIds: [String!] }
+  input AddStepToPartInput { stepType: String! partId: String! prevStepIds: [String!] }
 
   "Input object type for removeStepFromPart() mutation"
   input RemoveStepFromPartInput { id: String stepType: String }

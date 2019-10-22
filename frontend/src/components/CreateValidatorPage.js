@@ -104,8 +104,8 @@ export default props => {
         filter={item => item.validator === null}
         clearOnClick
         onSelect={ selection => {
-          setModuleName( selection.fileName )
-          focusNextInput()
+          setModuleName( selection ? selection.fileName : "")
+          if (selection) focusNextInput()
         }}
         onKeyDown={ handleKeyDown }
         inputRef={ref => setInputRefs(Object.assign(inputRefs, {moduleName: ref}))}

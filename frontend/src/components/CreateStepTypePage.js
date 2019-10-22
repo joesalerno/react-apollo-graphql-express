@@ -160,8 +160,8 @@ export default props => {
         displayField="name"
         clearOnClick
         onSelect={ selection => {
-          setForm(selection.name)
-          focusNextInput()
+          setForm(selection ? selection.name : "")
+          if (selection) focusNextInput()
         }}
         onKeyDown={ handleKeyDown }
         inputRef={ref => setInputRefs(Object.assign(inputRefs, {form: ref}))}

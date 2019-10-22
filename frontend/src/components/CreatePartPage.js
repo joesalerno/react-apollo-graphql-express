@@ -140,7 +140,7 @@ export default props => {
         <Typography variant="h5"> {`No image uploaded`} </Typography>
       </div>
       
-      <div><img src={image || ""} alt="part-image" style={{display:image?"flex":"none",maxHeight:"468px", maxWidth:"468px", margin:"8px auto 11px auto"}} /></div>
+      <div><img src={image || ""} alt="part" style={{display:image?"flex":"none",maxHeight:"468px", maxWidth:"468px", margin:"8px auto 11px auto"}} /></div>
 
       <input
         ref={ref => setInputRefs(Object.assign(inputRefs, {image: ref}))}

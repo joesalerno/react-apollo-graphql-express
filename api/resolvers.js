@@ -412,10 +412,10 @@ module.exports = {
     },
 
     addStepToPart: async (root, { input }, { self }) => {
-      var { part, stepType, prevStepIds } = input
+      var { partId, stepType, prevStepIds } = input
       if (!await userHasRoles(self, ["admin", "engineer"])) throw Error("Not authorized")
 
-      part = await Part.findByIdOrNo(part)
+      const part = await Part.findById(partId)
       if (!part) throw Error("Part not found")
 
       stepType = await StepType.findByIdOrName(stepType)
@@ -424,6 +424,9 @@ module.exports = {
 
       if(prevStepIds){
         const prevSteps = await PartStep.find({_id: {$in: prevStepIds}})
+        console.log("HERE!!")
+        console.log(prevSteps)
+        console.log(prevStepIds)
         if (prevSteps.length != prevStepIds.length) throw Error("Previous Step not found")
         for (var prevStep of prevSteps)
           if (!prevStep.enabled) throw Error("Cannot add step to part. Previous step is disabled")

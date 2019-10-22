@@ -61,9 +61,7 @@ export default props => {
         rows={Comments.data ? Comments.data.comments : []}
         columns={[
           { name: "data", title: "Comment" },
-          { name: "user", title: "Posted By", getCellValue: ref => {
-              return ref.user.username
-          }},
+          { name: "user", title: "Posted By", getCellValue: ref => ref.user.username },
           { name: "subject", title: "Subject ID" },
         ]}
       >

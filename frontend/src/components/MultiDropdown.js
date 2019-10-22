@@ -37,7 +37,7 @@ export default props => {
   return <Downshift
     onSelect={selection => {
       handleSelect(selection)
-      return props.onSelect(selection)
+      if (props.onSelect) props.onSelect(selection)
     }}
     itemToString={item => item 
       ? props.displayField 
