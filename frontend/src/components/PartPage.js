@@ -134,6 +134,16 @@ export default props => {
 
         <Button 
           variant="contained"
+          size="small" color="default"
+          fullWidth 
+          href={Part.data.part.blueprint || ""}
+          download={Part.data.part.blueprint ? `${Part.data.part.name}_blueprint.${Part.data.part.blueprint.split(`;`)[0].split(`/`)[1]}` : `blueprint`}
+        >
+          Upload New Blueprint
+        </Button>
+
+        <Button 
+          variant="contained"
           size="small" color="primary"
           fullWidth 
           href={Part.data.part.blueprint || ""}

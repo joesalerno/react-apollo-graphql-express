@@ -106,7 +106,7 @@ function App() {
       <Switch>
         <Route exact path="/" render={props =>
             validAuth()
-              ? <Redirect to = {currentPage} {...props} logout={logout} />
+              ? <Redirect to = {currentPage}/>
               : <LoginPage {...props} login={login} logout={logout} />
           }
         />
@@ -125,7 +125,7 @@ function App() {
           : <Redirect to="/" />
         }/>
 
-        <Route path="/jobs/:jobNo" render={props => validAuth()
+        <Route exact path="/jobs/:jobNo" render={props => validAuth()
           ? <JobPage {...props} changePage={changePage} logout={logout} auth={auth}/>
           : <Redirect to="/" />
         }/>
@@ -150,7 +150,7 @@ function App() {
           : <Redirect to="/" />
         }/>
 
-        <Route path="/parts/:id" render={props => validAuth()
+        <Route exact path="/parts/:id" render={props => validAuth()
           ? <PartPage {...props} changePage={changePage} logout={logout} auth={auth}/>
           : <Redirect to="/" />
         }/>
@@ -175,7 +175,7 @@ function App() {
           : <Redirect to="/" />
         }/>
 
-        <Route  exact path="/roles"render={props => validAuth()
+        <Route exact path="/roles"render={props => validAuth()
           ? <RolesPage {...props} changePage={changePage} logout={logout} auth={auth}/>
           : <Redirect to="/" />
         }/>
@@ -185,7 +185,7 @@ function App() {
           :  <Redirect to="/"/>
         }/>
 
-        <Route  exact path="/forms"render={props => validAuth()
+        <Route exact path="/forms"render={props => validAuth()
           ? <FormsPage {...props} changePage={changePage} logout={logout} auth={auth}/>
           : <Redirect to="/" />
         }/>
@@ -200,7 +200,6 @@ function App() {
           : <Redirect to="/" />
         }/>
 
-        
         <Route exact path="/createvalidator" render={props => validAuth()
           ? <CreateValidatorPage {...props} changePage={changePage} logout={logout} auth={auth}/>
           : <Redirect to="/" />
