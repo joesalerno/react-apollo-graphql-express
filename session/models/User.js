@@ -16,7 +16,7 @@ module.exports = (sequelize, Types) => {
     }
   )
   User.beforeValidate(user => {
-    user.password = bcrypt.hashSync(user.password, saltRounds)
+    if (user.changed("password")) user.password = bcrypt.hashSync(user.password, saltRounds)
   })
   User.associate = function(models) {
     // associations can be defined here
