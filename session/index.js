@@ -1,3 +1,4 @@
+//-- Import -------------------------------------------------------------------
 const express = require("express")
 const session = require("express-session")
 const SQLiteStore = require("connect-sqlite3")(session)
@@ -5,12 +6,16 @@ const { User } = require("./models")
 const morgan = require("morgan")
 const fs = require("fs")
 
+//-- Create an Express instance -----------------------------------------------
 const app = express()
 
-app.use(morgan("combined", { stream: fs.createWriteStream("./access.log", {flags: "a"})}))
+//-- Enable logging to access.log ---------------------------------------------
+app.use(morgan("combined", {stream: fs.createWriteStream("./access.log", {flags: "a"})}))
 
+//-- Parse incoming JSON into req.body object ---------------------------------
 app.use(express.json())
 
+//-- Enable sessions, save to SQLite database ---------------------------------
 app.use(session({
   store: new SQLiteStore,
   secret: "secret key 1234567890!",
@@ -19,12 +24,14 @@ app.use(session({
   cookie: { maxAxe: 7 * 24 * 60 * 60 * 1000 }
 }))
 
+//-- Middleware to count views of each page in session ------------------------
 app.use(({ session, path }, res, next) => {
   if (!session.views) session.views = {}
   session.views[path] = (session.views[path] || 0) + 1
   next()
 })
 
+//-- Routes -------------------------------------------------------------------
 app.all("/register", async ({ body }, res) => {
   if (!body.name)  return res.status(400).send("Must provide username (name)")
   if (!body.pass)  return res.status(400).send("Must provide password (pass)")
@@ -60,4 +67,6 @@ app.all("/protected", ({ session }, res) => {
 
 app.all("*", ({ session, path }, res) => res.send("You viewed this page " + session.views[path] + " times"))
 
+//-- Start the Express server -------------------------------------------------
 app.listen(3000)
+//-- Loop Server --------------------------------------------------------------
