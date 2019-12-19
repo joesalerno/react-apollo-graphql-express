@@ -29,7 +29,6 @@ app.use(session({
 
 //-- Middleware to count views of each page in session ------------------------
 app.use(({ session, path }, res, next) => {
-  if (!session.views) session.views = {}
   session.views[path] = (session.views[path] || 0) + 1
   next()
 })
