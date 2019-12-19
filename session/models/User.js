@@ -6,20 +6,17 @@ module.exports = (sequelize, Types) => {
       name: Types.STRING,
       email: Types.STRING,
       password: Types.STRING
-    },{
-      instanceMethods: {
-        comparePassword: (password, done) => 
-          bcrypt.compare(password, this.getDataValue("password"), (err, isMatch) => 
-            err ? done(err) : done(null, isMatch)
-          )
-      }
-    }
+    },{}
   )
-  User.beforeValidate(user => {
-    if (user.changed("password")) user.password = bcrypt.hashSync(user.password, saltRounds)
-  })
   User.associate = function(models) {
     // associations can be defined here
   }
+  User.prototype.validPassword = function(password) {
+    return bcrypt.compareSync(password, this.password)
+  }
+  User.beforeValidate(user => {
+    if (user.changed("password")) user.password = bcrypt.hashSync(user.password, saltRounds)
+  })
+  
   return User
 }

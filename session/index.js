@@ -6,6 +6,9 @@ const { User } = require("./models")
 const morgan = require("morgan")
 const fs = require("fs")
 
+const port = 3000
+const maxAge = 7 * 24 * 60 * 60 * 1000
+
 //-- Create an Express instance -----------------------------------------------
 const app = express()
 
@@ -21,7 +24,7 @@ app.use(session({
   secret: "secret key 1234567890!",
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAxe: 7 * 24 * 60 * 60 * 1000 }
+  cookie: { maxAge }
 }))
 
 //-- Middleware to count views of each page in session ------------------------
@@ -30,6 +33,18 @@ app.use(({ session, path }, res, next) => {
   session.views[path] = (session.views[path] || 0) + 1
   next()
 })
+
+//-- Apply this middleware to routes you want to protect ----------------------
+const authorize = (allowed) => ({session}, res, next) => 
+  Array.isArray(allowed) && !allowed.includes(session.user) || session.user !== allowed
+    ? next("Unauthorized")
+    : next()
+
+//-- Query the DB and validate credentials ------------------------------------
+const authenticate = async (username, password) => {
+  const user = await User.findOne({where: {name: username}})
+  return user && user.validPassword(password)
+}
 
 //-- Routes -------------------------------------------------------------------
 app.all("/register", async ({ body }, res) => {
@@ -42,15 +57,20 @@ app.all("/register", async ({ body }, res) => {
   res.send(await User.create(body))
 })
 
-app.all("/login", ({ query, body, session }, res) => {
-  if (query.user || body.user) {
-    session.user = query.user || body.user
-    return res.send("You have logged in!")
-  }
-  res.send("Enter a username after / in url, or send user field in post request JSON, or add to /?user= query parameter")
+const loginPage = `Username and password required. Enter "user" and "pass" fields to request body JSON or ?query= parameters, or go to /login/username/password`
+
+app.all("/login", async ({ body, query, session }, res) => {
+  Object.assign(body, query)
+  if (!query.user || !query.pass) return res.status(401).send(loginPage)
+  if (!await authenticate(query.user, query.pass)) return res.status(401).send("Unauthorized")
+  session.user = query.user
+  res.send("You have logged in!")
 })
 
-app.all("/login/:user", ({ params, session }, res) => {
+app.all("/login/:any", (req, res) => res.send(loginPage))
+
+app.all("/login/:user/:pass", async ({ params, session }, res) => {
+  if (!await authenticate(params.user, params.pass)) return res.status(401).send("Unauthorized")
   session.user = params.user
   res.send("You have logged in!")
 })
@@ -65,8 +85,10 @@ app.all("/protected", ({ session }, res) => {
   else res.status(401).send("Not logged in! Unable to see secret information!")
 })
 
+app.all("/joeonly", authorize("joe"), (req, res) => res.send("This is the Joe only page, just for Joe!"))
+
 app.all("*", ({ session, path }, res) => res.send("You viewed this page " + session.views[path] + " times"))
 
 //-- Start the Express server -------------------------------------------------
-app.listen(3000)
-//-- Loop Server --------------------------------------------------------------
+app.listen(port, console.log(`API server listening on port ${port}`))
+//---------------------------------~ LOOP ~------------------------------------
