@@ -1,0 +1,125 @@
+{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{- Server.pl -}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+Open Genesis, then run server.pl
+
+Listen for queries while(1):
+  Parse query
+  Try to read data from database... ///It should be assumed DB is up to date
+  If data not in database: 
+    Read data from Genesis...
+    Write data to database // & Possibly fork some datasaver.pl since job is already open to pull all of its data
+    Goto: try to read data from database
+  Respond with JSON
+
+{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{- SaveToDb.pl -}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+Run hook when opening or closing job (or when saving?)
+  -Also, should it remember state on open? so when saving to DB it can only save changed state? this way preserving data changed elsewhere a bit...
+
+For all database fields:
+  Save that field to database
+
+--
+
+Get entities that can be queried for every entity type
+Fire EVERY Query
+Store Response in database
+
+--
+✔ = can get entity list to query
+Queryable Entities: [
+  root ✔
+  job ✔
+  step ✔
+  symbol ✔
+  layer ✔
+  stackup ✔
+  wheel ✔
+  matrix ✔
+  check ✔
+  ncset ✔
+  ncrset ✔
+  attributes
+  panel_classes
+  notes
+  eda
+  comp
+]
+
+Query $entities{job}{JOBS_LIST} =>
+  STEPS_LIST,
+  SYMBOLS_LIST,
+  WHEELS_LIST,
+  MATRIX_LIST,
+  STACKUPS_LIST,
+  TEMPLATES_LIST,
+  FORMS_LIST,
+  FLOWS_LIST
+(for every step):
+Query $entities{step}{LAYERS_LIST} &
+Query $entities{step}{CHECKS_LIST} &
+Query $entities{step}{NETS_LIST} =>
+  LAYERS_LIST,
+  CHECKS_LIST,
+  NETS_LIST
+(for every step/layer):
+Query $entities{layer}{LAYERS_LIST} =>
+Query $entities{layer}{AOISETS_LIST} =>
+Query $entities{layer}{NCRSETS_LIST} =>
+  NCSETS_LIST,
+  AOISETS_LIST,
+  NCRSETS_LIST
+
+{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{- API server (index.js) -}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+GraphQl route:
+  Resolve queries:
+    For each field:
+      Try to read from server.pl or other db or anything
+Other routes:
+  Can be put in graphQL or better in Frontend
+
+{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{- Frontend server (index.js) -}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+
+Get Frontend Libraries Installed:
+
+  "@apollo/react-hooks"
+  "@devexpress/dx-react-core"
+  "@devexpress/dx-react-grid"
+  "@devexpress/dx-react-grid-material-ui"
+  "@material-ui/core"
+  "@material-ui/icons"
+  "apollo-boost"
+  "axios" or "wretch"
+  "downshift"
+  "graphql"
+  "jsonwebtoken"
+  "react"
+  "react-cookie"
+  "react-dom"
+  "react-router-dom"
+  "react-router-transition"
+  "react-scripts"
+
+  ...
+
+  "npx create-react-app"
+    downloads and runs command from npm
+    installs Babel transpiler, webpack, initializes with best practices
+    could also npm install create-react-app possibly
+
+Routes:
+
+/
+
+/login
+/register
+
+/jobs
+/jobs/:job/  //matrix
+/jobs/:job/steps
+/jobs/:job/steps/:step
+/jobs/:job/layers/
+/jobs/:job/layers/:layer
+
+/createcoupon

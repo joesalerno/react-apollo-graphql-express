@@ -1,4 +1,4 @@
-//-- Import -------------------------------------------------------------------
+//----------------------------~ Init API Server ~------------------------------
 const express = require("express")
 const session = require("express-session")
 const SQLiteStore = require("connect-sqlite3")(session)
@@ -29,6 +29,7 @@ app.use(session({
 
 //-- Middleware to count views of each page in session ------------------------
 app.use(({ session, path }, res, next) => {
+  session.views = session.views || {}
   session.views[path] = (session.views[path] || 0) + 1
   next()
 })
@@ -57,6 +58,7 @@ app.all("/register", async ({ body }, res) => {
 })
 
 const loginPage = `Username and password required. Enter "user" and "pass" fields to request body JSON or ?query= parameters, or go to /login/username/password`
+app.all("/login/:any", (req, res) => res.send(loginPage))
 
 app.all("/login", async ({ body, query, session }, res) => {
   Object.assign(body, query)
@@ -65,8 +67,6 @@ app.all("/login", async ({ body, query, session }, res) => {
   session.user = query.user
   res.send("You have logged in!")
 })
-
-app.all("/login/:any", (req, res) => res.send(loginPage))
 
 app.all("/login/:user/:pass", async ({ params, session }, res) => {
   if (!await authenticate(params.user, params.pass)) return res.status(401).send("Unauthorized")
@@ -91,3 +91,4 @@ app.all("*", ({ session, path }, res) => res.send("You viewed this page " + sess
 //-- Start the Express server -------------------------------------------------
 app.listen(port, console.log(`API server listening on port ${port}`))
 //---------------------------------~ LOOP ~------------------------------------
+//                                    ..

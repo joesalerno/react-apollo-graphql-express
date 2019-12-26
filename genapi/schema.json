@@ -1,0 +1,200 @@
+{
+  "root":{
+    "jobs_list":{"format":"array"}
+  },
+
+  "job":{
+    "attr":          {"format":"array","params":["name","val"]},
+    "flows_list":    {"format":"array"},
+    "forms_list":    {"format":"array"},
+    "matrix_list":   {"format":"array"},
+    "stackups_list": {"format":"array"},
+    "steps_list":    {"format":"array"},
+    "symbols_list":  {"format":"array"},
+    "templates_list":{"format":"array"},
+    "wheels_list":   {"format":"array"},
+    "exists":        {"format":"value"}
+  },
+
+  "step":{
+    "active_area":{"format":"value","params":["xmin","ymin","xmax","ymax"]},
+    "attr":       {"format":"array","params":["name","val"]},
+    "checks_list":{"format":"array"},
+    "datum":      {"format":"value","params":["x","y"]},
+    "layers_list":{"format":"array"},
+    "limits":     {"format":"value","params":["xmin","ymin","xmax","ymax"]},
+    "nets_list":  {"format":"array"},
+    "num_repeats":{"format":"value"},
+    "num_sr":     {"format":"value"},
+    "prof":       {"format":"freetext"},
+    "prof_limits":{"format":"value","params":["xmin","ymin","xmax","ymax"]},
+    "repeat":     {"format":"array","params":["step","xa","ya","angle","mirror","xmin","ymin","xmax","ymax"]},
+    "sr":         {"format":"array","params":["step","xa","ya","dx","dy","nx","ny","angle","mirror","xmin","ymin","xmax","ymax"]},
+    "sr_limits":  {"format":"value","params":["xmin","ymin","xmax","ymax"]},
+    "exists":     {"format":"value"}
+  },
+
+  "symbol":{
+    "attr":     {"format":"array","params":["name","val"]},
+    "feat_hist":{"format":"value","options":["break_sr","select"],"params":["line","pad","surf","arc","text","total"]},
+    "features": {"format":"freetext","options":["break_feat","select"]},
+    "fill":     {"format":"value","params":["dx","dy"]},
+    "limits":   {"format":"value","params":["xmin","ymin","xmax","ymax"]},
+    "sym_hist": {"format":"array","options":["break_sr"],"params":["symbol","line","pad","arc"]},
+    "exists":   {"format":"value"}
+  },
+
+  "layer:":{
+    "aoisets_list":{"format":"array"},
+    "attr":        {"format":"array","options":["break_sr","break_feat","select"],"params":["name","val"]},
+    "context":     {"format":"value"},
+    "drl_end":     {"format":"value"},
+    "drl_start":   {"format":"value"},
+    "feat_hist":   {"format":"value","options":["select","break_sr"],"params":["line","pad","surf","arc","text","total"]},
+    "features":    {"format":"freetext"},
+    "foil_side":   {"format":"value"},
+    "limits":      {"format":"value","params":["xmin","ymin","xmax","ymax"]},
+    "lpd":         {"format":"array","params":["was_input","is_defined","polarity","speed","xtretch","ystretch","xshift","yshift","xmirror","ymirror","copper_area","xcenter","ycenter","plot_kind1","plot_kind2","minvec","advec","minflash","adflash","conductors1","conductors2","conductors3","conductors4","conductors5","media","resolution","smoothing","swap_axes"]},
+    "ncrsets_list":{"format":"array"},
+    "ncsets_list": {"format":"array"},
+    "num_tool":    {"format":"value"},
+    "polarity":    {"format":"value"},
+    "row":         {"format":"value"},
+    "sheet_side":  {"format":"value"},
+    "side":        {"format":"value"},
+    "syms_hist":   {"format":"array","options":["break_sr"],"params":["symbol","line","pad","arc"]},
+    "tool":        {"format":"array","params":["num","count","type","min_tol","max_tol","finish_size","drill_size","bit"]},
+    "tool_thick":  {"format":"value"},
+    "tool_user":   {"format":"value"},
+    "type":        {"format":"value"},
+    "exists":      {"format":"value"}
+  },
+
+  "stackup":{
+    "allow_change":  {"format":"value"},
+    "construct":     {"format":"value"},
+    "cost":          {"format":"value"},
+    "etch_factor":   {"format":"value"},
+    "freq":          {"format":"value"},
+    "height":        {"format":"value"},
+    "imp":           {"format":"array","params":["model","ref1","ref2","lyr","dual_lyr","imp","imp_pos_tol","imp_neg_tol","target","target_tol","orig_width","curr_width","orig_space","curr_space","width_plus","width_minus"]},
+    "is_mirror":     {"format":"value"},
+    "layer":         {"format":"array","params":["side","serial","name"]},
+    "mask_er":       {"format":"value"},
+    "mask_thick":    {"format":"value"},
+    "pile":          {"format":"array","params":["cost","material","weave","thick","pos_tol","neg_tol","name","cat_num","vendor","upsidedown"]},
+    "plate_thick":   {"format":"value"},
+    "pressed":       {"format":"array","params":["material","thick","known"]},
+    "resin_er":      {"format":"value"},
+    "target_neg_tol":{"format":"value"},
+    "target_pos_tol":{"format":"value"},
+    "target_thick":  {"format":"value"},
+    "thick":         {"format":"value"},
+    "thick_type":    {"format":"value"},
+    "valid":         {"format":"value"},
+    "vendor":        {"format":"value"},
+    "width":         {"format":"value"},
+    "width_var":     {"format":"value"},
+    "exists":        {"format":"value"}
+  },
+
+  "wheel":{
+    "dcode": {"format":"array","params":["num","symbol","angle","mirror"]},
+    "exists":{"format":"value"}
+  },
+
+  "matrix":{
+    "attr":      {"format":"array","params":["val"]},
+    "col":       {"format":"array","params":["col","type","step_name"]},
+    "row":       {"format":"array","params":["row","type","name","context","layer_type","polarity","side","drl_start","drl_end","foil_side","sheet_side"]},
+    "num_rows":  {"format":"value"},
+    "num_cols":  {"format":"value"},
+    "num_layers":{"format":"value"},
+    "num_steps": {"format":"value"},
+    "exists":    {"format":"value"}
+  },
+
+  "check":{
+    "chk_attr":    {"format":"array","params":["name","val","exists"]},
+    "duration":    {"format":"value"},
+    "erf":         {"format":"value"},
+    "last_time":   {"format":"value"},
+    "meas":        {"format":"freetext"},
+    "meas_disp_id":{"format":"freetext"},
+    "num_act":     {"format":"value"},
+    "report":      {"format":"freetext"},
+    "status":      {"format":"value"},
+    "title":       {"format":"value"},
+    "exists":      {"format":"value"}
+  },
+
+  "ncset":{
+    "format":    {"format":"value"},
+    "machine":   {"format":"value"},
+    "num_splits":{"format":"value"},
+    "num_stages":{"format":"value"},
+    "reg":       {"format":"value"},
+    "exists":    {"format":"value"}
+  },
+
+  "ncrset":{
+    "format": {"format":"value"},
+    "machine":{"format":"value"},
+    "reg":    {"format":"value"},
+    "exists": {"format":"value"}
+  },
+
+  "attributes":{
+    "atr":      {"format":"array","options":["deleted"],"params":["name","changed","context","type","entity","def","min_txt_len","max_txt_len","options","option_del","min_int_val","max_int_val","min_flt_val","max_flt_val"]},
+    "force_lib":{"format":"value"},
+    "num_atr":  {"format":"value","options":["deleted"]},
+    "exists":   {"format":"value"}
+  },
+
+  "panel_classes":{
+    "cls":    {"format":"array","params":["name","width","height","t_active","b_active","l_active","r_active","sr_margin","sr_orient"]},
+    "num_cls":{"format":"value"},
+    "exists": {"format":"value"}
+  },
+
+  "notes":{
+    "note":  {"format":"array","params":["date","time","user","x","y","text"]},
+    "exists":{"format":"value"}
+  },
+
+  "eda":{
+    "comp":  {"format":"array","options":["select","top","bottom"]},
+    "ncomps":{"format":"value","options":["top","bottom"],"params":["refdes","centroidx","centroidy","npin","pin0x","pin0y","side","rotation","mirror","color","serial","limitminx","limitminy","limitmaxx","limitmaxy","cpn","ipn","mpn","vendor","bompackage","package"]},
+    "th":    {"format":"value","options":["select","top","bottom"]},
+    "exists":{"format":"value"}
+  },
+
+  "comp":{
+    "attribute": {"format":"array","params":["name","val"]},
+    "color":     {"format":"value"},
+    "part":      {"format":"value"},
+    "refdes":    {"format":"value"},
+    "x":         {"format":"value"},
+    "y":         {"format":"value"},
+    "side":      {"format":"value"},
+    "rotation":  {"format":"value"},
+    "mirror":    {"format":"value"},
+    "serial":    {"format":"value"},
+    "npins":     {"format":"value"},
+    "pin":       {"format":"array","params":["num","x","y"]},
+    "pin0x":     {"format":"value"},
+    "pin0y":     {"format":"value"},
+    "limitminx": {"format":"value"},
+    "limitmaxx": {"format":"value"},
+    "limitminy": {"format":"value"},
+    "limitmaxy": {"format":"value"},
+    "properties":{"format":"array","params":["name","val"]},
+    "cpn":       {"format":"value"},
+    "ipn":       {"format":"value"},
+    "mpn":       {"format":"value"},
+    "vendor":    {"format":"value"},
+    "bompackage":{"format":"value"},
+    "package":   {"format":"value"},
+    "exists":    {"format":"value"}
+  }
+}

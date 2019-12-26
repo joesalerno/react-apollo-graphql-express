@@ -31,3 +31,26 @@ Executing (default): PRAGMA INDEX_LIST(`Users`)
 Executing (default): CREATE TABLE IF NOT EXISTS `Users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255), `email` VARCHAR(255), `password` VARCHAR(255), `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL);
 Executing (default): SELECT 1+1 AS result
 Executing (default): PRAGMA INDEX_LIST(`Users`)
+Executing (default): CREATE TABLE IF NOT EXISTS `Users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255), `email` VARCHAR(255), `password` VARCHAR(255), `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL);
+Executing (default): SELECT 1+1 AS result
+Executing (default): PRAGMA INDEX_LIST(`Users`)
+Executing (default): CREATE TABLE IF NOT EXISTS `Users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255), `email` VARCHAR(255), `password` VARCHAR(255), `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL);
+Executing (default): SELECT 1+1 AS result
+Executing (default): PRAGMA INDEX_LIST(`Users`)
+Executing (default): CREATE TABLE IF NOT EXISTS `Users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255), `email` VARCHAR(255), `password` VARCHAR(255), `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL);
+Executing (default): SELECT 1+1 AS result
+Executing (default): PRAGMA INDEX_LIST(`Users`)
+Executing (default): CREATE TABLE IF NOT EXISTS `Users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255), `email` VARCHAR(255), `password` VARCHAR(255), `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL);
+Executing (default): SELECT 1+1 AS result
+Executing (default): PRAGMA INDEX_LIST(`Users`)
+Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE `User`.`name` = 'joe' LIMIT 1;
+Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE `User`.`name` = 'joe' LIMIT 1;
+Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE `User`.`name` = 'joe' LIMIT 1;
+Executing (default): CREATE TABLE IF NOT EXISTS `Users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255), `email` VARCHAR(255), `password` VARCHAR(255), `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL);
+Executing (default): SELECT 1+1 AS result
+Executing (default): PRAGMA INDEX_LIST(`Users`)
+Executing (default): CREATE TABLE IF NOT EXISTS `Users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` VARCHAR(255), `email` VARCHAR(255), `password` VARCHAR(255), `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL);
+Executing (default): SELECT 1+1 AS result
+Executing (default): PRAGMA INDEX_LIST(`Users`)
+Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE `User`.`name` = 'joe' LIMIT 1;
+Executing (default): SELECT `id`, `name`, `email`, `password`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE `User`.`name` = 'joe' LIMIT 1;
