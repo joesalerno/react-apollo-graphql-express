@@ -22,8 +22,8 @@ const server = new ApolloServer({
 
 const app = express()
 
-app.use(cors()); //enable ALL cors requests!!
-app.use(express.json());
+app.use(cors()) //enable ALL cors requests!!
+app.use(express.json())
 
 app.use("/register", (req, res, next) => {
   new User(req.body).save()

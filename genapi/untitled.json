@@ -1,6 +1,6 @@
-{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{- Server.pl -}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{- server -}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
-Open Genesis, then run server.pl
+Open Genesis, then run server
 
 Listen for queries while(1):
   Parse query
@@ -81,33 +81,6 @@ Other routes:
 
 {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{- Frontend server (index.js) -}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
-Get Frontend Libraries Installed:
-
-  "@apollo/react-hooks"
-  "@devexpress/dx-react-core"
-  "@devexpress/dx-react-grid"
-  "@devexpress/dx-react-grid-material-ui"
-  "@material-ui/core"
-  "@material-ui/icons"
-  "apollo-boost"
-  "axios" or "wretch"
-  "downshift"
-  "graphql"
-  "jsonwebtoken"
-  "react"
-  "react-cookie"
-  "react-dom"
-  "react-router-dom"
-  "react-router-transition"
-  "react-scripts"
-
-  ...
-
-  "npx create-react-app"
-    downloads and runs command from npm
-    installs Babel transpiler, webpack, initializes with best practices
-    could also npm install create-react-app possibly
-
 Routes:
 
 /
@@ -116,10 +89,22 @@ Routes:
 /register
 
 /jobs
+
+jobs() {
+  name
+  comments
+  currentProcess{name}
+  blueprint
+}
+
 /jobs/:job/  //matrix
 /jobs/:job/steps
 /jobs/:job/steps/:step
 /jobs/:job/layers/
 /jobs/:job/layers/:layer
 
-/createcoupon
+/jobs/:job/coupons/
+/jobs/:job/coupons/:coupon
+/jobs/:job/coupons/create
+
+

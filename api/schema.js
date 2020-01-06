@@ -59,6 +59,12 @@ module.exports = gql`
     timeCreated: String!
   }
 
+  "A single Genesis job representing a type of part"
+  type Job {
+    name: String!
+    path: String!
+  }
+
   "A single job ordered by a customer"
   type Job {
     id: String!

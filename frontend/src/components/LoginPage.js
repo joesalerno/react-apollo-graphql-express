@@ -16,14 +16,6 @@ export default props => {
   const [password, setPassword] = useState(0)
   const [showPassword, setShowPassword] = useState(0)
 
-  const handleChange = event => {
-    const { target: { id, value } } = event
-    if (id === "username") setUsername(value)
-    if (id === "password") setPassword(value)
-  }
-
-  const handleClickShowPassword = () => setShowPassword(!showPassword)
-
   const validUsername = () => username.length > 0
     ? {valid: true}
     : {err: "Please enter a valid username (1 or more characters)"}
@@ -36,6 +28,14 @@ export default props => {
 
   const inputRefs = {}
 
+  const handleChange = event => {
+    const { target: { id, value } } = event
+    if (id === "username") setUsername(value)
+    if (id === "password") setPassword(value)
+  }
+
+  const handleClickShowPassword = () => setShowPassword(!showPassword)
+
   const focusNextInput = () => {
     if (!validUsername().valid) inputRefs.username.focus()
     else if (!validPassword().valid) inputRefs.password.focus()
@@ -45,7 +45,7 @@ export default props => {
     validInput ? props.login(username, password) : focusNextInput()
   }
 
-  return <SmallWindowView width="375px" logo>
+  return <SmallWindowView width="380px" logo>
     <div style={{ margin: "16px" }}>
 
       <Avatar style={{ margin: "0 auto 4px auto" }}>

@@ -269,7 +269,6 @@ module.exports = {
     createRole: async (root, { input }, { self }) => {
       const { name, users } = input
       //Admin role needs a way to be created initially
-      
       if (!(name.toLowerCase() === "admin") && !await userHasRoles(self, "admin"))
        throw Error("Not authorized")
       const userIds = []
