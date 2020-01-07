@@ -3,5 +3,7 @@ import "./BasicLayout.scss"
 
 export default props => <div className="Screen">
   <NavBar {...props}/>
-  <div className="Background"> { props.children } </div>
+  <div className="Frame">
+    { props.children }
+  </div>
 </div>

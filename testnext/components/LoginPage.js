@@ -4,9 +4,10 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined"
 import Visibility from "@material-ui/icons/Visibility"
 import VisibilityOff from "@material-ui/icons/VisibilityOff"
 import TTMLogo from "../public/ttmvectorlogoblue.svg"
+import BasicLayout from "../components/BasicLayout"
 import "./LoginPage.scss"
 
-const LoginPage = ({login, session}) => {
+const LoginPage = ({login, logout, session}) => {
   const [username, setUsername] = useState(0)
   const [password, setPassword] = useState(0)
   const [showPassword, setShowPassword] = useState(0)
@@ -35,83 +36,85 @@ const LoginPage = ({login, session}) => {
   }
 
   const handleKeyDown = event => { if (event.key === "Enter")
-    validInput ? Login(username, password) : focusNextInput()
+    validInput ? login(username, password) : focusNextInput()
   }
 
   const handleClickShowPassword = () => setShowPassword(!showPassword)
 
-  return <div className="LoginPage">
-    
-    <NoSsr>
-      <div style={{height: "84px", width: "500px", margin: "auto auto 30px auto"}}>
-        <div className="Logo" style={{
+  return <BasicLayout session={session} logout={logout}>
+    <div className="LoginPage">  
+      <NoSsr>
+        <div style={{
           background: `url(${TTMLogo})`,
           backgroundSize: "contain",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
           height: "84px",
-          width: "500px"
+          width: "500px",
+          maxWidth: "100%",
+          margin: "auto auto 30px auto"
         }}/>
-      </div>
 
-      <Avatar> <LockOutlinedIcon/> </Avatar>
+        <Avatar> <LockOutlinedIcon/> </Avatar>
 
-      <Typography
-        component="h1"
-        variant="h5"
-        style={{ textAlign: "center", margin: "8px 0px 30px 0px" }}
-      > Login </Typography>
+        <Typography
+          component="h1"
+          variant="h5"
+          style={{ textAlign: "center", margin: "8px 0px 38px 0px" }}
+        > CAM Login </Typography>
 
-      <TextField
-        id="username"
-        inputRef={ref => { inputRefs.username = ref }}
-        label="Enter Username"
-        variant="outlined"
-        margin="dense"
-        autoComplete="username"
-        autoFocus
-        required
-        onKeyDown={handleKeyDown}
-        onChange={handleChange}
-        style={{ backgroundColor: "white", margin:"5px", width: "250px" }}
-      />
+        <TextField
+          id="username"
+          inputRef={ref => { inputRefs.username = ref }}
+          label="Enter Username"
+          variant="outlined"
+          margin="dense"
+          autoComplete="username"
+          autoFocus
+          required
+          onKeyDown={handleKeyDown}
+          onChange={handleChange}
+          style={{ backgroundColor: "white", margin:"5px", width: "250px" }}
+        />
 
-      <TextField
-        id="password"
-        inputRef={ref => { inputRefs.password = ref }}
-        label="Enter Password"
-        variant="outlined"
-        margin="dense"
-        autoComplete="password"
-        required
-        onKeyDown={handleKeyDown}
-        onChange={handleChange}
-        InputProps={{ type: showPassword ? "text" : "password",
-          endAdornment: <InputAdornment position="end">
-            <IconButton onClick={handleClickShowPassword}>
-              {showPassword ? <Visibility/>: <VisibilityOff/>}
-            </IconButton>
-          </InputAdornment>
-        }}
-        style={{ backgroundColor: "white", margin:"5px", width: "250px" }}
-      />
-      
-      <Button
-        id="login"
-        color="primary"
-        variant="contained"
-        disabled={!validUsername().valid || !validPassword().valid}
-        onClick={() => (login(username, password))}
-        style={{ margin:"8px 5px 8px 5px", width: "250px" }}
-      > Login </Button>
+        <TextField
+          id="password"
+          inputRef={ref => { inputRefs.password = ref }}
+          label="Enter Password"
+          variant="outlined"
+          margin="dense"
+          autoComplete="password"
+          required
+          onKeyDown={handleKeyDown}
+          onChange={handleChange}
+          InputProps={{ type: showPassword ? "text" : "password",
+            endAdornment: <InputAdornment position="end">
+              <IconButton onClick={handleClickShowPassword}>
+                {showPassword ? <Visibility/>: <VisibilityOff/>}
+              </IconButton>
+            </InputAdornment>
+          }}
+          style={{ backgroundColor: "white", margin:"5px", width: "250px" }}
+        />
+        
+        <Button
+          id="login"
+          color="primary"
+          variant="contained"
+          disabled={!validUsername().valid || !validPassword().valid}
+          onClick={() => (login(username, password))}
+          style={{ margin:"8px 5px 8px 5px", width: "250px" }}
+        > Login </Button>
 
-      <div style={{width:"250px", display:"flex", justifyContent:"space-around", margin:"0 auto auto auto"}}>
-        <a href="/">Register</a>
-        <a href="/">Forgot Password</a>
-      </div>
-
-    </NoSsr>
-  </div>
+        <div style={{width:"250px", display:"flex", justifyContent:"space-around", margin:"0 auto auto auto"}}>
+          <a href="/">Register</a>
+          <a href="/">Forgot Password</a>
+        </div>    
+      </NoSsr>
+    </div>
+  </BasicLayout>
+  
+  
 }
 
 export default LoginPage

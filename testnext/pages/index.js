@@ -1,6 +1,5 @@
 import "./index.scss";
 import LoginPage from "../components/LoginPage"
-import BasicLayout from "../components/BasicLayout"
 import { useReducer } from "react"
 
 const Index = ({ session }) => {
@@ -16,9 +15,10 @@ const Index = ({ session }) => {
     forceUpdate()
   }
 
-  return <BasicLayout session={session} logout={logout}>
-    <LoginPage session={session} login={login}/>
-  </BasicLayout>
+  console.log(session)
+
+  return <LoginPage session={session} logout={logout} login={login}/>
+
 }
 
 export default Index

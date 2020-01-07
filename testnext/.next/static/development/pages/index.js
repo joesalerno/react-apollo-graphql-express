@@ -22,8 +22,8 @@ var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
   return __jsx("div", {
     className: "Screen"
   }, __jsx(_NavBar__WEBPACK_IMPORTED_MODULE_1__["default"], props), __jsx("div", {
-    className: "Background"
-  }, " ", props.children, " "));
+    className: "Frame"
+  }, props.children));
 });
 
 /***/ }),
@@ -48,8 +48,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _material_ui_icons_VisibilityOff__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_material_ui_icons_VisibilityOff__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _public_ttmvectorlogoblue_svg__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../public/ttmvectorlogoblue.svg */ "./public/ttmvectorlogoblue.svg");
 /* harmony import */ var _public_ttmvectorlogoblue_svg__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_public_ttmvectorlogoblue_svg__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _LoginPage_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./LoginPage.scss */ "./components/LoginPage.scss");
-/* harmony import */ var _LoginPage_scss__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_LoginPage_scss__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _components_BasicLayout__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../components/BasicLayout */ "./components/BasicLayout.js");
+/* harmony import */ var _LoginPage_scss__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./LoginPage.scss */ "./components/LoginPage.scss");
+/* harmony import */ var _LoginPage_scss__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_LoginPage_scss__WEBPACK_IMPORTED_MODULE_7__);
 
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 
@@ -60,8 +61,10 @@ var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 
 
 
+
 var LoginPage = function LoginPage(_ref) {
   var login = _ref.login,
+      logout = _ref.logout,
       session = _ref.session;
 
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(0),
@@ -108,39 +111,37 @@ var LoginPage = function LoginPage(_ref) {
   };
 
   var handleKeyDown = function handleKeyDown(event) {
-    if (event.key === "Enter") validInput ? Login(username, password) : focusNextInput();
+    if (event.key === "Enter") validInput ? login(username, password) : focusNextInput();
   };
 
   var handleClickShowPassword = function handleClickShowPassword() {
     return setShowPassword(!showPassword);
   };
 
-  return __jsx("div", {
+  return __jsx(_components_BasicLayout__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    session: session,
+    logout: logout
+  }, __jsx("div", {
     className: "LoginPage"
   }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["NoSsr"], null, __jsx("div", {
-    style: {
-      height: "84px",
-      width: "500px",
-      margin: "auto auto 30px auto"
-    }
-  }, __jsx("div", {
-    className: "Logo",
     style: {
       background: "url(".concat(_public_ttmvectorlogoblue_svg__WEBPACK_IMPORTED_MODULE_5___default.a, ")"),
       backgroundSize: "contain",
       backgroundRepeat: "no-repeat",
       backgroundPosition: "center",
       height: "84px",
-      width: "500px"
+      width: "500px",
+      maxWidth: "100%",
+      margin: "auto auto 30px auto"
     }
-  })), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Avatar"], null, " ", __jsx(_material_ui_icons_LockOutlined__WEBPACK_IMPORTED_MODULE_2___default.a, null), " "), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], {
+  }), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Avatar"], null, " ", __jsx(_material_ui_icons_LockOutlined__WEBPACK_IMPORTED_MODULE_2___default.a, null), " "), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], {
     component: "h1",
     variant: "h5",
     style: {
       textAlign: "center",
-      margin: "8px 0px 30px 0px"
+      margin: "8px 0px 38px 0px"
     }
-  }, " Login "), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["TextField"], {
+  }, " CAM Login "), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["TextField"], {
     id: "username",
     inputRef: function inputRef(ref) {
       inputRefs.username = ref;
@@ -206,7 +207,7 @@ var LoginPage = function LoginPage(_ref) {
     href: "/"
   }, "Register"), __jsx("a", {
     href: "/"
-  }, "Forgot Password"))));
+  }, "Forgot Password")))));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (LoginPage);
@@ -48522,10 +48523,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _index_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.scss */ "./pages/index.scss");
 /* harmony import */ var _index_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_index_scss__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components_LoginPage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/LoginPage */ "./components/LoginPage.js");
-/* harmony import */ var _components_BasicLayout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/BasicLayout */ "./components/BasicLayout.js");
 
 var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
-
 
 
 
@@ -48546,13 +48545,12 @@ var Index = function Index(_ref) {
     forceUpdate();
   };
 
-  return __jsx(_components_BasicLayout__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  console.log(session);
+  return __jsx(_components_LoginPage__WEBPACK_IMPORTED_MODULE_2__["default"], {
     session: session,
-    logout: logout
-  }, __jsx(_components_LoginPage__WEBPACK_IMPORTED_MODULE_2__["default"], {
-    session: session,
+    logout: logout,
     login: login
-  }));
+  });
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (Index);

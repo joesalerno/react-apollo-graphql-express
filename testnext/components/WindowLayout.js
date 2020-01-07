@@ -7,7 +7,7 @@ export default props => <div className="Screen">
 
   <NavBar {...props}/>
 
-  <div className="Background">
+  <div className="Frame" style={{margin:"8px 0"}}>
 
     { !props.logo ? null : <div className="Logo" style={{
       background: `url(${TTMLogo})`,
@@ -22,7 +22,9 @@ export default props => <div className="Screen">
       height: `${props.height || ""}`,
       width: `${props.width || "380px"}`
     }}>
+
       { props.children }
+
     </Paper>
 
   </div>
