@@ -165,9 +165,15 @@ const MyApp = ({
   const {
     0: user,
     1: setUser
-  } = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])(undefined); //const [user, setUser] = useState(cookie.user || undefined)
-  //if (!user && cookie.user) setUser(cookie.user)
-
+  } = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])(undefined);
+  const {
+    0: initialLoad,
+    1: setInitialLoad
+  } = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])(true);
+  Object(react__WEBPACK_IMPORTED_MODULE_1__["useEffect"])(() => {
+    if (initialLoad && !user && cookie.user) setUser(cookie.user);
+    setInitialLoad(false);
+  });
   return __jsx(Component, Object(_babel_runtime_corejs2_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, pageProps, {
     user: user,
     setUser: setUser,
@@ -175,24 +181,7 @@ const MyApp = ({
     setCookie: setCookie,
     removeCookie: removeCookie
   }));
-}; // class MyApp extends App {
-//   state = {
-//     user: undefined
-//   }
-//   componentDidMount() {
-//     console.log(this.props.cookies)
-//     //if (!user && this.props.cookies.user) setUser()
-//   }
-//   render() {
-//     <Component {...pageProps} user={user} setUser={setUser} cookie={cookie} setCookie={setCookie} removeCookie={removeCookie}/>
-//   }
-// }
-// MyApp.getInitialProps = async ({Component, ctx}) => {
-//   let pageProps = {}
-//   if (Component.getInitialProps) pageProps = await Component.getInitialProps(ctx)
-//   return {pageProps: {...pageProps, session: ctx.req.session, sessionID: ctx.req.sessionID}}
-// }
-
+};
 
 /* harmony default export */ __webpack_exports__["default"] = (MyApp);
 

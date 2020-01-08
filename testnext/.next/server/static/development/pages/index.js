@@ -400,11 +400,11 @@ const NavBar = ({
   style: {
     display: user ? "flex" : "none"
   }
-}, "Logged in as ", `${user}`, __jsx(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_1___default.a, {
+}, __jsx(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_1___default.a, {
   variant: "contained",
   color: "primary",
   onClick: logout
-}, "Log Out"));
+}, "Log Out ", user));
 
 /* harmony default export */ __webpack_exports__["default"] = (NavBar);
 
@@ -679,15 +679,19 @@ var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 const Index = ({
   user,
   setUser,
+  cookie,
   setCookie,
-  cookie
+  removeCookie
 }) => {
   const login = (username, password) => {
     setUser(username);
     setCookie("user", username);
   };
 
-  const logout = () => setUser(undefined);
+  const logout = () => {
+    setUser(undefined);
+    removeCookie("user");
+  };
 
   if (!user) return __jsx(_components_LoginPage__WEBPACK_IMPORTED_MODULE_2__["default"], {
     user: user,
