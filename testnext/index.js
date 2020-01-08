@@ -21,20 +21,23 @@ app.prepare()
 
     server.use(express.json())
 
-    server.use(session({
-      store: new SQLiteStore,
-      secret: "secret key 1234567890!",
-      resave: false,
-      saveUninitialized: true,
-      cookie: { MAXAGE }
-    }))
+    // var store = new SQLiteStore
 
-    //-- Middleware to count views of each page in session ------------------------
-    server.use(({ session, path }, res, next) => {
-      session.views = session.views || {}
-      session.views[path] = (session.views[path] || 0) + 1
-      next()
-    })
+    // server.use(session({
+    //   store,
+    //   secret: "secret key 1234567890!",
+    //   resave: false,
+    //   saveUninitialized: true,
+    //   cookie: { MAXAGE }
+    // }))
+
+    // //-- Middleware to count views of each page in session ------------------------
+    // server.use(({ session, path }, res, next) => {
+    //   session.views = session.views || {}
+    //   session.views[path] = (session.views[path] || 0) + 1
+    //   session.test = "TEST"
+    //   next()
+    // })
 
     server.get("*", handle)
 

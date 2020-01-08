@@ -1,4 +1,4 @@
-import TTMLogo from "../public/ttmvectorlogoblue.svg"
+import TTMLogo from "../components/TTMTechnologiesLogo"
 import Paper from "@material-ui/core/Paper"
 import NavBar from "./NavBar"
 import "./WindowLayout.scss"
@@ -7,20 +7,20 @@ export default props => <div className="Screen">
 
   <NavBar {...props}/>
 
-  <div className="Frame" style={{margin:"8px 0"}}>
+  <div className="Frame">
 
-    { !props.logo ? null : <div className="Logo" style={{
-      background: `url(${TTMLogo})`,
-      backgroundSize: "contain",
-      backgroundRepeat: "no-repeat",
-      height: `${props.width ? `calc(${props.width}/6)` : "63px"}`,
-      width: `${props.width || "380px"}`
+    { !props.logo ? null :
+    <TTMLogo style={{
+      margin: "auto auto 30px auto",
+      height: (props.windowStyle && props.windowStyle.width) || props.width ? `calc(${(props.windowStyle && props.windowStyle.width || props.width)}/6)` : "63px",
+      width: (props.windowStyle && props.windowStyle.width) || props.width ? `${props.windowStyle && props.windowStyle.width || props.width}` : "380px"
     }}/>}
 
     <Paper className="Window" component="main" style={{ 
       margin: props.logo ? "0 auto auto auto" : "auto",
-      height: `${props.height || ""}`,
-      width: `${props.width || "380px"}`
+      height: props.height || "",
+      width: props.width || "380px",
+      ...props.windowStyle,
     }}>
 
       { props.children }

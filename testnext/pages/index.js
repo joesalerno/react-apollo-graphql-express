@@ -1,24 +1,18 @@
 import "./index.scss";
 import LoginPage from "../components/LoginPage"
-import { useReducer } from "react"
+import HomePage from "../components/HomePage"
 
-const Index = ({ session }) => {
-  const forceUpdate = useReducer(()=>({}))[1]
-
+const Index = ({ user, setUser, setCookie, cookie }) => {
   const login = (username, password) => {
-    session.user = username
-    forceUpdate()
+    setUser(username)
+    setCookie("user", username)
   }
 
-  const logout = () => {
-    session.user = undefined
-    forceUpdate()
-  }
+  const logout = () => setUser(undefined)
 
-  console.log(session)
+  if (!user) return <LoginPage user={user} login={login} logout={logout}/>
 
-  return <LoginPage session={session} logout={logout} login={login}/>
-
+  return <HomePage user={user} login={login} logout={logout} cookie={cookie}/>
 }
 
 export default Index

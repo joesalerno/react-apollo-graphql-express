@@ -3,14 +3,21 @@ import { NoSsr, TextField, Typography, Avatar, IconButton, Button, InputAdornmen
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined"
 import Visibility from "@material-ui/icons/Visibility"
 import VisibilityOff from "@material-ui/icons/VisibilityOff"
-import TTMLogo from "../public/ttmvectorlogoblue.svg"
+import TTMLogo from "../components/TTMTechnologiesLogo"
 import BasicLayout from "../components/BasicLayout"
 import "./LoginPage.scss"
 
-const LoginPage = ({login, logout, session}) => {
-  const [username, setUsername] = useState(0)
-  const [password, setPassword] = useState(0)
+const LoginPage = ({login, logout, user}) => {
+  //------------------------- Initialize Component -----------------------------
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(0)
+  const inputRefs = {}
+
+  const focusNextInput = () => {
+    if (!validUsername().valid) inputRefs.username.focus()
+    else if (!validPassword().valid) inputRefs.password.focus()
+  }
 
   const validUsername = () => username.length > 0
     ? {valid: true}
@@ -22,17 +29,10 @@ const LoginPage = ({login, logout, session}) => {
 
   const validInput = validUsername().valid && validPassword().valid
 
-  const inputRefs = {}
-
   const handleChange = event => {
     const { target: { id, value } } = event
     if (id === "username") setUsername(value)
     if (id === "password") setPassword(value)
-  }
-
-  const focusNextInput = () => {
-    if (!validUsername().valid) inputRefs.username.focus()
-    else if (!validPassword().valid) inputRefs.password.focus()
   }
 
   const handleKeyDown = event => { if (event.key === "Enter")
@@ -41,14 +41,12 @@ const LoginPage = ({login, logout, session}) => {
 
   const handleClickShowPassword = () => setShowPassword(!showPassword)
 
-  return <BasicLayout session={session} logout={logout}>
+  //-------------------------------- Render ------------------------------------
+  return <BasicLayout user={user} logout={logout}>
     <div className="LoginPage">  
       <NoSsr>
-        <div style={{
-          background: `url(${TTMLogo})`,
-          backgroundSize: "contain",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "center",
+
+        <TTMLogo style={{
           height: "84px",
           width: "500px",
           maxWidth: "100%",
@@ -64,6 +62,7 @@ const LoginPage = ({login, logout, session}) => {
         > CAM Login </Typography>
 
         <TextField
+          value={username}
           id="username"
           inputRef={ref => { inputRefs.username = ref }}
           label="Enter Username"
@@ -78,6 +77,7 @@ const LoginPage = ({login, logout, session}) => {
         />
 
         <TextField
+          value={password}
           id="password"
           inputRef={ref => { inputRefs.password = ref }}
           label="Enter Password"
@@ -106,15 +106,14 @@ const LoginPage = ({login, logout, session}) => {
           style={{ margin:"8px 5px 8px 5px", width: "250px" }}
         > Login </Button>
 
-        <div style={{width:"250px", display:"flex", justifyContent:"space-around", margin:"0 auto auto auto"}}>
+        <div className="Links">
           <a href="/">Register</a>
           <a href="/">Forgot Password</a>
-        </div>    
+        </div>
+
       </NoSsr>
     </div>
   </BasicLayout>
-  
-  
 }
 
 export default LoginPage
