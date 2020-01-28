@@ -35,8 +35,8 @@ const LoginPage = ({login, logout, user}) => {
     if (id === "password") setPassword(value)
   }
 
-  const handleKeyDown = event => { if (event.key === "Enter")
-    validInput ? login(username, password) : focusNextInput()
+  const handleKeyDown = event => { 
+    if (event.key === "Enter") validInput ? login(username, password) : focusNextInput()
   }
 
   const handleClickShowPassword = () => setShowPassword(!showPassword)
@@ -90,7 +90,7 @@ const LoginPage = ({login, logout, user}) => {
           InputProps={{ type: showPassword ? "text" : "password",
             endAdornment: <InputAdornment position="end">
               <IconButton onClick={handleClickShowPassword}>
-                {showPassword ? <Visibility/>: <VisibilityOff/>}
+                {showPassword ? <Visibility/> : <VisibilityOff/>}
               </IconButton>
             </InputAdornment>
           }}
@@ -102,7 +102,7 @@ const LoginPage = ({login, logout, user}) => {
           color="primary"
           variant="contained"
           disabled={!validUsername().valid || !validPassword().valid}
-          onClick={() => (login(username, password))}
+          onClick={() => login(username, password)}
           style={{ margin:"8px 5px 8px 5px", width: "250px" }}
         > Login </Button>
 

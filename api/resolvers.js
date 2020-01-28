@@ -137,7 +137,7 @@ module.exports = {
   ValidatorModule: {
     validator: validatorModule => Validator.findOne({moduleName: validatorModule.fileName})
   },
-
+  
   Comment: {
     data: comment => {
       if (!comment.enabled) return "-deleted-"
@@ -147,41 +147,41 @@ module.exports = {
     comments: comment => Comment.find({ subjectId: comment.id }),
     user: comment => User.findById(comment.userId)
   },
-
+  
   Query: {
     me: (root, args, { self }) => self,
-
+    
     user: (root, { id, username }) => {
       if (!id && !username) throw Error("Must provide id or username")
       return User.findByIdOrName(id ? id : username)
     },
     users: () => User.find({}),
-
+    
     role: (root, { id, name }) => {
       if (!id && !name) throw Error("Must provide id or name")
       return Role.findByIdOrName(id ? id : name)
     },
-
+    
     roles: () => Role.find({}),
-
+    
     customer: (root, { id, name }) => {
       if (!id && !name) throw Error("Must provide id or name")
       return Customer.findByIdOrName(id ? id : name)
     },
-
+    
     customers: () => Customer.find({}),
-
+    
     part: (root, { id }) => Part.findById(id),
-
+    
     parts: () => Part.find({}),
-
+    
     location: (root, {id, name}) => {
       if (!id && !name) throw Error("Must provide an id or name")
       return Location.findByIdOrName(id ? id : name)
     },
-
+    
     locations: () => Location.find({}),
-
+    
     job: (root, { id, jobNo }) => {
       if (!id && !jobNo) throw Error("Must provide an id or jobNo")
       return Job.findByIdOrNo(id ? id : jobNo)
@@ -270,7 +270,7 @@ module.exports = {
       const { name, users } = input
       //Admin role needs a way to be created initially
       if (!(name.toLowerCase() === "admin") && !await userHasRoles(self, "admin"))
-       throw Error("Not authorized")
+        throw Error("Not authorized")
       const userIds = []
       if (users) {
         for (var user of users) {

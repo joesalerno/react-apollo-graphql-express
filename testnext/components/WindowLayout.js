@@ -1,31 +1,33 @@
-import TTMLogo from "../components/TTMTechnologiesLogo"
+/* eslint-disable react/react-in-jsx-scope */
+import Logo from "../components/TTMTechnologiesLogo"
 import Paper from "@material-ui/core/Paper"
 import NavBar from "./NavBar"
 import "./WindowLayout.scss"
 
-export default props => <div className="Screen">
+const WindowLayout = ({children, logo, height, width, windowStyle, ...props}) => <div className="Screen">
 
   <NavBar {...props}/>
 
   <div className="Frame">
 
-    { !props.logo ? null :
-    <TTMLogo style={{
+    { logo && <Logo style={{
       margin: "auto auto 30px auto",
-      height: (props.windowStyle && props.windowStyle.width) || props.width ? `calc(${(props.windowStyle && props.windowStyle.width || props.width)}/6)` : "63px",
-      width: (props.windowStyle && props.windowStyle.width) || props.width ? `${props.windowStyle && props.windowStyle.width || props.width}` : "380px"
-    }}/>}
+      height: windowStyle && windowStyle.width || width ? `calc(${windowStyle&&windowStyle.width||width}/6)` : "63px",
+      width:  windowStyle && windowStyle.width || width || "380px",
+    }}/> }
 
     <Paper className="Window" component="main" style={{ 
-      margin: props.logo ? "0 auto auto auto" : "auto",
-      height: props.height || "",
-      width: props.width || "380px",
-      ...props.windowStyle,
+      margin: logo ? "0 auto auto auto" : "auto",
+      height: height || "",
+      width: width || "380px",
+      ...windowStyle,
     }}>
 
-      { props.children }
+      { children }
 
     </Paper>
 
   </div>
 </div>
+
+export default WindowLayout

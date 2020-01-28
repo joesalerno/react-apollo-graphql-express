@@ -1,0 +1,15 @@
+.Screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  position: absolute;
+}
+
+.Frame {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+  -webkit-overflow-scrolling: touch;
+}

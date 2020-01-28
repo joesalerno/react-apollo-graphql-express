@@ -1,0 +1,11 @@
+* {
+  padding: 0;
+  margin: 0;
+  -webkit-overflow-scrolling: touch;
+}
+.switch-wrapper {
+  position: relative
+}
+.switch-wrapper > div {
+  position: absolute
+}
