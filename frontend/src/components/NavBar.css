@@ -7,3 +7,12 @@
   align-items: center;
   justify-content: flex-end;
 }
+
+.Title {
+  margin: auto;
+  position: absolute;
+  width:100%;
+  left: 0;
+  text-align: center;
+  color:#333333;
+}

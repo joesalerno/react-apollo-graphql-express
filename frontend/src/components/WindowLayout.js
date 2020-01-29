@@ -4,9 +4,9 @@ import Paper from "@material-ui/core/Paper"
 import NavBar from "./NavBar"
 import "./WindowLayout.css"
 
-const WindowLayout = ({auth, logo, width, children, ...props}) => <>
+const WindowLayout = ({logo, width, children, ...rest}) => <>
 
-  {<NavBar {...props} />}
+  {<NavBar {...rest} />}
 
   <div className="Frame">
 

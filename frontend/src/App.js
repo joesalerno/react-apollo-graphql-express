@@ -1,28 +1,31 @@
 import React, { useState } from "react"
-import WindowLayout from "./components/WindowLayout"
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
+import Index from "./pages/Index"
 import "./App.css"
 
 function App() {
-  const [values, setValues] = useState({})
-  return (
-    <WindowLayout>
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        {Array.from(Array(10)).map((x, i) => (
-          <input
-            onChange={event => {
-              setValues({ ...values, [i]: event.target.value })
-            }}
-            id={i}
-            value={values[i]}
-            style={{
-              width: 165,
-              backgroundColor: values[i]
-            }}
-          />
-        ))}
-      </div>
-    </WindowLayout>
-  )
+  const [auth, setAuth] = useState(localStorage.getItem("auth") || "")
+
+  const login = (username, password) => {
+    //authenticate...
+    setAuth(username)
+    localStorage.setItem("auth", username)
+  }
+  
+  const logout = () => {
+    setAuth("")
+    localStorage.removeItem("auth")
+  }
+
+  return <Router>
+    <Switch>
+
+      <Route path="/">
+        <Index auth={auth} login={login} logout={logout}/>
+      </Route>
+
+    </Switch>
+  </Router>
 }
 
 export default App
