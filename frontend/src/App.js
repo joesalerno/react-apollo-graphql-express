@@ -1,6 +1,8 @@
 import React, { useState } from "react"
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
-import Index from "./pages/Index"
+import CreateCouponPage from "./pages/CreateCouponPage"
+import IndexPage from "./pages/IndexPage"
+import JobsPage from "./pages/JobsPage"
 import "./App.css"
 
 function App() {
@@ -20,8 +22,16 @@ function App() {
   return <Router>
     <Switch>
 
-      <Route path="/">
-        <Index auth={auth} login={login} logout={logout}/>
+      <Route exact path="/">
+        <IndexPage auth={auth} login={login} logout={logout}/>
+      </Route>
+
+      <Route exact path="/jobs/:job">
+        <JobsPage auth={auth} login={login} logout={logout}/>
+      </Route>
+
+      <Route exact path="/jobs/:job/CreateCoupon">
+        <CreateCouponPage auth={auth} login={login} logout={logout}/>
       </Route>
 
     </Switch>
