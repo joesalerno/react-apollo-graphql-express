@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, Fragment } from "react"
 import { Link } from "react-router-dom"
 import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
@@ -45,11 +45,11 @@ const NavBar = ({ auth, logout, login, links }) => {
       />
 
       <div style={{margin:"0 auto 0 0"}}>
-        {links && links.map(link => <>
+        {links && links.map(link => <Fragment key={`div-${link.name}`}>
           ⮞&nbsp;
-          { link.ref ? <Link to={link.ref} style={{color:"#005291"}}>{ link.name }</Link> : link.name }
+          { link.ref ? <Link key={`link-${link.name}`} to={link.ref} style={{color:"#005291"}}>{ link.name }</Link> : link.name }
           &nbsp;
-        </>)}
+        </Fragment>)}
       </div>
       
       {!auth && (

@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom"
 import CreateCouponPage from "./pages/CreateCouponPage"
 import IndexPage from "./pages/IndexPage"
-import JobsPage from "./pages/JobsPage"
+import JobPage from "./pages/JobPage"
 import "./App.css"
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
       </Route>
 
       <Route exact path="/jobs/:job">
-        <JobsPage auth={auth} login={login} logout={logout}/>
+        <JobPage auth={auth} login={login} logout={logout}/>
       </Route>
 
       <Route exact path="/jobs/:job/CreateCoupon">
