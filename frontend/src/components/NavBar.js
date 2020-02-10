@@ -1,5 +1,5 @@
 import React, { useState, Fragment } from "react"
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
 import Menu from "@material-ui/core/Menu"
@@ -12,6 +12,8 @@ import "./NavBar.css"
 const NavBar = ({ auth, logout, login, links }) => {
   const [user, setUser] = useState("")
   const [pass, setPass] = useState("")
+
+  const history = useHistory()
 
   const [userMenuAnchor, setUserMenuAnchor] = useState(null)
   const handleUserMenuClick = event => setUserMenuAnchor(event.currentTarget)
@@ -51,7 +53,7 @@ const NavBar = ({ auth, logout, login, links }) => {
     </div>
 
     <Menu id="user-menu" anchorEl={userMenuAnchor} keepMounted open={Boolean(userMenuAnchor)} onClose={handleUserMenuClose}>
-      <MenuItem onClick={() => window.location.assign("/settings")}> Settings </MenuItem>
+      <MenuItem onClick={() => {handleUserMenuClose(); history.push("/settings")}}> Settings </MenuItem>
       <MenuItem onClick={() => {handleUserMenuClose(); logout()}}> Logout </MenuItem>
     </Menu>
 
