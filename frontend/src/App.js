@@ -9,7 +9,6 @@ import JobPage from "./pages/JobPage"
 import { apiAddress } from "./config"
 import "./App.css"
 
-
 function App() {
   const [auth, setAuth] = useState(localStorage.getItem("auth") || "")
 

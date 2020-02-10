@@ -1,6 +1,6 @@
 module.exports = { 
   port: 5000,
-  secretOrKey: 'SecretKey',
   saltRounds:12,
-  loginTokenExpireMinutes:30
-}
+  loginTokenExpireMinutes:30,
+  secretOrKey: 'SecretKey',
+} 

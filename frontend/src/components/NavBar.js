@@ -2,6 +2,9 @@ import React, { useState, Fragment } from "react"
 import { Link } from "react-router-dom"
 import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
+import Menu from "@material-ui/core/Menu"
+import MenuItem from "@material-ui/core/MenuItem"
+import AccountCircleIcon from "@material-ui/icons/AccountCircle"
 import TTMLogo from "../components/TTMTechnologiesLogo"
 import { userFromToken } from "../modules"
 import "./NavBar.css"
@@ -9,6 +12,10 @@ import "./NavBar.css"
 const NavBar = ({ auth, logout, login, links }) => {
   const [user, setUser] = useState("")
   const [pass, setPass] = useState("")
+
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null)
+  const handleUserMenuClick = event => setUserMenuAnchor(event.currentTarget)
+  const handleUserMenuClose = () => setUserMenuAnchor(null)
 
   const validUser = () => user.length > 0
   const validPass = () => pass.length > 3
@@ -42,7 +49,12 @@ const NavBar = ({ auth, logout, login, links }) => {
         &nbsp;
       </Fragment>)}
     </div>
-    
+
+    <Menu id="user-menu" anchorEl={userMenuAnchor} keepMounted open={Boolean(userMenuAnchor)} onClose={handleUserMenuClose}>
+      <MenuItem onClick={() => window.location.assign("/settings")}> Settings </MenuItem>
+      <MenuItem onClick={() => {handleUserMenuClose(); logout()}}> Logout </MenuItem>
+    </Menu>
+
     {!userFromToken(auth) && <div>
       <TextField
         id="user"
@@ -81,12 +93,17 @@ const NavBar = ({ auth, logout, login, links }) => {
 
     </div>}
 
+    {userFromToken(auth) && <Button variant="outlined" onClick={handleUserMenuClick} style={{ margin: "0" }}>
+      {userFromToken(auth)}
+      <AccountCircleIcon fontSize="inherit" style={{margin: "5px 0px 5px 5px"}}/>
+    </Button>}
+
     {userFromToken(auth) && <Button
       variant="contained"
       color="primary"
       onClick={()=>{ setUser(""); setPass(""); logout(); }}
       style={{ margin: "0 16px" }}
-    > Logout {userFromToken(auth)} </Button>}
+    > Logout </Button>}
 
   </div>
 }

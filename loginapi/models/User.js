@@ -17,13 +17,6 @@ catch { writeFileSync(userdb, "[]") }
 try { JSON.parse(readFileSync(userdb)) }
 catch { throw Error( "Unable to parse database JSON" ) }
 
-const writeDb = async users => {
-  while (!await lockFile.lock(userdb)) await sleep(1)
-  let signal = await writeFileAsync(userdb, JSON.stringify(users, null, 2))
-  lockFile.unlock(userdb)
-  return signal
-}
-
 // -----------------------------------------------------------------------------
 const validators = [
   {name: "username", error: "username required", isValid: val => Boolean(val)},
@@ -68,30 +61,51 @@ const getOne = async query => {
 }
 
 const add = async user => {
+  while (!await lockFile.lock(userdb)) await sleep(1)
   const users = await get()
   const error = await validate(user, users)
-  if (error) return error
+  if (error) {
+    lockFile.unlock(userdb)
+    return error
+  }
   const hash = await hashPassword(user.password)
   users.push({username: user.username, password: hash, uuid: nanoid()})
-  return Boolean(await writeDb(users))
+  let signal = await writeFileAsync(userdb, JSON.stringify(users, null, 2))
+  lockFile.unlock(userdb)
+  return signal
 }
 
 const edit = async (uuid, newUser) => {
-  if (!uuid) return "uuid required"
+  while (!await lockFile.lock(userdb)) await sleep(1)
+  if (!uuid) {
+    lockFile.unlock(userdb)
+    return "uuid required"
+  }
   let user = (await getOne({uuid}))
-  if (!user) return "user not found"
+  if (!user) {
+    lockFile.unlock(userdb)
+    return "user not found"
+  }
   const users = (await get()).filter(u => u.uuid !== uuid)
   if (newUser.password) newUser.password = await hashPassword(newUser.password)
   newUser = {...user, ...newUser, uuid:user.uuid}
   const error = await validate(newUser, users)
-  if (error) return error
+  if (error) {
+    lockFile.unlock(userdb)
+    return error
+  }
   users.push(newUser)
-  return Boolean(await writeDb(users))
+  let signal = await writeFileAsync(userdb, JSON.stringify(users, null, 2))
+  lockFile.unlock(userdb)
+  return signal
 }
 
 const deleteById = async uuid => {
+  while (!await lockFile.lock(userdb)) await sleep(1)
   const users = (await get()).filter(u => u.uuid !== uuid)
-  return Boolean(await writeDb(users))
+  let signal = await writeFileAsync(userdb, JSON.stringify(users, null, 2))
+  lockFile.unlock(userdb)
+  return signal
 }
 
 module.exports = { 
