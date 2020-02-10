@@ -90,7 +90,7 @@ const NavBar = ({ auth, logout, login, links }) => {
         variant="contained"
         color="primary"
         onClick={() => login(user, pass)}
-        style={{ margin: "2px 8px 0 8px", padding:"6px 16px 5px 16px" }}
+        style={{ margin: "2px 8px 1px 8px", padding:"6px 16px 6px 16px" }}
       > Login </Button>
 
     </div>}
@@ -104,7 +104,7 @@ const NavBar = ({ auth, logout, login, links }) => {
       variant="contained"
       color="primary"
       onClick={()=>{ setUser(""); setPass(""); logout(); }}
-      style={{ margin: "0 16px" }}
+      style={{ margin: "2px 8px 1px 8px", padding:"6px 16px 6px 16px" }}
     > Logout </Button>}
 
   </div>
