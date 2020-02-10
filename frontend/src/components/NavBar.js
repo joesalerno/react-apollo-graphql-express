@@ -2,117 +2,93 @@ import React, { useState, Fragment } from "react"
 import { Link } from "react-router-dom"
 import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
-// import InputAdornment from "@material-ui/core/InputAdornment"
-// import IconButton from "@material-ui/core/IconButton"
-// import Visibility from "@material-ui/icons/Visibility"
-// import VisibilityOff from "@material-ui/icons/VisibilityOff"
 import TTMLogo from "../components/TTMTechnologiesLogo"
+import { userFromToken } from "../modules"
 import "./NavBar.css"
 
 const NavBar = ({ auth, logout, login, links }) => {
   const [user, setUser] = useState("")
   const [pass, setPass] = useState("")
-  // const [showPass, setShowPass] = useState(0)
 
-  const validUsername = () => user.length > 0
-  const validPassword = () => pass.length > 0
-  const validInput = () => validUsername() && validPassword()
-
-  const handleChange = event => {
-    const {
-      target: { id, value }
-    } = event
-    if (id === "username") setUser(value)
-    if (id === "password") setPass(value)
-  }
-  // const handleClickShowPassword = () => setShowPass(!showPass)
+  const validUser = () => user.length > 0
+  const validPass = () => pass.length > 3
+  const validInput = validUser() && validPass()
 
   const inputRefs = {}
 
   const focusNextInput = () => {
-    if (!validUsername()) inputRefs.user.focus()
-    else if (!validPassword()) inputRefs.pass.focus()
+    if (!validUser()) inputRefs.user.focus()
+    else if (!validPass()) inputRefs.pass.focus()
   }
 
-  const handleKeyDown = event => { if (event.key === "Enter")
-    validInput() ? login(user, pass) : focusNextInput()
+  const handleKeyDown = ({key}) => {
+    if (key === "Enter") validInput ? login( user, pass  ) : focusNextInput()
   }
 
-  return (
-    <div className="NavBar">
-      <TTMLogo
-        style={{ height: "inherit", width: "150px", margin: "0 8px" }}
+  const handleChange = event => {
+    const { target: { id, value } } = event
+    if (id === "user") setUser(value)
+    if (id === "pass") setPass(value)
+  }
+
+  return <div className="NavBar">
+    
+    <TTMLogo style={{ height: 60, width: 150, margin: "0 8px" }}/>
+
+    <div style={{margin:"0 auto 0 0"}}>
+      {links && links.map(link => <Fragment key={`div-${link.name}`}>
+        ❯&nbsp;
+        { link.ref ? <Link key={`link-${link.name}`} to={link.ref} style={{color:"#005291"}}>{ link.name }</Link> : link.name }
+        &nbsp;
+      </Fragment>)}
+    </div>
+    
+    {!userFromToken(auth) && <div>
+      <TextField
+        id="user"
+        label="Username"
+        autoComplete="username"
+        variant="outlined"
+        size="small"
+        style={{margin:"0 4px", width: 110, flex:"none"}}
+        value={user}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        inputRef={ref => { inputRefs.user = ref }}
       />
 
-      <div style={{margin:"0 auto 0 0"}}>
-        {links && links.map(link => <Fragment key={`div-${link.name}`}>
-          ⮞&nbsp;
-          { link.ref ? <Link key={`link-${link.name}`} to={link.ref} style={{color:"#005291"}}>{ link.name }</Link> : link.name }
-          &nbsp;
-        </Fragment>)}
-      </div>
+      <TextField
+        id="pass"
+        label="Password"
+        autoComplete="password"
+        type="password"
+        variant="outlined"
+        size="small"
+        style={{margin:"0 0 0 4px", width: 130, flex:"none"}}
+        value={pass}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        inputRef={ref => { inputRefs.pass = ref }}
+      /> 
       
-      {!auth && (
-        <>
-          
-          <TextField
-            autoComplete="username"
-            variant="outlined"
-            id="username"
-            label="Username"
-            size="small"
-            style={{margin:"0 4px", width: 110}}
-            value={user}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            inputRef={ref => { inputRefs.user = ref }}
-          />
+      <Button
+        disabled={!validInput}
+        variant="contained"
+        color="primary"
+        onClick={() => login(user, pass)}
+        style={{ margin: "2px 8px 0 8px", padding:"6px 16px 5px 16px" }}
+      > Login </Button>
 
-          <TextField
-            autoComplete="password"
-            variant="outlined"
-            id="password"
-            label="Password"
-            size="small"
-            style={{margin:"0 0 0 4px", width: 130}}
-            value={pass}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            inputRef={ref => { inputRefs.pass = ref }}
-            type="password"
-            // InputProps={{type: showPass ? "text" : "password", endAdornment: (
-            //   <InputAdornment position="end">
-            //     <IconButton onClick={handleClickShowPassword}>
-            //       {showPass ? <Visibility/> : <VisibilityOff/>}
-            //     </IconButton>
-            //   </InputAdornment>
-            // )}}
-          /> 
+    </div>}
 
-          <Button
-            disabled={!validInput()}
-            variant="contained"
-            color="primary"
-            onClick={() => login(user, pass)}
-            style={{ margin: "0 8px" }}
-          >
-            Login
-          </Button>
-        </>
-      )}
+    {userFromToken(auth) && <Button
+      variant="contained"
+      color="primary"
+      onClick={()=>{ setUser(""); setPass(""); logout(); }}
+      style={{ margin: "0 16px" }}
+    > Logout {userFromToken(auth)} </Button>}
 
-      {auth && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={logout}
-          style={{ margin: "0 16px" }}
-        >
-          Logout {auth}
-        </Button>
-      )}
-    </div>
-  )
+  </div>
 }
 
 export default NavBar

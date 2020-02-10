@@ -1,0 +1,25 @@
+{
+  "name": "loginapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.10.0",
+    "apollo-server-express": "^2.10.0",
+    "bcrypt": "^3.0.8",
+    "better-sqlite3": "^5.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "graphql": "^14.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "nanoid": "^2.1.11",
+    "nodemon": "^2.0.2",
+    "proper-lockfile": "^4.1.1"
+  }
+}
