@@ -1,4 +1,4 @@
-/*
+/*//////////////////////////////////////////////////////////////////////////////
 
 JsModel.js:  Very simple promise-based JSON database model
 Joe Salerno 2020
@@ -42,7 +42,7 @@ const Users = new JsModel ({
   preSave: (user, otherRecords) => ({...user, password: hash(password)}),
 })
 
-*/
+*///////////////////////////////////////////////////////////////////////////////
 
 const { writeFile, readFile, readFileSync, writeFileSync } = require("fs")
 const { promisify } = require("util")
@@ -94,6 +94,7 @@ class _JsModel { constructor({name, fields, validators, preSave}) { ////////////
     try { JSON.parse(readFileSync(this._db)) }
     catch { throw Error( "Unable to parse database JSON" ) }
 
+    fields = { ...fields, uuid: { name: "uuid", type: "string", required: true, unique: true } }
     _validateFields(fields)
     this._schema = fields
     
@@ -110,10 +111,10 @@ class _JsModel { constructor({name, fields, validators, preSave}) { ////////////
     while (!gotLock) {
       try {
         gotLock = await lockFile.lock(this._db)
-        await sleep(1)
       } catch {
         //loop forever
       }
+      await sleep(1)
     }
   }
 
@@ -126,7 +127,7 @@ class _JsModel { constructor({name, fields, validators, preSave}) { ////////////
   async _validate(record, currentRecords) {
     for (const key in record) {
       let schemaField = this._schema.filter(field => field.name === key)[0]
-      if (key === "uuid") schemaField = {name: "uuid", type: "string", required: true, unique: true}
+      //if (key === "uuid") schemaField = {name: "uuid", type: "string", required: true, unique: true}
       if (!schemaField) return `type validation failed. key ${key} is not in schema`
       if (schemaField.unique && currentRecords && currentRecords.length && currentRecords.some(r => r[key] === record[key] && r.uuid !== record.uuid))
         return `unique validation failed for key ${key}`
