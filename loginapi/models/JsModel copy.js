@@ -232,6 +232,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     }
      
     res = _applyMethods(this._methods, res)
+
     return res
   }
 
@@ -259,7 +260,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     }
 
     record.uuid = nanoid()
-    record = _applyMethods(record)
+    record = this._applyMethods(record)
 
     records.push(record)
     return (await this._writeDb(records)) || record
@@ -294,7 +295,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
       throw Error ( `Validation error: ${error}` )
     }
 
-    record = _applyMethods(record)
+    record = this._applyMethods(record)
 
     records.push(record)
     return (await this._writeDb(records)) || record
