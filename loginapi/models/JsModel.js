@@ -4,7 +4,7 @@ JsModel.js:  Very simple promise-based JSON database model
 Joe Salerno 2020
 
 *//////////////////////////////////////////////////////////////////////////////*/
-
+/*
 function Example() {
   const JsModel = require("./models/JsModel")
 
@@ -67,7 +67,9 @@ function Example() {
     }
   })
 
-}///////////////////////////////////////////////////////////////////////////////
+}
+*/
+////////////////////////////////////////////////////////////////////////////////
 
 const { writeFile, readFile, readFileSync, writeFileSync } = require("fs")
 const { promisify } = require("util")
@@ -122,6 +124,21 @@ const _validateMethods = methods => {
   for (const key in methods) if (typeof methods[key] !== "function") throw Error (`Invalid method ${key}. Must be a function. Got: ${typeof methods[key]}`)
 }
 
+const _applyStatics = schema => {
+  for (const f of Object.keys(schema._model._statics || {})) schema[f] = schema._model._statics[f].bind(schema)
+}
+
+const _applyMethods = (methods, recordOrRecords) => {
+  const apply = (methods, record) => { for (const key of Object.keys(methods)) record[key] =  methods[key].bind(record) }
+  if (typeof recordOrRecords === undefined) return undefined
+  if (Array.isArray(recordOrRecords)) {
+    for (const record of recordOrRecords) apply(methods, record)
+    return recordOrRecords
+  }
+  apply(methods, recordOrRecords)
+  return recordOrRecords
+}
+
 class _JsModel { constructor({name, fields, validators, preSave, statics, methods}) { ////////////////////////////////
     if (!name || typeof name !== "string") throw Error ("Invalid model name")
 
@@ -140,12 +157,9 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
 
     _validateStatics(statics)
     this._statics = statics
-    //for (const key of Object.keys(statics)) this[key] = statics[key]
 
     _validateMethods(methods)
     this._methods = methods
-
-    
 
     if (!(typeof preSave).match(/function|undefined/)) throw Error ( "Invalid preSave hook. Must be a function or undefined" )
     this._preSaveHook = preSave
@@ -189,22 +203,6 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
 
   async _preSave(record, oldRecord) { return this._preSaveHook ? await this._preSaveHook(record, oldRecord) : record }
 
-  _applyMethods(res) {
-    if (typeof res === undefined) return undefined
-    if (Array.isArray(res)) {
-      for (const record of res) {
-        for (const key of Object.keys(this._methods)) {
-          record[key] = this._methods[key].bind(this)
-        }
-      }
-      return res
-    }
-    for (const key of Object.keys(this._methods)) {
-      res[key] = this._methods[key].bind(this)
-    }
-    return res
-  }
-
   ////////////////
   //   Exists   //
   ////////////////
@@ -216,10 +214,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   async getOne (query) {
     let res = await this.get(query)
     if (!res.length) return undefined
-
-    res = this._applyMethods(res[0])
-    // console.log("AFTER:*****************")
-    // console.log(res)
+    res = _applyMethods(this._methods, res[0])
     return res
   }
 
@@ -231,14 +226,13 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     
     try { res = JSON.parse((await readFileAsync(this._db)).toString()) }
     catch { return [] }
+    
     if (typeof query === "object") {
       res = res.filter(r => Object.keys(query).every(key => r[key] && r[key] === query[key]))
     }
-    // console.log("Got:*******************")
-    // console.log(res)
-    res = this._applyMethods(res)
-    // console.log("after:*******************")
-    // console.log(res)
+     
+    res = _applyMethods(this._methods, res)
+
     return res
   }
 
@@ -246,7 +240,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   //   Add   //
   /////////////
   async add (record) {
-    if (!record) throw Error ( "Must provide record")
+    if (!record) throw Error ( "Must provide record" )
     await this._lockDb()
 
     const records = await this.get({})
@@ -255,12 +249,12 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
       record = await this._preSave(record, records)
     } catch(e) {
       lockFile.unlock(this._db)
-      throw new Error ( `preSave hook error: ${e}`)
+      throw new Error ( `preSave hook error: ${e}` )
     }
 
     const error = await this._validate(record, records)
     if (error) {
-      console.log(`Error: ${error}`)
+      throw new Error ( `Error: ${error}` )
       lockFile.unlock(this._db)
       return undefined
     }
@@ -276,7 +270,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   //   Edit   //
   //////////////
   async edit (uuid, newFields) {
-    if (!uuid || !newFields) throw Error ( "Must provide uuid and new record")
+    if (!uuid || !newFields) throw Error ( "Must provide uuid and new record" )
     await this._lockDb()
     
     let record = (await this.getOne({uuid}))
@@ -292,13 +286,13 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
       lockFile.unlock(this._db)
       throw Error ( `preSave hook error: ${error}` )
     }
-    records = records.filter(u => u.uuid !== uuid)
+    records = records.filter(u => u.uuid !== uuid )
     
     record = {...record, ...newFields, uuid:record.uuid}
     const error = await this._validate(record, records)
     if (error) {
       lockFile.unlock(this._db)
-      throw Error (`Validation error: ${error}`)
+      throw Error ( `Validation error: ${error}` )
     }
 
     record = this._applyMethods(record)
@@ -311,7 +305,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   //    Delete    //
   //////////////////
   async delete (filter) {
-    if (!filter) throw Error ("Must provide filter object")
+    if (!filter) throw Error ( "Must provide filter object" )
     await this._lockDb()
     const records = await this.get()
     return (await this._writeDb(records.filter(r => !Object.keys(filter).every(key => r[key] && r[key] === filter[key])))) || filter
@@ -330,8 +324,6 @@ class JsModel { constructor(args) {
   this.getOne     = query             => this._model.getOne(query)
 
   for (const f of Object.keys(this._model._statics || {})) this[f] = this._model._statics[f].bind(this)
-  for (const f of Object.keys(this._model._methods || {})) {  }
-  
 }}
 
 module.exports = JsModel
