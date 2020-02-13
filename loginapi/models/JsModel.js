@@ -11,10 +11,10 @@ function Example() {
   // Try to load or create new db at ./models/User.json:
   const Users = new JsModel ({ 
     name: "User",
-    fields: [
-      {name: "username", type: "string", required: true, unique: true},
-      {name: "password", type: "string", required: true},
-    ],
+    fields:
+      name: {"username", type: "string", required: true, unique: true},
+      name: {"password", type: "string", required: true},
+    ,
   })
   
   // Then, asynchronously add a user:
