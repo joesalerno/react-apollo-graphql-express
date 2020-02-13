@@ -81,19 +81,19 @@ const lockFile = require("proper-lockfile")
 const sleep = ms => new Promise(done => setTimeout(done, ms))
 
 const _validateFields = fields => {
-  if (!Array.isArray(fields)) throw Error( `Invalid schema. Must be array of field objects` )
-  for (let i = 0; i < fields.length; i++) {
-    if (typeof fields[i] !== "object") throw Error( `Invalid schema field. Must be an object having a unique name and valid properties. Valid properties are name, fields, validators, preSave` )
-    for (const key in fields[i]) {
-      if (!key.match(/^(name|type|required|unique|uuid)$/)) throw Error ( "Invalid schema field property. Valid properties are name, type, required, unique, and preSave" )
+  if (Array.isArray(fields) || typeof fields !== "object") throw Error( `Invalid schema. Must be object containing field definitions. Got: ${typeof fields}` )
+  for (const f in fields) { 
+    let field = fields[f]
+    if (typeof field === "string") {
+      for (const type of ["undefined", "string", "number", "boolean"]) {
+        if (field === type) field = { type }
+      }
     }
-    if (!(typeof fields[i].unique).match(/boolean|undefined/)) throw Error ( "Unique field must be a boolean or undefined" )
-    if (!(typeof fields[i].required).match(/boolean|undefined/)) throw Error ( "Required field must be a boolean or undefined" )
-    if (typeof fields[i].name !== "string" || !fields[i].name) throw Error ( "Each field must have a name" )
-    if (!fields[i].type || !fields[i].type.match(/string|object|array|boolean|/)) throw Error ( `Type field must be undefined or string, object, array, or boolean` )
-    for (let j = i+1; j < fields.length; j++) {
-      if (fields[i].name === fields[j].name) throw Error ( "Each field name must be unique" )
-    }
+    if (!typeof field === "object") throw Error( `Invalid schema field "${f}". Must be type string or a field definition object. Got: ${typeof field}` )
+    for (const prop in field) if (!prop.match(/^(type|required|unique|uuid)$/)) throw Error( `Invalid schema field property "${prop}". Valid properties are type, required, unique, and preSave` )
+    if (!(typeof field.unique).match(/boolean|undefined/)) throw Error( `Unique field must be a boolean or undefined. Got: ${typeof field}` )
+    if (!(typeof field.required).match(/boolean|undefined/)) throw Error( `Required field must be a boolean or undefined. Got: ${typeof field}` )
+    if (field.type && !field.type.match(/undefined|string|number|boolean/)) throw Error( `Type field must be undefined, string, number, or boolean. Got: ${field.type}` )
   }
 }
 
@@ -106,7 +106,7 @@ const _validateValidators = (validators, fields) => {
       if (!key.match(/^(field|isValid|error)$/)) throw Error ( `Invalid validator property. Valid properties are field, isValid, and error. Got: ${key}` )
     }
     if (typeof validators[i].field !== "string") throw Error ( `Invalid validator field. Must be a string equal to a schema field name. Got: ${typeof validators[i].field}` )
-    if (!fields.some(f => f.name === validators[i].field)) throw Error ( `Invalid validator field. Must be a string equal to a schema field name. Got: ${validators[i].field}` )
+    if (!(Object.keys(fields).includes(validators[i].field))) throw Error ( `Invalid validator field. Must be a string equal to a schema field name. Got: ${validators[i].field}` )
     if (typeof validators[i].isValid !== "function") throw Error ( `Invalid isValid function for ${validators[i].field}. Must be a function. Got: ${typeof validators[i].isValid}` )
     if (validators[i].error && typeof validators[i].error !== "string") throw Error ( `Invalid validator error. Must be a string. Got: ${typeof validators[i].error}` )
   }
@@ -114,23 +114,28 @@ const _validateValidators = (validators, fields) => {
 
 const _validateStatics = statics => {
   if (typeof statics === "undefined") return
-  if (typeof statics !== "object") throw Error ( `Invalid static functions. Must be an object containing functions or undefined. Got: ${typeof statics}` )
-  for (const key in statics) if (typeof statics[key] !== "function") throw Error (`Invalid static function ${key}. Must be a function. Got: ${typeof statics[key]}`)
+  if (typeof statics !== "object") throw Error( `Invalid static functions. Must be an object containing functions or undefined. Got: ${typeof statics}` )
+  for (const key in statics) if (typeof statics[key] !== "function") throw Error(`Invalid static function ${key}. Must be a function. Got: ${typeof statics[key]}`)
 }
 
-const _validateMethods = methods => {
+const _validateMethods = (methods, schema) => {
   if (typeof methods === "undefined") return
-  if (typeof methods !== "object") throw Error ( `Invalid methods. Must be an object containing methods or undefined. Got ${typeof methods}` )
-  for (const key in methods) if (typeof methods[key] !== "function") throw Error (`Invalid method ${key}. Must be a function. Got: ${typeof methods[key]}`)
+  if (typeof methods !== "object") throw Error( `Invalid methods. Must be an object containing methods or undefined. Got ${typeof methods}` )
+  for (const key in methods) {
+    if (typeof methods[key] !== "function") throw Error( `Invalid method ${key}. Must be a function. Got: ${typeof methods[key]}`)
+    if (Object.keys(schema).includes(key)) throw Error( `Invalid method name ${key}. Can't be the same as schema field name` )
+  } 
 }
 
-const _applyStatics = schema => {
-  for (const f of Object.keys(schema._model._statics || {})) schema[f] = schema._model._statics[f].bind(schema)
+const _applyStatics = model => {
+  for (const f of Object.keys(model._model._statics || {})) model[f] = model._model._statics[f].bind(model)
 }
 
 const _applyMethods = (methods, recordOrRecords) => {
-  const apply = (methods, record) => { for (const key of Object.keys(methods)) record[key] =  methods[key].bind(record) }
-  if (typeof recordOrRecords === undefined) return undefined
+  if (typeof recordOrRecords === undefined || typeof methods === undefined) return undefined
+  const apply = (methods, record) => { 
+    for (const key in methods) record[key] = methods[key].bind(record)
+  }
   if (Array.isArray(recordOrRecords)) {
     for (const record of recordOrRecords) apply(methods, record)
     return recordOrRecords
@@ -143,22 +148,23 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     if (!name || typeof name !== "string") throw Error ("Invalid model name")
 
     this._db = `./models/${name}.json`
+
     try { readFileSync(this._db) }
     catch { writeFileSync(this._db, "[]") }
     try { JSON.parse(readFileSync(this._db)) }
     catch { throw Error( "Unable to parse database JSON" ) }
 
-    fields.push({ name: "uuid", type: "string", required: true, unique: true })
+    fields.uuid = {type: "string", required: true, unique: true}
     _validateFields(fields)
     this._schema = fields
     
     _validateValidators(validators, fields)
     this._validators = validators
-
+    
     _validateStatics(statics)
     this._statics = statics
 
-    _validateMethods(methods)
+    _validateMethods(methods, this._schema)
     this._methods = methods
 
     if (!(typeof preSave).match(/function|undefined/)) throw Error ( "Invalid preSave hook. Must be a function or undefined" )
@@ -166,7 +172,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
-  async _lockDb() {
+  async _lockDb() { // The most expensive operation by far
     let gotLock = false
     while (!gotLock) {
       try { gotLock = await lockFile.lock(this._db) }
@@ -174,6 +180,8 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
       await sleep(1)
     }
   }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
 
   async _writeDb (newRecordset) {
     let signal = await writeFileAsync(this._db, JSON.stringify(newRecordset, null, 2))
@@ -183,17 +191,21 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
 
   async _validate(record, currentRecords) {
     for (const key in record) {
-      if (Object.keys(this._methods).includes(key)) continue //methods aren't going to be fields in schema
-      let schemaField = this._schema.filter(field => field.name === key)[0]
-      if (!schemaField) return `type validation failed. Key "${key}" is not in schema`
-      if (schemaField.unique && currentRecords && currentRecords.length && currentRecords.some(r => r[key] === record[key] && r.uuid !== record.uuid))
+      if (this._methods && Object.keys(this._methods).includes(key)) continue //methods aren't going to be fields in schema
+
+      if (!this._schema[key]) return `type validation failed. Key "${key}" is not in schema`
+
+      if (this._schema[key].unique && currentRecords && currentRecords.length && currentRecords.some(r => r[key] === record[key] && r.uuid !== record.uuid))
         return `unique validation failed for key ${key}`
 
-      if (schemaField.required && typeof record[key] === undefined) 
+      if (this._schema[key].required && !Boolean( record[key] ))
         return `required validation failed for key ${key}`
 
-      if (schemaField.type && (typeof record[key] === undefined || typeof record[key] !== schemaField.type))
-        return `type validation failed for key ${key}`
+      if (!(typeof record[key]).match(/undefined|string|number|boolean/))
+        return `type validation failed for key ${key}. Must be undefined, string, number, or boolean. Got: ${typeof record[key]}`
+
+      if (this._schema[key].type && (typeof record[key] === undefined || typeof record[key] !== this._schema[key].type))
+        return `type validation failed for key ${key}. Must match ${this._schema[key].type}. Got: ${typeof record[key]}`
     }
     for (const validator of this._validators || []) {
       if (!await validator.isValid(record[validator.field], currentRecords))
@@ -201,12 +213,11 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     }
   }
 
-  async _preSave(record, oldRecord) { return this._preSaveHook ? await this._preSaveHook(record, oldRecord) : record }
+  async _preSave(changes, record, recordSet) {
+    return this._preSaveHook ? await this._preSaveHook(changes, record, recordSet) : changes 
+  }
 
-  ////////////////
-  //   Exists   //
-  ////////////////
-  async exists (query) { return Boolean((await this.get(query)).length) }
+  //// Interface: //////////////////////////////////////////////////////////////////////////////////
 
   /////////////////
   //   Get One   //
@@ -227,10 +238,8 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     try { res = JSON.parse((await readFileAsync(this._db)).toString()) }
     catch { return [] }
     
-    if (typeof query === "object") {
-      res = res.filter(r => Object.keys(query).every(key => r[key] && r[key] === query[key]))
-    }
-     
+    if (typeof query === "object") res = res.filter(r => Object.keys(query).every(key => r[key] && r[key] === query[key]))
+    
     res = _applyMethods(this._methods, res)
     return res
   }
@@ -244,22 +253,20 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
 
     const records = await this.get({})
 
-    try {
-      record = await this._preSave(record, records)
-    } catch(e) {
+    try { record = await this._preSave(record, {}, records) }
+    catch(error) {
       lockFile.unlock(this._db)
-      throw new Error ( `preSave hook error: ${e}` )
+      throw new Error ( `preSave hook error: ${error}` )
     }
 
     const error = await this._validate(record, records)
     if (error) {
-      throw new Error ( `Error: ${error}` )
       lockFile.unlock(this._db)
-      return undefined
+      throw new Error ( `Error: ${error}` )
     }
 
     record.uuid = nanoid()
-    record = _applyMethods(record)
+    record = _applyMethods(this._methods, record)
 
     records.push(record)
     return (await this._writeDb(records)) || record
@@ -272,29 +279,30 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     if (!uuid || !newFields) throw Error ( "Must provide uuid and new record" )
     await this._lockDb()
     
-    let record = (await this.getOne({uuid}))
+    let record = (await this.getOne({uuid: uuid}))
     if (!record) {
       lockFile.unlock(this._db)
       throw Error ( "Record not found" )
     }
     
     let records = await this.get()
+    let preSaved
     try {
-      newFields = await this._preSave(newFields, records)
+      preSaved = await this._preSave(newFields, record, records)
     } catch(error) {
       lockFile.unlock(this._db)
       throw Error ( `preSave hook error: ${error}` )
     }
+    record = {...record, ...preSaved, uuid:record.uuid}
+
     records = records.filter(u => u.uuid !== uuid )
-    
-    record = {...record, ...newFields, uuid:record.uuid}
     const error = await this._validate(record, records)
     if (error) {
       lockFile.unlock(this._db)
       throw Error ( `Validation error: ${error}` )
     }
 
-    record = _applyMethods(record)
+    record = _applyMethods(this._methods, record)
 
     records.push(record)
     return (await this._writeDb(records)) || record
@@ -313,16 +321,18 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class JsModel { constructor(args) {
-  this._model     = new _JsModel(args)
-  this.add        = record            => this._model.add(record)
-  this.delete     = filter            => this._model.delete(filter)
-  this.edit       = (uuid, newFields) => this._model.edit(uuid, newFields)
-  this.exists     = query             => this._model.exists(query)
-  this.get        = query             => this._model.get(query)
-  this.getOne     = query             => this._model.getOne(query)
+class JsModel { constructor( schema ) {
 
-  for (const f of Object.keys(this._model._statics || {})) this[f] = this._model._statics[f].bind(this)
+  this._model = new _JsModel( schema )
+
+  this.add    = record            => this._model.add( record )
+  this.delete = filter            => this._model.delete( filter )
+  this.edit   = (uuid, newFields) => this._model.edit( uuid, newFields )
+  this.get    = query             => this._model.get( query )
+  this.getOne = query             => this._model.getOne( query )
+  
+  _applyStatics( this )
+
 }}
 
 module.exports = JsModel
