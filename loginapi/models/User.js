@@ -7,9 +7,7 @@ module.exports = new JsModel({
     password: {type: "string", required: true},
     host: "string"
   },
-  preSave: (user, oldUser) => {
-    return ({...oldUser, password: user.password ? `hash${user.password}` : oldUser.password})
-  },
+  preSave: (user, oldUser) =>  ({...oldUser, password: user.password ? `hash${user.password}` : oldUser.password}),
   validators: [
     {field:"host", isValid: () => true, error: "invalid hostname"},
     {field:"host", isValid: () => true, error: "unable to reach host"}

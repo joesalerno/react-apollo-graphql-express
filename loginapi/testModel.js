@@ -26,7 +26,6 @@
 //   },
 // })  
 
-
 const fs = require ("fs")
 fs.writeFileSync("./models/User.json", "[]")
 
@@ -36,6 +35,7 @@ let time = Date.now()
 let promises = []
 for(let i = 0; i < 100; i++) {
   promises.push(
+    //User.get()
     User.add({username: `bob${i}`, password: `123${i}`, host:"23asdf423"})
     .then(bob => User.edit(bob.uuid, {username: `jim${i}`, password: `456${i}`, host: 2} ))
     .then(jim => User.edit(jim.uuid, {username: `done${i}`}))

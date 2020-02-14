@@ -13,7 +13,7 @@ function Example() {
     name: "User",
     fields:
       name: {"username", type: "string", required: true, unique: true},
-      name: {"password", type: "string", required: true},
+      name: {"password", type: "string"},
     ,
   })
   
@@ -37,6 +37,7 @@ function Example() {
   })
   
   // You can also set a preSave hook to run before any add or edit:
+  // Note: Hook will run once for each item to be changed:
   const Users = new JsModel ({
     //...
     preSave: (user, otherRecords) => ({...user, password: hash(password)}),
@@ -76,7 +77,9 @@ const { promisify } = require("util")
 const writeFileAsync = promisify(writeFile)
 const readFileAsync = promisify(readFile)
 const nanoid = require("nanoid")
-const lockFile = require("proper-lockfile")
+//const lockFile = require("proper-lockfile")
+const Locker = require("../modules/locker")
+const locker = new Locker()
 
 const sleep = ms => new Promise(done => setTimeout(done, ms))
 
@@ -173,19 +176,22 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
   async _lockDb() { // The most expensive operation by far
-    let gotLock = false
-    while (!gotLock) {
-      try { gotLock = await lockFile.lock(this._db) }
-      catch { /* loop forever */ }
+    console.log("locking")
+      //try { gotLock = await locker.lock(this._db) }
+      //try { gotLock = await lockFile.lock(this._db) }
+      //catch { /* loop forever */ }
+      await locker.lock(this._db)
       await sleep(1)
-    }
+    console.log("Locked")
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
   async _writeDb (newRecordset) {
     let signal = await writeFileAsync(this._db, JSON.stringify(newRecordset, null, 2))
-    lockFile.unlock(this._db)
+    //await locker.unlock(this._db)
+    this._lockDb()
+    //lockFile.unlock(this._db)
     return signal
   }
 
@@ -251,17 +257,36 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     if (!record) throw Error ( "Must provide record" )
     await this._lockDb()
 
+    // const preAdd = async record => {
+    //   try { record = await this._preSave(record, {}, records) }
+    //   catch(error) {
+    //     lockFile.unlock(this._db)
+    //     throw new Error ( `preSave hook error: ${error}` )
+    //   }
+    //   const error = await this._validate(record, records)
+    //   if (error) {
+    //     lockFile.unlock(this._db)
+    //     throw new Error ( `Error: ${error}` )
+    //   }
+    //   record.uuid = nanoid()
+    //   return _applyMethods(this._methods, record)  
+    // }
+
     const records = await this.get({})
+
+    
 
     try { record = await this._preSave(record, {}, records) }
     catch(error) {
-      lockFile.unlock(this._db)
+      await locker.unlock(this._db)
+      // lockFile.unlock(this._db)
       throw new Error ( `preSave hook error: ${error}` )
     }
 
     const error = await this._validate(record, records)
     if (error) {
-      lockFile.unlock(this._db)
+      await locker.unlock(this._db)
+      //lockFile.unlock(this._db)
       throw new Error ( `Error: ${error}` )
     }
 
@@ -281,7 +306,8 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     
     let record = (await this.getOne({uuid: uuid}))
     if (!record) {
-      lockFile.unlock(this._db)
+      await locker.unlock(this._db)
+      //lockFile.unlock(this._db)
       throw Error ( "Record not found" )
     }
     
@@ -290,7 +316,8 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     try {
       preSaved = await this._preSave(newFields, record, records)
     } catch(error) {
-      lockFile.unlock(this._db)
+      await locker.unlock(this._db)
+      //lockFile.unlock(this._db)
       throw Error ( `preSave hook error: ${error}` )
     }
     record = {...record, ...preSaved, uuid:record.uuid}
@@ -298,7 +325,8 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     records = records.filter(u => u.uuid !== uuid )
     const error = await this._validate(record, records)
     if (error) {
-      lockFile.unlock(this._db)
+      await locker.unlock(this._db)
+      //lockFile.unlock(this._db)
       throw Error ( `Validation error: ${error}` )
     }
 
