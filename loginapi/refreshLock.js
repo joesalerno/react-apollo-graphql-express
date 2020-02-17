@@ -1,8 +1,6 @@
 const { writeFileSync, unlinkSync, statSync, rmdirSync } = require("fs")
 
 
-
-
 let lockfiles = []
 let toggle = false
 
