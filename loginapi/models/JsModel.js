@@ -72,16 +72,9 @@ function Example() {
 */
 ////////////////////////////////////////////////////////////////////////////////
 
-const { writeFile, readFile, readFileSync, writeFileSync } = require("fs")
-const { promisify } = require("util")
-const writeFileAsync = promisify(writeFile)
-const readFileAsync = promisify(readFile)
+const { readFileSync, writeFileSync } = require("fs")
 const nanoid = require("nanoid")
-//const lockFile = require("proper-lockfile")
 const Locker = require("../modules/locker")
-const locker = new Locker()
-
-const sleep = ms => new Promise(done => setTimeout(done, ms))
 
 const _validateFields = fields => {
   if (Array.isArray(fields) || typeof fields !== "object") throw Error( `Invalid schema. Must be object containing field definitions. Got: ${typeof fields}` )
@@ -152,6 +145,8 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
 
     this._db = `./models/${name}.json`
 
+    this._locker = new Locker()
+
     try { readFileSync(this._db) }
     catch { writeFileSync(this._db, "[]") }
     try { JSON.parse(readFileSync(this._db)) }
@@ -173,29 +168,20 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     if (!(typeof preSave).match(/function|undefined/)) throw Error ( "Invalid preSave hook. Must be a function or undefined" )
     this._preSaveHook = preSave
   }
-  //////////////////////////////////////////////////////////////////////////////////////////////////
-
-  async _lockDb() { // The most expensive operation by far
-    console.log("locking")
-      //try { gotLock = await locker.lock(this._db) }
-      //try { gotLock = await lockFile.lock(this._db) }
-      //catch { /* loop forever */ }
-      await locker.lock(this._db)
-      await sleep(1)
-    console.log("Locked")
-  }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
   async _writeDb (newRecordset) {
-    let signal = await writeFileAsync(this._db, JSON.stringify(newRecordset, null, 2))
-    //await locker.unlock(this._db)
-    this._lockDb()
-    //lockFile.unlock(this._db)
+    let signal = writeFileSync(this._db, JSON.stringify(newRecordset, null, 2))
+    await this._locker.unlock(this._db)
     return signal
   }
 
   async _validate(record, currentRecords) {
+    for (const key in this._schema) {
+      if (key !== "uuid" && this._schema[key].required && !Boolean( record[key]))
+        return `required validation failed for key ${key}`
+    }
     for (const key in record) {
       if (this._methods && Object.keys(this._methods).includes(key)) continue //methods aren't going to be fields in schema
 
@@ -203,9 +189,6 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
 
       if (this._schema[key].unique && currentRecords && currentRecords.length && currentRecords.some(r => r[key] === record[key] && r.uuid !== record.uuid))
         return `unique validation failed for key ${key}`
-
-      if (this._schema[key].required && !Boolean( record[key] ))
-        return `required validation failed for key ${key}`
 
       if (!(typeof record[key]).match(/undefined|string|number|boolean/))
         return `type validation failed for key ${key}. Must be undefined, string, number, or boolean. Got: ${typeof record[key]}`
@@ -215,7 +198,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     }
     for (const validator of this._validators || []) {
       if (!await validator.isValid(record[validator.field], currentRecords))
-        return validator.error || "validation failure"
+        return validator.error || `validation failure on key ${key}`
     }
   }
 
@@ -231,8 +214,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   async getOne (query) {
     let res = await this.get(query)
     if (!res.length) return undefined
-    res = _applyMethods(this._methods, res[0])
-    return res
+    return _applyMethods(this._methods, res[0])
   }
 
   //////////////////
@@ -240,14 +222,10 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   //////////////////
   async get (query) {
     let res
-    
-    try { res = JSON.parse((await readFileAsync(this._db)).toString()) }
+    try { res = JSON.parse(readFileSync(this._db)) }
     catch { return [] }
-    
     if (typeof query === "object") res = res.filter(r => Object.keys(query).every(key => r[key] && r[key] === query[key]))
-    
-    res = _applyMethods(this._methods, res)
-    return res
+    return _applyMethods(this._methods, res)
   }
 
   /////////////
@@ -255,44 +233,20 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   /////////////
   async add (record) {
     if (!record) throw Error ( "Must provide record" )
-    await this._lockDb()
-
-    // const preAdd = async record => {
-    //   try { record = await this._preSave(record, {}, records) }
-    //   catch(error) {
-    //     lockFile.unlock(this._db)
-    //     throw new Error ( `preSave hook error: ${error}` )
-    //   }
-    //   const error = await this._validate(record, records)
-    //   if (error) {
-    //     lockFile.unlock(this._db)
-    //     throw new Error ( `Error: ${error}` )
-    //   }
-    //   record.uuid = nanoid()
-    //   return _applyMethods(this._methods, record)  
-    // }
-
+    await this._locker.lock(this._db)
     const records = await this.get({})
-
-    
-
     try { record = await this._preSave(record, {}, records) }
     catch(error) {
-      await locker.unlock(this._db)
-      // lockFile.unlock(this._db)
+      await this._locker.unlock(this._db)
       throw new Error ( `preSave hook error: ${error}` )
     }
-
     const error = await this._validate(record, records)
     if (error) {
-      await locker.unlock(this._db)
-      //lockFile.unlock(this._db)
+      await this._locker.unlock(this._db)
       throw new Error ( `Error: ${error}` )
     }
-
     record.uuid = nanoid()
     record = _applyMethods(this._methods, record)
-
     records.push(record)
     return (await this._writeDb(records)) || record
   }
@@ -302,12 +256,10 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   //////////////
   async edit (uuid, newFields) {
     if (!uuid || !newFields) throw Error ( "Must provide uuid and new record" )
-    await this._lockDb()
-    
+    await this._locker.lock(this._db)
     let record = (await this.getOne({uuid: uuid}))
     if (!record) {
-      await locker.unlock(this._db)
-      //lockFile.unlock(this._db)
+      await this._locker.unlock(this._db)
       throw Error ( "Record not found" )
     }
     
@@ -316,22 +268,17 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
     try {
       preSaved = await this._preSave(newFields, record, records)
     } catch(error) {
-      await locker.unlock(this._db)
-      //lockFile.unlock(this._db)
+      await this._locker.unlock(this._db)
       throw Error ( `preSave hook error: ${error}` )
     }
     record = {...record, ...preSaved, uuid:record.uuid}
-
     records = records.filter(u => u.uuid !== uuid )
     const error = await this._validate(record, records)
     if (error) {
-      await locker.unlock(this._db)
-      //lockFile.unlock(this._db)
+      await this._locker.unlock(this._db)
       throw Error ( `Validation error: ${error}` )
     }
-
     record = _applyMethods(this._methods, record)
-
     records.push(record)
     return (await this._writeDb(records)) || record
   }
@@ -341,7 +288,7 @@ class _JsModel { constructor({name, fields, validators, preSave, statics, method
   //////////////////
   async delete (filter) {
     if (!filter) throw Error ( "Must provide filter object" )
-    await this._lockDb()
+    await this._locker.lock(this._db)
     const records = await this.get()
     return (await this._writeDb(records.filter(r => !Object.keys(filter).every(key => r[key] && r[key] === filter[key])))) || filter
   }

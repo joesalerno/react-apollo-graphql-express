@@ -27,11 +27,8 @@ const test = async (concurrent, times) => {
 }
 
 let start = Date.now()
-test(25, 200).then(() => console.log(Date.now()-start))
-// let concurrent = 15
-// let times = 100
-// let promises = []
-// for (let i = 0; i < times; i++){
-//   promises.push(doConcurrent(concurrent))
-// }
-// Promise.all(promises).then(()=>console.log(Date.now()-start))
+test(25, 100).then(() => console.log(Date.now()-start))
+
+
+
+

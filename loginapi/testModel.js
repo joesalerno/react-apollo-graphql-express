@@ -31,21 +31,26 @@ fs.writeFileSync("./models/User.json", "[]")
 
 const User = require("./models/User")
 
+// User.add({username: `bob`, password: `123`, host:"23asdf423"})
+// .then(bob => User.edit(bob.uuid, {username: `jim`, password: `456`, host: 2} ))
+// .then(jim => User.edit(jim.uuid, {username: `done`}))
+
 let time = Date.now()
 let promises = []
-for(let i = 0; i < 100; i++) {
+let concurrent = 400
+for(let i = 0; i < concurrent; i++) {
   promises.push(
-    //User.get()
     User.add({username: `bob${i}`, password: `123${i}`, host:"23asdf423"})
     .then(bob => User.edit(bob.uuid, {username: `jim${i}`, password: `456${i}`, host: 2} ))
     .then(jim => User.edit(jim.uuid, {username: `done${i}`}))
-    //.then(() => (User.get()))
-    //.then(users => users.forEach(user => {console.log(user)}))
   )
 }
-Promise.all(promises).then(
-  () => console.log(Date.now() - time)
-)
+Promise.all(promises).then(() => {
+  let newTime = Date.now() - time
+  console.log(`${concurrent}: ${newTime}, (${newTime/concurrent} per test)`)
+})
+
+//User.add({username: "joe", password:"test"}).then(x => console.log(x))
 
 //User.everyone().then(everyone => console.log(everyone))
 //Users.add({username: "bob", password: "thing"}).then(x => console.log(x))
