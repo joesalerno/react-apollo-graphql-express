@@ -6,6 +6,7 @@ import IndexPage from "./pages/IndexPage"
 import RegisterPage from "./pages/RegisterPage"
 import SettingsPage from "./pages/SettingsPage"
 import JobPage from "./pages/JobPage"
+import TestPage from "./pages/TestPage"
 import { apiAddress } from "./config"
 import "./App.css"
 
@@ -47,6 +48,10 @@ function App() {
 
       <Route exact path="/register">
         <RegisterPage auth={auth} login={login} logout={logout} register={register}/>
+      </Route>
+
+      <Route exact path="/test">
+        <TestPage auth={auth} login={login} logout={logout} register={register}/>
       </Route>
 
       <Route exact path="/settings">

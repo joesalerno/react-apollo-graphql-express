@@ -13,7 +13,7 @@ module.exports = new JsModel({
     {field:"host", isValid: () => true, error: "unable to reach host"}
   ],
   methods: {
-    validPassword: function (password) { return this.password === password }
+    verifyPassword: function (password) { return `hash${password}` === this.password }
   },
   statics: {
     loggedInUsers: async function () { return await this.get() }

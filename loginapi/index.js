@@ -24,16 +24,20 @@ app.use("/users", async (req, res) => {
 
 app.use("/login", async (req, res) => {
   const { username, password } = req.body
-  if (!await User.verifyPassword(username, password)) return res.status(400).send("Invalid username or password")
+  const user = await User.getOne({username})
+  console.log(user)
+  console.log(req.body)
+  console.log(`hash${password}`)
+  if (!user || !await user.verifyPassword(password)) return res.status(400).send("Invalid username or password")
   return res.send(generateLoginToken(username))
 })
 
 app.use("/register", async (req, res) => {
   const { username, password } = req.body
-  if ((await User.get({username})).length) return res.status(400).send("Username already taken")
+  if (await User.getOne({username})) return res.status(400).send("Username already taken")
   if (!username) return res.status(400).send("Username required")
   if (!password) return res.status(400).send("Password required")
-  if (await User.add({username, password})) return res.status(400).send("Error adding user to database")
+  if (!await User.add({username, password})) return res.status(400).send("Error adding user to database")
   return res.send(generateLoginToken(username))
 })
 

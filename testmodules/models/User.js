@@ -1,10 +1,8 @@
 const { JsonModel } = require("../modules/json-model")
 const bcrypt = require("bcrypt")
 const saltRounds = 12
-const _hashPassword = async password => await bcrypt.hash(password, saltRounds)
-const hashPassword = password => `hash:${password}`
-const _verifyPassword = async (password, hash) => await bcrypt.compare(password, hash)
-const verifyPassword = (password, hash) => `hash:${password}` === hash
+const hashPassword = async password => await bcrypt.hash(password, saltRounds)
+const verifyPassword = async (password, hash) => await bcrypt.compare(password, hash)
 
 module.exports = new JsonModel({
   name: "User",
@@ -13,7 +11,7 @@ module.exports = new JsonModel({
     password: {type: "string", required: true},
     host: "string"
   },
-  preSave: async (user, oldUser) =>  ({...user, password: (user.password ? await hashPassword(user.password) : oldUser.password)}),
+  preSave: async (user, oldUser) =>  ({...user, password: user.password ? await hashPassword(user.password) : oldUser.password}),
   validators: [
     {field:"host", isValid: () => true, error: "invalid hostname"},
     {field:"host", isValid: () => true, error: "unable to reach host"}

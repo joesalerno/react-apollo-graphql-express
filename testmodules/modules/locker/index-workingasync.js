@@ -1,4 +1,4 @@
-const { mkdir, rmdir, stat, mkdirSync, rmdirSync, statSync } = require("fs")
+const { mkdir, rmdir, stat } = require("fs")
 const { promisify } = require("util")
 const mkdirAsync = promisify(mkdir)
 const rmdirAsync = promisify(rmdir)
@@ -24,7 +24,7 @@ module.exports = class Locker { constructor({ keepalive, timeout, retry, attempt
   ///////////////////////////////////// Options:
   this.keepalive = keepalive || 1000 // ms to update mtime, to protect stale locks
   this.timeout   = timeout   || 2000 // ms before lock is considered stale
-  this.retry     = retry     || 35    // ms before re-trying after unsuccessful lock
+  this.retry     = retry     || 1    // ms before re-trying after unsuccessful lock
   this.attempts  = attempts  || 0    // number of failed attempts before error is thrown (resets on success)
   //////////////////////////////////////////////////////////////////////////////////////////////////////////
   this.lockCount = 0 // starts/stops refresher daemon. program won't close with lock open ~ this is a plus
