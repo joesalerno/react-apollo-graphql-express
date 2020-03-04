@@ -1,64 +1,98 @@
 import React from "react"
 import Downshift from "downshift"
 
-export default ({data, itemToString, width, onChange, onClick, allowTypedValues, inputField, validateInput, inputProps, initialSelectedItem}) => <Downshift
-  onClick={onClick || (() => {})}
+export default ({
+  data,
+  itemToString,
+  onClick,
+  onChange,
+  readOnly,
+  acceptTypedInput, inputField,
+  validateInput,
+  inputValue, setInputValue, 
+  selectedItem,
+  initialSelectedItem,
+  width,
+  placeholder,
+  inputProps,
+}) => <Downshift
+  itemToString={ itemToString || (item => item) }
+  onClick={ onClick || (() => {}) }
   onChange={ onChange || (selection => { if (selection) alert(itemToString(selection)) }) }
-  itemToString={itemToString || (item => item)}
-  initialSelectedItem={initialSelectedItem}
+  inputValue={ inputValue }
+  setInputValue={ setInputValue }
+  selectedItem={ selectedItem }
+  initialSelectedItem={ initialSelectedItem }
 >
   {({
     getInputProps,
     getItemProps,
     getToggleButtonProps,
+    getMenuProps,
     selectedItem,
     selectItem,
     clearSelection,
     inputValue,
     highlightedIndex,
     isOpen,
-    openMenu
+    openMenu,
+    closeMenu
   }) => {
-    const filteredData = data.filter(item => !inputValue || itemToString ? itemToString(item).includes(inputValue) : item.includes(inputValue))
+    const filteredData = readOnly ? data : data.filter(item => !inputValue || itemToString ? itemToString(item).includes(inputValue) : item.includes(inputValue))
+    const validTypedInput = () => acceptTypedInput && (!validateInput || validateInput(inputValue))
+    const selectTypedInput = () => selectItem(inputField ? {[inputField]: inputValue} : inputValue)
     return <div>
       <div>
-        <input {...getInputProps({style: { width: width || "200px", border: "1px", borderStyle:"solid", borderColor: validateInput ? validateInput(inputValue) ? "#0F0" : "#F00" : "#7A7A7A" }, ...inputProps, 
-          onKeyDown: event => { if (allowTypedValues && event.key === "Enter" && (!validateInput || validateInput(inputValue))) selectItem(inputField ? {[inputField]: inputValue} : inputValue) },
-          onClick: () => {if (!selectedItem) openMenu()}
-         })}
-          
+        <input {...getInputProps({style: { 
+          width: `calc(${width} - 5.2px)` || "200px",
+          padding: "0 0 0 2px",
+          border: "2px",
+          borderStyle:"solid",
+          borderRadius: "3px",
+          borderColor: validateInput ? validateInput(inputValue) ? "#005291" : "#F00" : "#005291" 
+        },
+          onKeyDown: event => { if (event.key === "Enter" && validTypedInput()) selectTypedInput() },
+          onClick: () => {if (!selectedItem || readOnly) openMenu()},
+          onBlur: () => {validTypedInput() ? selectTypedInput() : setInputValue(itemToString(selectedItem)); closeMenu() },
+          onChange: event => setInputValue(event.target.value),
+          placeholder,
+          readOnly,
+          ...inputProps,
+         })}  
         />
-        {selectedItem ? (
-          <button onClick={clearSelection}
-            style={{ background: "#FFF0", border: "0", margin: "-16px", width: "16px"}}
-          > ✕ </button>
-        ) : (
-          <button {...getToggleButtonProps()}
-            style={{ background: "#FFF0", border: "0", margin: "-16px", width: "16px" }}
-          > ⌄ </button>
-        )}
+
+        {!readOnly && selectedItem && <button onClick={() => {clearSelection();openMenu();}}
+          style={{ background: "#FFF0", border: "0", margin: "-16px", width: "16px"}}
+        > ✕ </button>}
+        
+        {(readOnly || !selectedItem) && <button {...getToggleButtonProps()}
+          style={{ background: "#FFF0", border: "0", margin: "-16px", width: "16px" }}
+        > ⏷ </button>}
+
       </div>
-      <div style={{
+      {isOpen && <div style={{
         position: "absolute",
+        zIndex: 2,
         background: "#FFF",
-        width: width || "200px",
+        width: `calc(${width} - 1.6px)` || "196.4px",
+        maxHeight: "298px",
+        overflowY: "auto",
         border: "1px",
         borderColor: "#7A7A7A",
         borderStyle: isOpen && filteredData.length ? "solid" : "hidden"
       }}>
-        <ul style={{ listStyleType: "none" }}>
-          {isOpen && filteredData.map((item, index) => 
-              <li key={`dropdown-item-${index}-${itemToString ? itemToString(item) : item}`}
-                {...getItemProps({ item, index, style: {
-                  padding: "0 0 0 4px",
-                  backgroundColor:
-                    highlightedIndex === index ? "lightgray" : null,
-                  fontWeight: selectedItem === item ? "bold" : "normal"
-                }})}
-              > {itemToString ? itemToString(item) : item} </li>
-            )}
+        <ul {...getMenuProps({ style: { listStyleType: "none" }})}>
+          {filteredData.map((item, index) => 
+            <li key={`dropdown-item-${index}-${(item.id || item._id || item.uuid) ? (item.id || item._id || item.uuid) : itemToString ? itemToString(item) : item}`}
+              {...getItemProps({ item, index, style: {
+                padding: "0 0 0 2px",
+                backgroundColor: highlightedIndex === index ? "lightgray" : null,
+                fontWeight: selectedItem === item ? "bold" : "normal",
+              }})}
+            > {itemToString ? itemToString(item) : item} </li>
+          )}
         </ul>
-      </div>
+      </div>}
     </div>
   }}
 </Downshift>
