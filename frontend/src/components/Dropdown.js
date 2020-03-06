@@ -9,7 +9,7 @@ export default ({
   readOnly,
   acceptTypedInput, inputField,
   validateInput,
-  inputValue, setInputValue, 
+  inputValue, setInputValue,
   selectedItem,
   initialSelectedItem,
   width,
@@ -47,8 +47,8 @@ export default ({
           width: `calc(${width} - 5.2px)` || "200px",
           padding: "0 0 0 2px",
           border: "2px",
-          borderStyle:"solid",
           borderRadius: "3px",
+          borderStyle:"solid",
           borderColor: validateInput ? validateInput(inputValue) ? "#005291" : "#F00" : "#005291" 
         },
           onKeyDown: event => { if (event.key === "Enter" && validTypedInput()) selectTypedInput() },
@@ -58,14 +58,14 @@ export default ({
           placeholder,
           readOnly,
           ...inputProps,
-         })}  
+         })}
         />
 
-        {!readOnly && selectedItem && <button onClick={() => {clearSelection();openMenu();}}
+        {!readOnly && selectedItem && <button tabIndex={-1} onClick={() => {clearSelection();openMenu();}}
           style={{ background: "#FFF0", border: "0", margin: "-16px", width: "16px"}}
         > ✕ </button>}
         
-        {(readOnly || !selectedItem) && <button {...getToggleButtonProps()}
+        {(readOnly || !selectedItem) && <button tabIndex={-1} {...getToggleButtonProps()}
           style={{ background: "#FFF0", border: "0", margin: "-16px", width: "16px" }}
         > ⏷ </button>}
 

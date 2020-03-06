@@ -200,7 +200,7 @@ module.exports = text => {
   // num_spokes - number of spokes
   // gap - size of spoke gap
   // rad -corner radius
-  // corners - a combination ofwhich corners are rounded
+  // corners - a combination of which corners are rounded
   // x<corners> is omitted if all corners are rounded
   if (text.match(/^rc_ths[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9])x[1-9]+[0-9]*x[1-9]+[0-9]*(\.[0-9]+)?xr[1-9]+[0-9]*(\.[0-9]+)?(x[0-8])?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/)) return "rounded rectangle thermal"
 
