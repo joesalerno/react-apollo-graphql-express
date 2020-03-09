@@ -8,11 +8,10 @@ export default ({heightPx = 250, widthPx = 250, drillSize, layers}) => <div styl
   display: "flex",
   flexDirection: "column"
 }}>
-  {layers.map(([name, size, color], i) => <Tooltip title={
-    `(Layer : ${name}), (Drill : ${drillSize/1000}"), (Pad : ${size/1000}"), (A.R. : ${Math.max((size - drillSize)/1000, 0)}")`
+  {layers.map(([name, size, color], i) => <Tooltip key={`___cross_section___${i}___`} title={
+    `(Layer : ${name}) (Drill : ${drillSize/1000}") (Pad : ${size/1000}") (A.R. : ${Math.max((size - drillSize)/1000, 0)}")`
   }>
-    <div key={`___cross_section___${i}___`} style={{
-      
+    <div style={{
       margin: "auto",
       width: "100%",
       flex: "auto",
