@@ -100,7 +100,6 @@ export default ({heightPx, widthPx, features}) => {
       // todo implement when look into crazy way odb specifies corners
     }
     const roundedRoundThermal = ({x, y, od, id, angle, num_spokes, gap}) => {
-      const gap = od-id || 0
       
     }
 
