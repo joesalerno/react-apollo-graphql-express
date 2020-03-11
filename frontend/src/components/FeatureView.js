@@ -99,8 +99,133 @@ export default ({heightPx, widthPx, features}) => {
     const halfOval = ({x, y, w, h}) => {
       // todo implement when look into crazy way odb specifies corners
     }
+
     const roundedRoundThermal = ({x, y, od, id, angle, num_spokes, gap}) => {
+      console.log({roundedRoundThermal: {x, y, od, id, angle, num_spokes, gap}})
+      const lw = od - id || 0
+      const pi2 = 2*Math.PI 
+      const avg = (od + id) / 2
+      const startRad = degreeToRadian(angle)
+      console.log({gap, lw, avg})
+      const halfGapRad = avg ? gap/avg * Math.PI : 0
+      const segmentRad = num_spokes ? pi2/num_spokes : 0
+      const smallArcRad = avg ? lw/avg * Math.PI : 0
+
+      const sections = []
+      for (let i = 0, rad; i < num_spokes; i++) {
+        const arcPointsY = []; const arcPointsX = [];
+        const tangentsX = [];  const tangentsY = [];
+        console.log({lw, segmentRad, start: degreeToRadian(angle), avg, halfGapRad, smallArcRad, thing2: lw ? pi2 * (lw/id) : 0})
+        // ID Point
+        rad = + startRad                            // start angle
+              + halfGapRad                          // half of gap % of id // move over half of gap.. radians 2pi(fullr) * ()
+              + segmentRad * i                      // this % around       // move over for i
+              + smallArcRad            // lw % of id          // move over small circle r
+        arcPointsX.push(x + id * Math.cos(rad))
+        arcPointsY.push(y + id * Math.sin(rad))
+
+        // Tangent Point
+        rad = + startRad                            // start angle
+              + segmentRad * i                      // this % around
+        tangentsX.push(x + avg * Math.cos(rad))
+        tangentsY.push(y + avg * Math.sin(rad))
+
+        // OD point
+        rad = + startRad                            // start angle
+              + halfGapRad                          // half of gap % of od
+              + segmentRad * i                      // this % around
+              + smallArcRad            // lw % of od
+        arcPointsX.push(x + od * Math.cos(rad))
+        arcPointsY.push(y + od * Math.sin(rad))
+
+        // Tangent Point
+        rad = + startRad                            // start angle
+              + segmentRad * (i+0.5)                  // this % around + half a segment
+        tangentsX.push(x + (od+.001) * Math.cos(rad))
+        tangentsY.push(y + (od+.001) * Math.sin(rad))
+
+        // OD Point
+        rad = + startRad                            // start angle
+              - halfGapRad                          // half of gap % of od
+              + segmentRad * (i+1)                    // next % around
+              - smallArcRad            // lw % of od
+        arcPointsX.push(x + od * Math.cos(rad))
+        arcPointsY.push(y + od * Math.sin(rad))
+
+        // Tangent Point
+        rad = + startRad                            // start angle
+              + segmentRad * (i+1)                    // next % around
+        tangentsX.push(x + avg * Math.cos(rad))
+        tangentsY.push(y + avg * Math.sin(rad))
+
+        // ID Point
+        rad = + startRad                            // start angle
+              - halfGapRad                          // half of gap % of id
+              + segmentRad * (i+1)                    // next % around
+              - smallArcRad            // lw % of id
+        arcPointsX.push(x + id * Math.cos(rad))
+        arcPointsY.push(y + id * Math.sin(rad))
+        
+        // Tangent Point
+        rad = + startRad                            // start angle
+              + segmentRad * (i+0.5)                  // this % around + half a segment
+        tangentsX.push(x + (id+.001) * Math.cos(rad))
+        tangentsY.push(y + (id+.001) * Math.sin(rad))
+        
+        sections.push([arcPointsX, arcPointsY, tangentsX, tangentsY])
+      }
+
+      //console.log({arcPointsX, arcPointsY,})
+      circle({x, y, r: 4})
+      ctx.fill()
+      ctx.closePath()
+      //for (let i = 0; i < arcPointsX.length; i++) circle({x: arcPointsX[i], y: arcPointsY[i], r: 3})
+
+      for (const [arcPointsX, arcPointsY, tangentsX, tangentsY] of sections) {
+        ctx.fillStyle = "blue"
+        // ctx.beginPath()
+        // circle({x: arcPointsX[0], y: arcPointsY[0], r: 3})
+        // circle({x: arcPointsX[1], y: arcPointsY[1], r: 3})
+        // circle({x: arcPointsX[2], y: arcPointsY[2], r: 3})
+        // circle({x: arcPointsX[3], y: arcPointsY[3], r: 3})
+        // circle({x: tangentsX[0], y: tangentsY[0], r: 3})
+        // circle({x: tangentsX[1], y: tangentsY[1], r: 3})
+        // circle({x: tangentsX[2], y: tangentsY[2], r: 3})
+        // circle({x: tangentsX[3], y: tangentsY[3], r: 3})
+
+        // ctx.closePath()
+        // ctx.fill()
+        // ctx.fillStyle = "yellow"
+        ctx.beginPath()
+        ctx.moveTo(arcPointsX[0], arcPointsY[0])
+        ctx.lineTo( tangentsX[0],  tangentsY[0])
+        ctx.lineTo(arcPointsX[1], arcPointsY[1])
+        ctx.lineTo( tangentsX[1],  tangentsY[1])
+        ctx.lineTo(arcPointsX[2], arcPointsY[2])
+        ctx.lineTo( tangentsX[2],  tangentsY[2])
+        ctx.lineTo(arcPointsX[3], arcPointsY[3])
+        ctx.lineTo( tangentsX[3],  tangentsY[3])
+        ctx.lineTo(arcPointsX[0], arcPointsY[0])
+        ctx.closePath()
+        ctx.fill()
+      }
       
+      console.log(sections)
+      for (const [arcPointsX, arcPointsY, tangentsX, tangentsY] of sections) {
+        // ctx.fillStle = "green"
+        // ctx.moveTo(arcPointsX[0], arcPointsY[0])
+        // ctx.arcTo(tangentsX[0], tangentsY[0], arcPointsX[1], arcPointsY[1], lw)
+        // ctx.arcTo(tangentsX[1], tangentsY[1], arcPointsX[2], arcPointsY[2], od)
+        // ctx.arcTo(tangentsX[2], tangentsY[2], arcPointsX[3], arcPointsY[3], od)
+
+      }
+      
+      ctx.fillStyle = "red"
+      //let arcPointX1 = x + od * Math.cos(degreeToRadian(angle))
+      //let arcPointY1 = y + od * Math.sin(degreeToRadian(angle))
+
+
+      //ctx.moveTo(firstArcPoint)
     }
 
     ctx.beginPath()

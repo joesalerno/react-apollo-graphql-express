@@ -14,26 +14,6 @@ const TestPage = ({auth, login, logout}) => {
   const getData = () => {let d = [];for (let i = 0; i <= 250; i++) d.push({symbol:`r${i}`}); return d}
   useEffect(() => setInputSelectedPad(selectedPad ? selectedPad.symbol : ""), [selectedPad])
 
-  // const features = [{type: "r", }]
-
-  const pathFromSymbol = symbol => {
-    let type = validOdbSymbol(symbol)
-    let path = new Path2D
-
-    if (!type) return path
-    if (type === "round") {
-      path.arc(0, 0, )
-      let [d, r] = symbol.match(/[0-9]+/g).map(text => parseFloat(text))
-      console.log({symbol, d, r})
-
-      //ctx.arc(100, 75, 50, 0, 2 * Math.PI)
-
-      // return [{type: "arc", x:0, y:0, }]
-
-      // return {d, r}
-    }
-  }
-
   const drawPad = ({ symbol, x, y, polarity, rotation, resize }) => {
     console.log("drawing pad")
     let canvas = document.getElementById("canvas")
@@ -260,6 +240,7 @@ const TestPage = ({auth, login, logout}) => {
     {symbol: "bfr25", x: 50, y:200},
     {symbol: "bfs25", x: 50, y:150},
     {symbol: "tri25x25", x: 50, y:100},
+    {symbol: "thr60x45x0x3x13", x: 150, y: 100},
 
   ]
   
