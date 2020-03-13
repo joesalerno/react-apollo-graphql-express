@@ -1,13 +1,22 @@
 import React, { useRef, useEffect } from "react"
 import validOdbSymbol from "../modules/validOdbSymbol"
 const degreeToRadian = degree => degree * Math.PI / 180
+const sq = n => n * n
+const degreeFromSides = (a, b, opposite) => {
+  if (!a || !b) return 0
+  return 180 * Math.acos( (sq(opposite) -sq(a) -sq(b))/( -2*a*b ) ) /Math.PI
+}
+const radFromSides = (a, b, opposite) => {
+  if (!a || !b) return 0
+  return Math.acos( (sq(opposite) -sq(a) -sq(b))/( -2*a*b ) )
+}
 
-
-
+//180*Math.acos((sq(fh.c.value)-sq(fh.a.value)-sq(fh.b.value))/(-2*fh.a.value*fh.b.value))/Math.PI
 export default ({heightPx, widthPx, features}) => {
   const canvasRef = useRef(null)
 
   const drawPad = ({ symbol, x, y, polarity, rotation, resize, fillStyle }) => {
+    
     const ctx = canvasRef.current.getContext("2d")
     const type = validOdbSymbol(symbol)
     if (!type) return console.log({ParsingError: {symbol, x, y, polarity, rotation, resize}})
@@ -101,131 +110,103 @@ export default ({heightPx, widthPx, features}) => {
     }
 
     const roundedRoundThermal = ({x, y, od, id, angle, num_spokes, gap}) => {
-      console.log({roundedRoundThermal: {x, y, od, id, angle, num_spokes, gap}})
-      const lw = od - id || 0
-      const pi2 = 2*Math.PI 
-      const avg = (od + id) / 2
+      const halfLw = (od - id) / 4 || 0
+      const avgR = (od + id) / 4
+      const ir = id/2, or = od/2;
+      const pi2 = Math.PI * 2
       const startRad = degreeToRadian(angle)
-      console.log({gap, lw, avg})
-      const halfGapRad = avg ? gap/avg * Math.PI : 0
-      const segmentRad = num_spokes ? pi2/num_spokes : 0
-      const smallArcRad = avg ? lw/avg * Math.PI : 0
+      const halfGapRad = radFromSides(avgR, avgR, gap/2)
+      const smallArcRad = radFromSides(avgR, avgR, halfLw)
+      const segmentRad = num_spokes ? pi2 / num_spokes : 0
 
       const sections = []
       for (let i = 0, rad; i < num_spokes; i++) {
-        const arcPointsY = []; const arcPointsX = [];
-        const tangentsX = [];  const tangentsY = [];
-        console.log({lw, segmentRad, start: degreeToRadian(angle), avg, halfGapRad, smallArcRad, thing2: lw ? pi2 * (lw/id) : 0})
-        // ID Point
-        rad = + startRad                            // start angle
-              + halfGapRad                          // half of gap % of id // move over half of gap.. radians 2pi(fullr) * ()
-              + segmentRad * i                      // this % around       // move over for i
-              + smallArcRad            // lw % of id          // move over small circle r
-        arcPointsX.push(x + id * Math.cos(rad))
-        arcPointsY.push(y + id * Math.sin(rad))
+        const circlesX = [], circlesY = [];
+        const inRads = [],   outRads = [];
 
-        // Tangent Point
-        rad = + startRad                            // start angle
-              + segmentRad * i                      // this % around
-        tangentsX.push(x + avg * Math.cos(rad))
-        tangentsY.push(y + avg * Math.sin(rad))
+        rad = startRad
+            + segmentRad * i
+            + halfGapRad
+            + smallArcRad
+        circlesX.push(x + avgR * Math.cos(rad))
+        circlesY.push(y + avgR * Math.sin(rad))
+        inRads.push(rad + Math.PI)
+        outRads.push(rad)
 
-        // OD point
-        rad = + startRad                            // start angle
-              + halfGapRad                          // half of gap % of od
-              + segmentRad * i                      // this % around
-              + smallArcRad            // lw % of od
-        arcPointsX.push(x + od * Math.cos(rad))
-        arcPointsY.push(y + od * Math.sin(rad))
+        rad = startRad
+            + segmentRad * (i+1)
+            - halfGapRad
+            - smallArcRad
+        circlesX.push(x + avgR * Math.cos(rad))
+        circlesY.push(y + avgR * Math.sin(rad))
+        inRads.push(rad + Math.PI)
+        outRads.push(rad)
 
-        // Tangent Point
-        rad = + startRad                            // start angle
-              + segmentRad * (i+0.5)                  // this % around + half a segment
-        tangentsX.push(x + (od+.001) * Math.cos(rad))
-        tangentsY.push(y + (od+.001) * Math.sin(rad))
+        sections.push([circlesX, circlesY, inRads, outRads])
+      }
 
-        // OD Point
-        rad = + startRad                            // start angle
-              - halfGapRad                          // half of gap % of od
-              + segmentRad * (i+1)                    // next % around
-              - smallArcRad            // lw % of od
-        arcPointsX.push(x + od * Math.cos(rad))
-        arcPointsY.push(y + od * Math.sin(rad))
+      for (const [circlesX, circlesY, inRads, outRads] of sections) {
+        let startingX = x + ir * Math.cos(outRads[0])
+        let startingY = y + ir * Math.sin(outRads[0])
+        ctx.moveTo(startingX, startingY)
+        ctx.arc(circlesX[0], circlesY[0], halfLw, inRads[0], outRads[0])
+        ctx.arc(x, y, ir, outRads[0], outRads[1])
+        ctx.arc(circlesX[1], circlesY[1], halfLw, outRads[1], inRads[1])
+        ctx.arc(x, y, or, outRads[1], outRads[0], true)
+      }
+    }
 
-        // Tangent Point
-        rad = + startRad                            // start angle
-              + segmentRad * (i+1)                    // next % around
-        tangentsX.push(x + avg * Math.cos(rad))
-        tangentsY.push(y + avg * Math.sin(rad))
+    const squaredRoundThermal = ({x, y, od, id, angle, num_spokes, gap}) => {
+      const halfLw = (od - id) / 4 || 0
+      const avgR = (od + id) / 4
+      const ir = id/2, or = od/2;
+      const pi2 = Math.PI * 2
+      const startRad = degreeToRadian(angle)
+      const halfGapRad = radFromSides(avgR, avgR, gap/2)
+      const smallArcRad = radFromSides(avgR, avgR, halfLw)
+      const segmentRad = num_spokes ? pi2 / num_spokes : 0
 
-        // ID Point
-        rad = + startRad                            // start angle
-              - halfGapRad                          // half of gap % of id
-              + segmentRad * (i+1)                    // next % around
-              - smallArcRad            // lw % of id
-        arcPointsX.push(x + id * Math.cos(rad))
-        arcPointsY.push(y + id * Math.sin(rad))
+      const sections = []
+      for (let i = 0, rad; i < num_spokes; i++) {
+        const outRads = [];
+
+        rad = startRad
+            + segmentRad * i
+            + halfGapRad
+            + smallArcRad
+        outRads.push(rad)
+
+        rad = startRad
+            + segmentRad * (i+1)
+            - halfGapRad
+            - smallArcRad
+        outRads.push(rad)
+
+        sections.push(outRads)
+      }
+
+      for (const outRads of sections) {
+        let cornerX = x + or * Math.cos(outRads[0])
+        let cornerY = y + or * Math.sin(outRads[0])
+        ctx.moveTo(cornerX, cornerY)
+
+        cornerX = x + ir * Math.cos(outRads[0])
+        cornerY = y + ir * Math.sin(outRads[0])
+        ctx.lineTo(cornerX, cornerY)
         
-        // Tangent Point
-        rad = + startRad                            // start angle
-              + segmentRad * (i+0.5)                  // this % around + half a segment
-        tangentsX.push(x + (id+.001) * Math.cos(rad))
-        tangentsY.push(y + (id+.001) * Math.sin(rad))
-        
-        sections.push([arcPointsX, arcPointsY, tangentsX, tangentsY])
+        ctx.arc(x, y, ir, outRads[0], outRads[1])
+
+        cornerX = x + or * Math.cos(outRads[1])
+        cornerY = y + or * Math.sin(outRads[1])
+        ctx.lineTo(cornerX, cornerY)
+
+        ctx.arc(x, y, or, outRads[1], outRads[0], true)
       }
+    }
 
-      //console.log({arcPointsX, arcPointsY,})
-      circle({x, y, r: 4})
-      ctx.fill()
-      ctx.closePath()
-      //for (let i = 0; i < arcPointsX.length; i++) circle({x: arcPointsX[i], y: arcPointsY[i], r: 3})
-
-      for (const [arcPointsX, arcPointsY, tangentsX, tangentsY] of sections) {
-        ctx.fillStyle = "blue"
-        // ctx.beginPath()
-        // circle({x: arcPointsX[0], y: arcPointsY[0], r: 3})
-        // circle({x: arcPointsX[1], y: arcPointsY[1], r: 3})
-        // circle({x: arcPointsX[2], y: arcPointsY[2], r: 3})
-        // circle({x: arcPointsX[3], y: arcPointsY[3], r: 3})
-        // circle({x: tangentsX[0], y: tangentsY[0], r: 3})
-        // circle({x: tangentsX[1], y: tangentsY[1], r: 3})
-        // circle({x: tangentsX[2], y: tangentsY[2], r: 3})
-        // circle({x: tangentsX[3], y: tangentsY[3], r: 3})
-
-        // ctx.closePath()
-        // ctx.fill()
-        // ctx.fillStyle = "yellow"
-        ctx.beginPath()
-        ctx.moveTo(arcPointsX[0], arcPointsY[0])
-        ctx.lineTo( tangentsX[0],  tangentsY[0])
-        ctx.lineTo(arcPointsX[1], arcPointsY[1])
-        ctx.lineTo( tangentsX[1],  tangentsY[1])
-        ctx.lineTo(arcPointsX[2], arcPointsY[2])
-        ctx.lineTo( tangentsX[2],  tangentsY[2])
-        ctx.lineTo(arcPointsX[3], arcPointsY[3])
-        ctx.lineTo( tangentsX[3],  tangentsY[3])
-        ctx.lineTo(arcPointsX[0], arcPointsY[0])
-        ctx.closePath()
-        ctx.fill()
-      }
+    const squareThermal = ({x, y, os, is, angle, num_spokes, gap}) => {
+      const halfGap = gap/2
       
-      console.log(sections)
-      for (const [arcPointsX, arcPointsY, tangentsX, tangentsY] of sections) {
-        // ctx.fillStle = "green"
-        // ctx.moveTo(arcPointsX[0], arcPointsY[0])
-        // ctx.arcTo(tangentsX[0], tangentsY[0], arcPointsX[1], arcPointsY[1], lw)
-        // ctx.arcTo(tangentsX[1], tangentsY[1], arcPointsX[2], arcPointsY[2], od)
-        // ctx.arcTo(tangentsX[2], tangentsY[2], arcPointsX[3], arcPointsY[3], od)
-
-      }
-      
-      ctx.fillStyle = "red"
-      //let arcPointX1 = x + od * Math.cos(degreeToRadian(angle))
-      //let arcPointY1 = y + od * Math.sin(degreeToRadian(angle))
-
-
-      //ctx.moveTo(firstArcPoint)
     }
 
     ctx.beginPath()
@@ -353,6 +334,11 @@ export default ({heightPx, widthPx, features}) => {
     else if (type === "round thermal (rounded)") {
       const [ od, id, angle, num_spokes, gap ] = getParams()
       roundedRoundThermal({x, y, od, id, angle, num_spokes, gap})
+    }
+
+    else if (type === "round thermal (squared)") {
+      const [ od, id, angle, num_spokes, gap ] = getParams()
+      squaredRoundThermal({x, y, od, id, angle, num_spokes, gap})
     }
 
     ctx.fill("evenodd")

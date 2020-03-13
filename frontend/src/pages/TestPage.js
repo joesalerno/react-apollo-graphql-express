@@ -5,6 +5,7 @@ import Dropdown from "../components/Dropdown"
 import CrossSection from "../components/CrossSection"
 import FeatureView from "../components/FeatureView"
 import validOdbSymbol from "../modules/validOdbSymbol"
+import Circle from "../components/paths/Circle"
 
 const degreeToRadian = degree => degree * Math.PI / 180
 
@@ -240,8 +241,10 @@ const TestPage = ({auth, login, logout}) => {
     {symbol: "bfr25", x: 50, y:200},
     {symbol: "bfs25", x: 50, y:150},
     {symbol: "tri25x25", x: 50, y:100},
-    {symbol: "thr60x45x0x3x13", x: 150, y: 100},
-
+    {symbol: "r15", x: 250, y:100},
+    {symbol: "thr60x45x0x3x7.5", x: 150, y: 100},
+    {symbol: "thr60x45x0x4x7.5", x: 250, y: 100},
+    {symbol: "ths60x45x0x4x7.5", x: 250, y: 150},
   ]
   
   const links = [{name:"CAM",ref:"/"}, {name:"Test"}]
@@ -275,6 +278,10 @@ const TestPage = ({auth, login, logout}) => {
       {/* <FeatureView features={features}/> */}
 
       {setTimeout(draw, 200)}
+
+        <Circle x={50} y={50} r={100}/>
+
+      
 
       {selectedPad && selectedPad.symbol}
 
