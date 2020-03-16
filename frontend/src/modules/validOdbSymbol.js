@@ -1,5 +1,6 @@
 module.exports = text => {
   if (!text) return false
+  if (typeof text !== "string") return false
 
   // Round: r<d>
   // d - circle diameter

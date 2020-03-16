@@ -7,11 +7,14 @@ import FeatureView from "../components/FeatureView"
 import validOdbSymbol from "../modules/validOdbSymbol"
 import Circle from "../components/paths/Circle"
 
+
+
 const degreeToRadian = degree => degree * Math.PI / 180
 
 const TestPage = ({auth, login, logout}) => {
   const [selectedPad, setSelectedPad] = useState({symbol:""})
   const [inputSelectedPad, setInputSelectedPad] = useState('')
+
   const getData = () => {let d = [];for (let i = 0; i <= 250; i++) d.push({symbol:`r${i}`}); return d}
   useEffect(() => setInputSelectedPad(selectedPad ? selectedPad.symbol : ""), [selectedPad])
 
@@ -245,6 +248,18 @@ const TestPage = ({auth, login, logout}) => {
     {symbol: "thr60x45x0x3x7.5", x: 150, y: 100},
     {symbol: "thr60x45x0x4x7.5", x: 250, y: 100},
     {symbol: "ths60x45x0x4x7.5", x: 250, y: 150},
+
+    //{symbol: "s_ths60x45x0x2x3.5", x: 250, y: 150},
+    {symbol: "s_ths40x25x45x4x7.5", x: 250, y: 205},
+    {symbol: "donut_s41x40", x:250, y:205},
+    {symbol: "donut_s26x25", x:250, y:205},
+    {symbol: "s_ths40x25x0x4x7.5", x: 250, y: 250},
+    {symbol: "donut_s41x40", x:250, y:250},
+    {symbol: "donut_s26x25", x:250, y:250},
+    {symbol: "s_ths40x25x0x3x7.5", x:295, y: 250},
+    {symbol: "donut_s41x40", x:295, y:250},
+    {symbol: "donut_s26x25", x:295, y:250},
+    // {symbol: "s_ths20x10x0x1x.5", x: 250, y: 150},
   ]
   
   const links = [{name:"CAM",ref:"/"}, {name:"Test"}]
@@ -283,9 +298,10 @@ const TestPage = ({auth, login, logout}) => {
 
       
 
-      {selectedPad && selectedPad.symbol}
+      
 
-      <FeatureView heightPx={500} widthPx={500} features={features}/>
+      
+      <FeatureView heightPx={500} widthPx={500} features={[...features, {symbol: selectedPad && selectedPad.symbol, x: 300, y:50}]}/>
 
       <Spinner style={{margin:"auto auto 40px auto"}}/>
     </div>
