@@ -6,8 +6,10 @@ import CrossSection from "../components/CrossSection"
 import FeatureView from "../components/FeatureView"
 import validOdbSymbol from "../modules/validOdbSymbol"
 import Circle from "../components/paths/Circle"
-
-
+import Square from "../components/paths/Square"
+import Rectangle from "../components/paths/Rectangle"
+import RoundedRectangle from "../components/paths/RoundedRectangle"
+import ChamferedRectangle from "../components/paths/ChamferedRectangle"
 
 const degreeToRadian = degree => degree * Math.PI / 180
 
@@ -23,7 +25,6 @@ const TestPage = ({auth, login, logout}) => {
     {symbol: "s10_5", x:5, y:5},
     {symbol: "s20_45", x:35, y:35},
     {symbol: "s30_5", x:65, y:65},
-    {symbol: "s30", x:365, y:365},
     {symbol: "rect100x20xr21_45", x:150, y:200},
     {symbol: "rect100x20xr21", x:150, y:200},
     {symbol: "rect100x20xc5", x:350, y:200},
@@ -46,30 +47,22 @@ const TestPage = ({auth, login, logout}) => {
     {symbol: "thr60x45x0x3x7.5", x: 150, y: 100},
     {symbol: "thr60x45x0x4x7.5", x: 250, y: 100},
     {symbol: "ths60x45x0x4x7.5", x: 250, y: 150},
-    // {symbol: "s_ths40x25x45x4x7.5", x: 250, y: 205},
-    // {symbol: "s_ths40x25x45x4x7.5", x: 250, y: 205},
-    {symbol: "donut_s41x40", x:250, y:205},
-    {symbol: "donut_s26x25", x:250, y:205},
-    // {symbol: "s_ths40x25x0x4x7.5", x: 250, y: 250},
-    {symbol: "donut_s41x40", x:250, y:250},
-    {symbol: "donut_s26x25", x:250, y:250},
-    // {symbol: "s_ths40x25x0x3x7.5", x:295, y: 250},
-    {symbol: "donut_s41x40", x:295, y:250},
-    {symbol: "donut_s26x25", x:295, y:250},
-    // {symbol: "s_ths20x10x0x1x.5", x: 250, y: 150},
-    // {symbol: "s_ths120x80x63x1x35", x: 150, y: 425},
-    {symbol: "s_ths120x80x133x1x35", x: 275, y: 425},
+    {symbol: "s_ths40x25x45x4x7.5", x: 250, y: 205},
+    {symbol: "s_ths40x25x45x4x7.5", x: 250, y: 205},
+    {symbol: "s_ths40x25x0x4x7.5", x: 250, y: 250},
+    {symbol: "s_ths40x25x0x3x7.5", x:295, y: 250},
+    {symbol: "s_ths120x80x63x7x16", x: 150, y: 425},
+    {symbol: "s_ths120x80x7x15x17", x: 275, y: 425},
     {symbol: "donut_s121x120", x:150, y:425},
     {symbol: "donut_s81x80", x:150, y:425},
     {symbol: "s35", x:150, y:425},
-
+    {symbol: "sr_ths120x80x6x3x20", x: 400, y: 425},
+    {symbol: "el20x45", x: 50, y: 425},
   ]
-  
+
   const links = [{name:"CAM",ref:"/"}, {name:"Test"}]
   return <WindowLayout title={"Test"} links={links} auth={auth} login={login} logout={logout}>
     <div style={{minHeight:272, width:"100%", display:"flex", flexDirection:"column"}}>
-
-
 
       <button onClick={()=> setSelectedPad({symbol: "clicked"})}>clicky</button>
 
@@ -81,7 +74,16 @@ const TestPage = ({auth, login, logout}) => {
 
       {/* <FeatureView features={features}/> */}
 
-      <Circle x={50} y={50} r={100}/>
+      <svg stroke="blue" height="200px">
+        <g stroke="#005291" fill="none">
+          <Circle x={35} y={50} r={25}/>
+          <Square x={95} y={50} s={50}/>
+          <Rectangle x={145} y={50} w={30} h={50}/>
+          <RoundedRectangle x={185} y={50} w={30} h={50} rad={4}/>
+          <ChamferedRectangle x={225} y={50} w={30} h={50} rad={4}/>
+        </g>
+      </svg>
+      
 
       
 
@@ -100,7 +102,7 @@ const TestPage = ({auth, login, logout}) => {
         setInputValue={setInputSelectedPad}
       />
       
-      <FeatureView heightPx={500} widthPx={500} features={[...features, {symbol: selectedPad && selectedPad.symbol, x: 300, y:50}]}/>
+      <FeatureView heightPx={500} widthPx={500} features={[...features, {symbol: selectedPad && selectedPad.symbol, x: 250, y:250}]}/>
 
       <Spinner style={{margin:"auto auto 40px auto"}}/>
     </div>

@@ -12,7 +12,16 @@ const radFromSides = (a, b, opposite) => {
   if (!a || !b) return 0
   return Math.acos( (sq(opposite) -sq(a) -sq(b))/( -2*a*b ) )
 }
-const squareCenterToEdge = ({degree, edge}) => {
+const squareCenterToEdge = (rad, edge) => {
+  const halfEdge = edge/2
+  const radToUse = rad % (Math.PI / 2)
+  if (radToUse <= Math.PI / 4) {
+    return halfEdge / Math.cos(radToUse)
+  } else {
+    return halfEdge / Math.sin(radToUse)
+  }
+}
+const squareCenterToEdgeDegrees = ({degree, edge}) => {
   const halfEdge = edge/2
   let angleToUse = degree % 90 // 4 quadrants calculated the same
   if (angleToUse <= 45) { // Use distance in X
@@ -28,14 +37,17 @@ const degreeSide = degree => {
   return "right"
 }
 const radSide = radian => {
-  if (radian >= Math.PI * 0.25 && radian < Math.PI * 0.75 ) return "top"
-  if (radian >= Math.PI * 0.75 && radian < Math.PI * 1.25 ) return "left"
-  if (radian >= Math.PI * 1.25 && radian < Math.PI * 1.75 ) return "bottom"
+  const modRad = radian % pi2
+  if (modRad >= Math.PI * 0.25 && modRad < Math.PI * 0.75 ) return "top"
+  if (modRad >= Math.PI * 0.75 && modRad < Math.PI * 1.25 ) return "left"
+  if (modRad >= Math.PI * 1.25 && modRad < Math.PI * 1.75 ) return "bottom"
   return "right"
 }
 const lowerOnRightSide = (rad1, rad2) => {
-  if (rad2 < rad1) return true
-  if (rad2 >= 315 && rad1 <= 45) return true
+  const mod1 = rad1 % pi2
+  const mod2 = rad2 % pi2
+  if (mod2 < mod1) return true
+  if (mod2 >= Math.PI * 1.75 && mod1 <= Math.PI * 0.25) return true
   return false
 }
 
@@ -248,182 +260,165 @@ export default ({heightPx, widthPx, features}) => {
     }
 
     const squareThermal = ({x, y, os, is, angle, num_spokes, gap}) => {
-      const halfGap = gap / 2
       const halfIn = is / 2
       const halfOut = os / 2
-      const inCornerDistance = squareCenterToEdge({degree: 45, edge: is})
-      const outCornerDistance = squareCenterToEdge({degree: 45, edge: os})
+      const inCornerDistance = squareCenterToEdge(Math.PI / 4, is)
+      const outCornerDistance = squareCenterToEdge(Math.PI / 4, os)
       const startRad = degreeToRadian(angle)
       const segmentRad = num_spokes ? pi2 / num_spokes : 0
       
-      for (let i = 0; i < num_spokes; i++) { //place needed corners then place inner end, then place outer end and any needed corners
-        let rad, inX1, inY1, inX2, inY2, outX1, outY1, outX2, outY2, radToUse, halfGapDistance
+      for (let i = 0; i < num_spokes; i++) { //place any needed corners, then inner point and outer point, then any needed corners, then last two points and draw
+        let rad, inX1, inY1, inX2, inY2, outX1, outY1, outX2, outY2, halfGapDistance
         const pointsX = [], pointsY = [];
 
         // Get first inner gap point
         rad = startRad
             + segmentRad * i
             % pi2
-        inX1 = x + squareCenterToEdge({degree: radToDegree(rad), edge: is}) * Math.cos(rad)
-        inY1 = y + squareCenterToEdge({degree: radToDegree(rad), edge: is}) * Math.sin(rad)
-        outX2 = x + squareCenterToEdge({degree: radToDegree(rad), edge: os}) * Math.cos(rad)
-        outY2 = y + squareCenterToEdge({degree: radToDegree(rad), edge: os}) * Math.sin(rad)
+        inX1 = x + squareCenterToEdge(rad, is) * Math.cos(rad)
+        inY1 = y + squareCenterToEdge(rad, is) * Math.sin(rad)
+        outX2 = x + squareCenterToEdge(rad, os) * Math.cos(rad)
+        outY2 = y + squareCenterToEdge(rad, os) * Math.sin(rad)
 
         // Get distance to move, which depends on angle and gap; skewed gap needs longer x or y distance
-        radToUse = rad % (Math.PI / 2) // treat 4 quadrants the same
-        if (radToUse <= Math.PI / 4) { // use distance along X
-          halfGapDistance = halfGap / Math.cos(radToUse)
-        }
-        else { // use distance along Y
-          halfGapDistance = halfGap / Math.sin(radToUse)
-        }
+        halfGapDistance = squareCenterToEdge(rad, gap)
 
-        // Move 'first' points for gap and wrap around edges, way to move depends on what side you're on
+        // Move 'first' points for gap, way to move depends on what side you're on
         let startSide = radSide(rad)
-        // alert(`startSide: ${startSide}`)
         if (startSide === "right") {
           inY1 += halfGapDistance
-          if (inY1 > y + halfIn) {
-            inX1 -= inY1 - (y + halfIn)
-            inY1 = y + halfIn
-          }
           outY2 += halfGapDistance
-          if (outY2 > y + halfOut) {
-            outX2 -= outY2 - (y + halfOut)
-            outY2 = y + halfOut
-          }
         }
         else if (startSide === "top") {
           inX1 -= halfGapDistance
-          if (inX1 < x - halfIn) {
-            inY1 -= (x - halfIn) - inX1
-            inX1 = x - halfIn
-          }
           outX2 -= halfGapDistance
-          if (inX1 < x - halfOut) {
-            outY2 -= (x - halfOut) - outX2
-            outX2 = x - halfOut
-          }
         }
         else if (startSide === "left") {
           inY1 -= halfGapDistance
-          if (inY1 < y - halfIn) {
-            inX1 += (y - halfIn) - inY1
-            inY1 = y - halfIn
-          }
           outY2 -= halfGapDistance
-          if (outY2 < y - halfOut) {
-            outX2 += (y - halfOut) - outY2
-            outY2 = y - halfOut
-          }
         }
         else if (startSide === "bottom") {
           inX1 += halfGapDistance
-          if (inX1 > x + halfIn) {
-            inY1 += inX1 - (x + halfIn)
-            inX1 = x + halfIn
-          }
           outX2 += halfGapDistance
-          if (outX2 > x + halfOut) {
-            outX2 = x + halfOut
-            outY2 += outX2 - (x + halfOut)
-          }
-        } // Get side of moved point to determine how many corner points to add
+        }
+        
+        // Wrap around edges
+        if (inY1 > y + halfIn) {
+          inX1 -= inY1 - (y + halfIn)
+          inY1 = y + halfIn
+        }
+        if (outY2 > y + halfOut) {
+          outX2 -= outY2 - (y + halfOut)
+          outY2 = y + halfOut
+        }
+        if (inX1 < x - halfIn) {
+          inY1 -= (x - halfIn) - inX1
+          inX1 = x - halfIn
+        }
+        if (outX2 < x - halfOut) {
+          outY2 -= (x - halfOut) - outX2
+          outX2 = x - halfOut
+        }
+        if (inY1 < y - halfIn) {
+          inX1 += (y - halfIn) - inY1
+          inY1 = y - halfIn
+        }
+        if (outY2 < y - halfOut) {
+          outX2 += (y - halfOut) - outY2
+          outY2 = y - halfOut
+        }
+        if (inX1 > x + halfIn) {
+          inY1 += inX1 - (x + halfIn)
+          inX1 = x + halfIn
+        }
+        if (outX2 > x + halfOut) {
+          outY2 += outX2 - (x + halfOut)
+          outX2 = x + halfOut
+        }
+
+        // Get side of moved point to determine how many corner points to add
         let startInRad = (pi2 + Math.atan2(inY1 - y, inX1 - x)) % pi2
         let startOutRad = (pi2 + Math.atan2(outY2 - y, outX2 - x)) % pi2
         let startInSide = radSide(startInRad)
         let startOutSide = radSide(startOutRad)
-        //startSide = radSide(firstRad)
 
-        // Get second inner gap point
+        // Get second inner and outer gap points
         rad = startRad
             + segmentRad * (i + 1)
             % pi2
-        inX2 = x + squareCenterToEdge({degree: radToDegree(rad), edge: is}) * Math.cos(rad)
-        inY2 = y + squareCenterToEdge({degree: radToDegree(rad), edge: is}) * Math.sin(rad)
-        outX1 = x + squareCenterToEdge({degree: radToDegree(rad), edge: os}) * Math.cos(rad)
-        outY1 = y + squareCenterToEdge({degree: radToDegree(rad), edge: os}) * Math.sin(rad)
+        inX2 = x + squareCenterToEdge(rad, is) * Math.cos(rad)
+        inY2 = y + squareCenterToEdge(rad, is) * Math.sin(rad)
+        outX1 = x + squareCenterToEdge(rad, os) * Math.cos(rad)
+        outY1 = y + squareCenterToEdge(rad, os) * Math.sin(rad)
 
         // Get distance to move, which depends on angle and gap; skewed gap needs longer x or y distance
-        radToUse = rad % (Math.PI / 2)
-        if (radToUse <= Math.PI / 4) {
-          halfGapDistance = halfGap / Math.cos(radToUse)
-        }
-        else {
-          halfGapDistance = halfGap / Math.sin(radToUse)
-        }
+        halfGapDistance = squareCenterToEdge(rad, gap)
         
-        // alert(`before: ${inX2}, ${inY2}, rad: ${rad}`)
-        // Move 'second' points for gap and wrap around edges, way to move depends on what side you're on
+        // Move 'second' points for gap, way to move depends on what side you're on
         let endSide = radSide(rad)
-        // alert(`endside: ${endSide}`)
         if (endSide === "right") {
           inY2 -= halfGapDistance
-          if (inY2 < y - halfIn) {
-            inX2 -= (y - halfIn) - inY2
-            inY2 = y - halfIn
-          }
           outY1 -= halfGapDistance
-          if (outY1 < y - halfOut) {
-            outX1 -= (y - halfOut) - outY1
-            outY1 = y - halfOut
-          }
         }
         else if (endSide === "top") {
-          // alert(`here: ${halfGapDistance} + ${inX2} = ${halfGapDistance + inX2}`)
           inX2 += halfGapDistance
-          if (inX2 > x + halfIn) {
-            inY2 -= inX2 - (x + halfIn)
-            inX2 = x + halfIn
-          }
           outX1 += halfGapDistance
-          if (outX1 > x + halfOut) {
-            outY1 -= outX1 - (x + halfOut)
-            outX1 = x + halfOut
-          }
         }
         else if (endSide === "left") {
           inY2 += halfGapDistance
-          if (inY2 > y + halfIn) {
-            inX2 +=  inY2 - (y + halfIn)
-            inY2 = y + halfIn
-          }
           outY1 += halfGapDistance
-          if (outY1 > y + halfOut) {
-            outX1 +=  outY1 - (y + halfOut)
-            outY1 = y + halfOut
-          }
         }
         else if (endSide === "bottom") {
           inX2 -= halfGapDistance
-          if (inX2 < x - halfIn) {
-            inY2 += (x - halfIn) - inX2 
-            inX2 = x - halfIn
-          }
           outX1 -= halfGapDistance
-          if (outX1 < x - halfOut) {
-            outY1 += (x - halfOut) - outX1 
-            outX1 = x - halfOut
-          }
-        } // Get side of moved point to determine how many corner points to add
+        }
+        
+        // Wrap around edges
+        if (inY2 < y - halfIn) {
+          inX2 -= (y - halfIn) - inY2
+          inY2 = y - halfIn
+        }
+        if (outY1 < y - halfOut) {
+          outX1 -= (y - halfOut) - outY1
+          outY1 = y - halfOut
+        }
+        if (inX2 > x + halfIn) {
+          inY2 -= inX2 - (x + halfIn)
+          inX2 = x + halfIn
+        }
+        if (outX1 > x + halfOut) {
+          outY1 -= outX1 - (x + halfOut)
+          outX1 = x + halfOut
+        }
+        if (inY2 > y + halfIn) {
+          inX2 +=  inY2 - (y + halfIn)
+          inY2 = y + halfIn
+        }
+        if (outY1 > y + halfOut) {
+          outX1 +=  outY1 - (y + halfOut)
+          outY1 = y + halfOut
+        }
+        if (inX2 < x - halfIn) {
+          inY2 += (x - halfIn) - inX2 
+          inX2 = x - halfIn
+        }
+        if (outX1 < x - halfOut) {
+          outY1 += (x - halfOut) - outX1 
+          outX1 = x - halfOut
+        }
+        
+        // Get side of moved point to determine how many corner points to add
         let endInRad = (pi2 + Math.atan2(inY2 - y, inX2 - x)) % pi2
         let endOutRad = (pi2 + Math.atan2(outY1 - y, outX1 - x)) % pi2
         let endInSide = (radSide(endInRad))
         let endOutSide = (radSide(endOutRad))
 
-        //endSide = radSide(startRad)
-        // alert(`before: ${inX2}, ${inY2}, rad: ${rad}`)
-        // alert(`start:${startSide}, end:${endSide}`)
-        // Add the first inner point of segment
         pointsX.push(inX1)
         pointsY.push(inY1)
-        alert(`in start:${startInSide}, end:${endInSide}`)
         //////////////////////////////////
         // Push inner corners if needed //
         if (startInSide === "right") {  ////////////////////////////////////////////////////////////
-          alert("here")
-          if (endInSide === "right" && lowerOnRightSide(endInRad, startInRad)) {
-            alert("not here")
+          if (num_spokes === 1 && endInSide === "right" && lowerOnRightSide(startInRad, endInRad )) {
             pointsX.push(x + inCornerDistance * Math.cos(Math.PI * 0.25))
             pointsY.push(y + inCornerDistance * Math.sin(Math.PI * 0.25))
             pointsX.push(x + inCornerDistance * Math.cos(Math.PI * 0.75))
@@ -453,7 +448,7 @@ export default ({heightPx, widthPx, features}) => {
           }
         }
         else if (startInSide === "bottom") { ///////////////////////////////////////////////////////
-          if (endInSide === "bottom" && startInRad > endInRad) {
+          if (num_spokes === 1 && endInSide === "bottom" && startInRad > endInRad) {
             pointsX.push(x + inCornerDistance * Math.cos(Math.PI * 1.75))
             pointsY.push(y + inCornerDistance * Math.sin(Math.PI * 1.75))
             pointsX.push(x + inCornerDistance * Math.cos(Math.PI * 0.25))
@@ -483,7 +478,7 @@ export default ({heightPx, widthPx, features}) => {
           }
         }
         else if (startInSide === "left") { /////////////////////////////////////////////////////////
-          if (endInSide === "left" && startInRad > endInRad) {
+          if (num_spokes === 1 && endInSide === "left" && startInRad > endInRad) {
             pointsX.push(x + inCornerDistance * Math.cos(Math.PI * 1.25))
             pointsY.push(y + inCornerDistance * Math.sin(Math.PI * 1.25))
             pointsX.push(x + inCornerDistance * Math.cos(Math.PI * 1.75))
@@ -513,8 +508,7 @@ export default ({heightPx, widthPx, features}) => {
           }
         }
         else if (startInSide === "top") { //////////////////////////////////////////////////////////
-          if (endInSide === "top" && startInRad > endInRad) {
-            alert("shouldn't be here")
+          if (num_spokes === 1 && endInSide === "top" && startInRad > endInRad) {
             pointsX.push(x + inCornerDistance * Math.cos(Math.PI * 0.75))
             pointsY.push(y + inCornerDistance * Math.sin(Math.PI * 0.75))
             pointsX.push(x + inCornerDistance * Math.cos(Math.PI * 1.25))
@@ -550,14 +544,11 @@ export default ({heightPx, widthPx, features}) => {
         pointsX.push(outX1)
         pointsY.push(outY1)
 
-        alert(`out start:${startOutSide}, end:${endOutSide}, out: ${outX1},${outY1}`)
         //////////////////////////////////
         // Push outer corners if needed //
         //////////////////////////////////
         if (startOutSide === "right") { ////////////////////////////////////////////////////////////
-          alert("here2")
-          if (endOutSide === "right" && lowerOnRightSide(endOutRad, startOutRad)) { 
-            alert("shouldn't be here")
+          if (num_spokes === 1 && endOutSide === "right" && lowerOnRightSide(startOutRad, endOutRad)) {
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
@@ -587,7 +578,7 @@ export default ({heightPx, widthPx, features}) => {
           }
         }
         else if (startOutSide === "bottom") { ///////////////////////////////////////////////////////
-          if (endOutSide === "bottom" && startOutRad > endOutRad) {
+          if (num_spokes === 1 && endOutSide === "bottom" && startOutRad > endOutRad) {
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
@@ -617,7 +608,7 @@ export default ({heightPx, widthPx, features}) => {
           }
         }
         else if (startOutSide === "left") { /////////////////////////////////////////////////////////
-          if (endOutSide === "left" && startOutRad > endOutRad) {
+          if (num_spokes === 1 && endOutSide === "left" && startOutRad > endOutRad) {
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
@@ -647,9 +638,7 @@ export default ({heightPx, widthPx, features}) => {
           }
         }
         else if (startOutSide === "top") { //////////////////////////////////////////////////////////
-          alert("got here 0")
-          if (endOutSide === "top" && startOutRad > endOutRad) {
-            alert("got here 1")
+          if (num_spokes === 1 && endOutSide === "top" && startOutRad > endOutRad) {
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
@@ -660,7 +649,6 @@ export default ({heightPx, widthPx, features}) => {
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
           }
           else if (endOutSide === "right") {
-            alert("got here 2")
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
@@ -669,14 +657,12 @@ export default ({heightPx, widthPx, features}) => {
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
           }
           else if (endOutSide === "bottom") {
-            alert("got here 3")
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
           }
           else if (endOutSide === "left") {
-            alert("got here 4")
             pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
             pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
           }
@@ -689,12 +675,346 @@ export default ({heightPx, widthPx, features}) => {
         // Draw it!
         ctx.moveTo(pointsX[pointsX.length-1], pointsY[pointsY.length-1])
         for (let i = 0; i < pointsX.length; i++) {
-            ctx.lineTo(pointsX[i], pointsY[i])
+          ctx.lineTo(pointsX[i], pointsY[i])
         }
-        // ctx.lineTo(pointsX[0], pointsY[0])
-        ctx.closePath()
       }
     }
+
+    const squareThermalOpenCorners = ({x, y, od, id, angle, num_spokes, gap}) => {
+      const halfIn = id / 2
+      const halfOut = od / 2
+      const startRad = degreeToRadian(angle)
+      const segmentRad = num_spokes ? pi2 / num_spokes : 0
+
+      for (let i = 0; i < num_spokes; i++) { //place any needed corners, then inner point and outer point, then any needed corners, then last two points and draw
+        let rad, inX1, inY1, inX2, inY2, outX1, outY1, outX2, outY2, halfGapDistance
+
+        // Get first inner gap point
+        rad = startRad
+            + segmentRad * i
+            % pi2
+        inX1 = x + squareCenterToEdge(rad, id) * Math.cos(rad)
+        inY1 = y + squareCenterToEdge(rad, id) * Math.sin(rad)
+
+        // Get distance to move, which depends on angle and gap; skewed gap needs longer x or y distance
+        halfGapDistance = squareCenterToEdge(rad, gap)
+
+        // Move first point for gap, way to move depends on what side you're on
+        let startSide = radSide(rad)
+        if (startSide === "right") {
+          inY1 += halfGapDistance
+        }
+        else if (startSide === "top") {
+          inX1 -= halfGapDistance
+        }
+        else if (startSide === "left") {
+          inY1 -= halfGapDistance
+        }
+        else if (startSide === "bottom") {
+          inX1 += halfGapDistance
+        }
+        
+        // Wrap around edges
+        if (inY1 > y + halfIn) {
+          inX1 -= inY1 - (y + halfIn)
+          inY1 = y + halfIn
+        }
+        if (inX1 < x - halfIn) {
+          inY1 -= (x - halfIn) - inX1
+          inX1 = x - halfIn
+        }
+        if (inY1 < y - halfIn) {
+          inX1 += (y - halfIn) - inY1
+          inY1 = y - halfIn
+        }
+        if (inX1 > x + halfIn) {
+          inY1 += inX1 - (x + halfIn)
+          inX1 = x + halfIn
+        }
+        // Get side of moved point to determine how many corner points to add
+        let startRad = (pi2 + Math.atan2(inY1 - y, inX1 - x)) % pi2
+        startSide = radSide(startRad)
+
+
+
+        // TODO FINISH THIS
+        // FIND OUT WHAT THEY DO ON CORNERS
+      }
+    }
+
+    const squareRoundThermal = ({x, y, os, id, angle, num_spokes, gap}) => {
+      const halfIn = id / 2
+      const halfOut = os / 2
+      const halfGapRad = (gap / 2 / (Math.PI * halfIn)) * Math.PI
+      const outCornerDistance = squareCenterToEdge(Math.PI / 4, os)
+      const startRad = degreeToRadian(angle)
+      const segmentRad = num_spokes ? pi2 / num_spokes : 0
+
+      for (let i = 0; i < num_spokes; i++) { //place inner point and outer point, then any needed corners, then last two points and draw
+        let rad, inX1, inY1, inX2, inY2, outX1, outY1, outX2, outY2, halfGapDistance
+        const pointsX = [], pointsY = [];
+        
+        // Get first inner point
+        const innerRad1 = startRad
+                        + segmentRad * i
+                        + halfGapRad
+                        % pi2
+        inX1 = x + halfIn * Math.cos(innerRad1)
+        inY1 = y + halfIn * Math.sin(innerRad1)
+
+        // Get 'first' outer gap point
+        rad = startRad
+            + segmentRad * i
+            % pi2
+        outX2 = x + squareCenterToEdge(rad, os) * Math.cos(rad)
+        outY2 = y + squareCenterToEdge(rad, os) * Math.sin(rad)
+
+        // Get distance to move, which depends on angle and gap; skewed gap needs longer x or y distance
+        halfGapDistance = squareCenterToEdge(rad, gap)
+
+        // Move 'first' points for gap, way to move (on outer) depends on what side you're on
+        const startSide = radSide(rad)
+        if (startSide === "right") {
+          outY2 += halfGapDistance
+        }
+        else if (startSide === "top") {
+          outX2 -= halfGapDistance
+        }
+        else if (startSide === "left") {
+          outY2 -= halfGapDistance
+        }
+        else if (startSide === "bottom") {
+          outX2 += halfGapDistance
+        }
+
+        // Wrap around edges
+        if (outY2 > y + halfOut) {
+          outX2 -= outY2 - (y + halfOut)
+          outY2 = y + halfOut
+        }
+        if (outX2 < x - halfOut) {
+          outY2 -= (x - halfOut) - outX2
+          outX2 = x - halfOut
+        }
+        if (outY2 < y - halfOut) {
+          outX2 += (y - halfOut) - outY2
+          outY2 = y - halfOut
+        }
+        if (outX2 > x + halfOut) {
+          outY2 += outX2 - (x + halfOut)
+          outX2 = x + halfOut
+        }
+
+        // Get first inner point
+        const innerRad2 = startRad
+                        + segmentRad * (i + 1)
+                        - halfGapRad
+                        % pi2
+        inX2 = x + halfIn * Math.cos(innerRad2)
+        inY2 = y + halfIn * Math.sin(innerRad2)
+
+        // Get 'second' outer gap point
+        rad = startRad
+            + segmentRad * (i + 1)
+            % pi2
+        outX1 = x + squareCenterToEdge(rad, os) * Math.cos(rad)
+        outY1 = y + squareCenterToEdge(rad, os) * Math.sin(rad)
+
+        // Get distance to move, which depends on angle and gap; skewed gap needs longer x or y distance
+        halfGapDistance = squareCenterToEdge(rad, gap)
+
+        // Move 'second' points for gap, way to move depends on what side you're on
+        let endSide = radSide(rad)
+        if (endSide === "right") {
+          outY1 -= halfGapDistance
+        }
+        else if (endSide === "top") {
+          outX1 += halfGapDistance
+        }
+        else if (endSide === "left") {
+          outY1 += halfGapDistance
+        }
+        else if (endSide === "bottom") {
+          outX1 -= halfGapDistance
+        }
+
+        // Wrap around edges
+        if (outY1 < y - halfOut) {
+          outX1 -= (y - halfOut) - outY1
+          outY1 = y - halfOut
+        }
+        if (outX1 > x + halfOut) {
+          outY1 -= outX1 - (x + halfOut)
+          outX1 = x + halfOut
+        }
+        if (outY1 > y + halfOut) {
+          outX1 +=  outY1 - (y + halfOut)
+          outY1 = y + halfOut
+        }
+        if (outX1 < x - halfOut) {
+          outY1 += (x - halfOut) - outX1 
+          outX1 = x - halfOut
+        }
+        
+        // Get side of moved point to determine how many corner points to add
+        let endRad = (pi2 + Math.atan2(outY1 - y, outX1 - x)) % pi2
+        endSide = (radSide(endRad))
+
+        pointsX.push(inX1)
+        pointsY.push(inY1)
+        pointsX.push(inX2)
+        pointsY.push(inY2)
+        pointsX.push(outX1)
+        pointsY.push(outY1)
+
+        //////////////////////////////////
+        // Push outer corners if needed //
+        //////////////////////////////////
+        if (startSide === "right") { ///////////////////////////////////////////////////////////////
+          if (num_spokes === 1 && endSide === "right" && lowerOnRightSide(startRad, endRad)) {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+          }
+          else if (endSide === "bottom") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+          }
+          else if (endSide === "left") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+          }
+          else if (endSide === "top") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+          }
+        }
+        else if (startSide === "bottom") { ///////////////////////////////////////////////////////
+          if (num_spokes === 1 && endSide === "bottom" && startRad > endRad) {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+          }
+          else if (endSide === "left") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+          }
+          else if (endSide === "top") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+          }
+          else if (endSide === "right") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+          }
+        }
+        else if (startSide === "left") { /////////////////////////////////////////////////////////
+          if (num_spokes === 1 && endSide === "left" && startRad > endRad) {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+          }
+          else if (endSide === "top") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+          }
+          else if (endSide === "right") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+          }
+          else if (endSide === "bottom") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+          }
+        }
+        else if (startSide === "top") { //////////////////////////////////////////////////////////
+          if (num_spokes === 1 && endSide === "top" && startRad > endRad) {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+          }
+          else if (endSide === "right") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.75))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+          }
+          else if (endSide === "bottom") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 1.25))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 1.25))
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+          }
+          else if (endSide === "left") {
+            pointsX.push(x + outCornerDistance * Math.cos(Math.PI * 0.75))
+            pointsY.push(y + outCornerDistance * Math.sin(Math.PI * 0.75))
+          }
+        } //////////////////////////////////////////////////////////////////////////////////////////
+
+        // Push last outer end points
+        pointsX.push(outX2)
+        pointsY.push(outY2)
+
+        // Draw it!
+        ctx.moveTo(pointsX[0], pointsY[0])
+        ctx.arc(x, y, halfIn, innerRad2, innerRad1, true)
+        for (let i = 1; i < pointsX.length; i++) {
+          ctx.lineTo(pointsX[i], pointsY[i])
+        }
+        ctx.lineTo(pointsX[0], pointsY[0])
+      }
+    }
+
+    const ellipse = ({x, y, w, h, rotation}) => {
+      ctx.ellipse(x, y, w, h, degreeToRadian(rotation) || 0, 0, 2*Math.PI)
+    }
+
+    const moire = ({x, y, rw, rg, nr, lw, ll, la}) => {
+      const r = ll/2
+      circle({x, y, r})
+      
+    }
+
 
     ctx.beginPath()
     ctx.fillStyle = fillStyle
@@ -735,10 +1055,6 @@ export default ({heightPx, widthPx, features}) => {
     else if (type === "oval") {
       const [ w, h ] = getParams()
       roundedRectangle({x, y, w, h, rad: Math.min(w/2, h/2)})
-      /* Below draws ellipse, they mean a slot */
-      // const [ w, h, rotation ] = getParams()
-      // ctx.ellipse(x, y, w, h, degreeToRadian(rotation) || 0, 0, 2*Math.PI)
-      // ctx.fill()
     }
 
     else if (type === "diamond") {
@@ -833,16 +1149,22 @@ export default ({heightPx, widthPx, features}) => {
       squareThermal({x, y, os, is, angle, num_spokes, gap})
     }
 
+    else if (type === "square-round thermal") {
+      const [ os, id, angle, num_spokes, gap ] = getParams()
+      squareRoundThermal({x, y, os, id, angle, num_spokes, gap})
+    }
+
+    else if (type === "ellipse") {
+      const [ w, h, rotation ] = getParams()
+      ellipse({x, y, w, h, rotation})
+    }
+
     ctx.fill("evenodd")
     ctx.restore()
   }
 
   const draw = () => {
     const ctx = canvasRef.current.getContext("2d")
-
-    //const canvas = canvasRef.current
-    //const ctx = canvas.getContext("2d")
-    // alert(squareCenterToEdge({degree:45, edge:2}))
 
     ctx.fillStyle = "black"
     ctx.rect(0,0,widthPx,heightPx)
