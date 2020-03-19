@@ -10,6 +10,19 @@ import Square from "../components/paths/Square"
 import Rectangle from "../components/paths/Rectangle"
 import RoundedRectangle from "../components/paths/RoundedRectangle"
 import ChamferedRectangle from "../components/paths/ChamferedRectangle"
+import Diamond from "../components/paths/Diamond"
+import HorizontalHexagon from "../components/paths/HorizontalHexagon"
+import VerticalHexagon from "../components/paths/VerticalHexagon"
+import Butterfly from "../components/paths/Butterfly"
+import SquareButterfly from "../components/paths/SquareButterfly"
+import Triangle from "../components/paths/Triangle"
+import RoundedRoundThermal from "../components/paths/RoundedRoundThermal"
+import SquaredRoundThermal from "../components/paths/SquaredRoundThermal"
+import SquareThermal from "../components/paths/SquareThermal"
+import SquareRoundThermal from "../components/paths/SquareRoundThermal"
+import RoundDonut from "../components/paths/RoundDonut"
+import SquareDonut from "../components/paths/SquareDonut"
+import SquareRoundDonut from "../components/paths/SquareRoundDonut"
 
 const degreeToRadian = degree => degree * Math.PI / 180
 
@@ -74,13 +87,28 @@ const TestPage = ({auth, login, logout}) => {
 
       {/* <FeatureView features={features}/> */}
 
-      <svg stroke="blue" height="200px">
-        <g stroke="#005291" fill="none">
-          <Circle x={35} y={50} r={25}/>
+      <svg height="200px">
+        <g stroke="none" fill="#005291" style={{hover:"stroke: black"}}>
+          <Circle x={35} y={50} r={25} />
           <Square x={95} y={50} s={50}/>
           <Rectangle x={145} y={50} w={30} h={50}/>
           <RoundedRectangle x={185} y={50} w={30} h={50} rad={4}/>
           <ChamferedRectangle x={225} y={50} w={30} h={50} rad={4}/>
+          <Diamond x={265} y={50} w={30} h={50} rad={4}/>
+          {/* Octagon is redundant, meh */}
+          <RoundDonut x={395} y={110} od={50} id={30}/>
+          <SquareDonut x={455} y={110} os={50} is={30}/>
+          <SquareRoundDonut x={455} y={170} od={50} id={30}/>
+          <HorizontalHexagon x={305} y={50} w={30} h={50} r={10}/>
+          <VerticalHexagon x={345} y={50} w={30} h={50} r={10}/>
+          <Butterfly x={395} y={50} d={50}/>
+          <SquareButterfly x={455} y={50} s={50}/>
+          <Triangle x={145} y={170} base={30} h={50}/>
+          {/* <HalfOval x={} y={} w={} h={} /> */}
+          <RoundedRoundThermal x={95} y={110} od={50} id={30} angle={0} num_spokes={2} gap={6}/>
+          <SquaredRoundThermal x={95} y={170} od={50} id={30} angle={0} num_spokes={2} gap={6}/>
+          <SquareThermal x={35} y={170} os={50} is={30} angle={0} num_spokes={7} gap={6}/>
+          <SquareRoundThermal x={35} y={110} os={50} id={30} angle={0} num_spokes={3} gap={6}/>
         </g>
       </svg>
       
