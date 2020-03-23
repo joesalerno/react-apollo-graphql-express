@@ -32,7 +32,7 @@ const sectionLines = (pointsX, pointsY) => {
   return string
 }
 
-export default ({x, y, os, is, angle, num_spokes, gap}) => {
+export default ({x, y, os, is, angle, num_spokes, gap, ...rest}) => {
   const halfIn = is / 2
   const halfOut = os / 2
   const inCornerDistance = squareCenterToEdge(Math.PI / 4, is)
@@ -41,6 +41,7 @@ export default ({x, y, os, is, angle, num_spokes, gap}) => {
   const segmentRad = num_spokes ? (pi2) / num_spokes : 0
 
   const sections = []
+  const points = []
   for (let i = 0; i < num_spokes; i++) {
     let rad, inX1, inY1, inX2, inY2, outX1, outY1, outX2, outY2, halfGapDistance
     const pointsX = [], pointsY = []
@@ -450,7 +451,13 @@ export default ({x, y, os, is, angle, num_spokes, gap}) => {
     sections.push([pointsX, pointsY])
   }
 
-  return <path d={sections.reduce((acc, [pointsX, pointsY]) => `${acc}
-    ${sectionLines(pointsX, pointsY)}
-  `, ``)}/>
+  for (const section of sections) {
+    for (let i = 0; i < section[0].length; i++) {
+      points.push([section[0][i], section[1][i]])
+    }
+  }
+
+  return <path points={JSON.stringify(points)} {...rest} d={sections.reduce((acc, [pointsX, pointsY]) => `${acc}
+    ${sectionLines(pointsX, pointsY)}`
+  , ``)}/>
 }

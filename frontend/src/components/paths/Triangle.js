@@ -1,11 +1,19 @@
 import React from "react"
-export default ({x, y, base, h}) => {
+export default ({x, y, base, h, ...rest}) => {
   const halfBase = base / 2
   const halfH = h/2
-  return <path d={`
-    M ${x-halfBase} ${y-halfH}
-    H ${x+halfBase}
+  const points = [ 
+    [x-halfBase, y-halfH],
+    [x-halfBase/2, y],
+    [x, y+halfH],
+    [x+halfBase/2, y],
+    [x+halfBase, y-halfH],
+    [x, y-halfH]
+  ]
+  return <path points={JSON.stringify(points)} {...rest} d={
+   `M ${x-halfBase} ${y-halfH}
     L ${x} ${y+halfH}
-    Z
-  `}/>
+    L ${x+halfBase} ${y-halfH}
+    Z`
+  }/>
 }

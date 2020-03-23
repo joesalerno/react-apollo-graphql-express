@@ -6,7 +6,7 @@ const radFromSides = (a, b, opposite) => {
   return Math.acos( ((opposite**2) -(a**2) -(b**2))/( -2*a*b ) )
 }
 
-export default ({x, y, od, id, angle, num_spokes, gap}) => {
+export default ({x, y, od, id, angle, num_spokes, gap, ...rest}) => {
   const halfLw = (od - id) / 4
   const avgR = (od + id) / 4
   const ir = id / 2
@@ -17,8 +17,16 @@ export default ({x, y, od, id, angle, num_spokes, gap}) => {
   const segmentRad = num_spokes ? (pi2) / num_spokes : 0
 
   const sections = []
+  const points = []
   for (let i = 0, rad; i < num_spokes; i++) {
     const section = {}
+
+    rad = startRad
+        + segmentRad * i
+        + halfGapRad
+        % pi2
+    points.push([x + avgR * Math.cos(rad), y + avgR * Math.sin(rad)])
+
 
     rad = startRad
         + segmentRad * i
@@ -29,7 +37,8 @@ export default ({x, y, od, id, angle, num_spokes, gap}) => {
     section.in1y  = y + ir * Math.sin(rad)
     section.out4x = x + or * Math.cos(rad)
     section.out4y = y + or * Math.sin(rad)
-    
+    points.push([section.in1x, section.in1y])
+
     rad = startRad
         + segmentRad * (i+1)
         - halfGapRad
@@ -39,15 +48,24 @@ export default ({x, y, od, id, angle, num_spokes, gap}) => {
     section.out3y = y + or * Math.sin(rad)
     section.in2x  = x + ir * Math.cos(rad)
     section.in2y  = y + ir * Math.sin(rad)
+    points.push([section.in2x, section.in2y])
+    points.push([section.out3x, section.out3y])
+    points.push([section.out4x, section.out4y])
+
+    rad = startRad
+    + segmentRad * (i+1)
+    - halfGapRad
+    % pi2
+    points.push([x + avgR * Math.cos(rad), y + avgR * Math.sin(rad)])
 
     sections.push(section)
   }
 
-  return <path d={sections.reduce((acc, s) => `${acc}
+  return <path points={JSON.stringify(points)} {...rest} d={sections.reduce((acc, s) => `${acc}
     M ${s.in1x} ${s.in1y}
     A ${ir}     ${ir}     0 0 1 ${s.in2x} , ${s.in2y}
     A ${halfLw} ${halfLw} 0 0 0 ${s.out3x}, ${s.out3y}
     A ${or}     ${or}     0 0 0 ${s.out4x}, ${s.out4y}
-    A ${halfLw} ${halfLw} 0 0 0 ${s.in1x} , ${s.in1y}
-  `, ``)}/>
+    A ${halfLw} ${halfLw} 0 0 0 ${s.in1x} , ${s.in1y}`
+  , ``)}/>
 }

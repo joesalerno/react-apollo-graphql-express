@@ -9,6 +9,7 @@ import JobPage from "./pages/JobPage"
 import TestPage from "./pages/TestPage"
 import { apiAddress } from "./config"
 import "./App.css"
+import EditorPage from "./pages/EditorPage"
 
 function App() {
   const [auth, setAuth] = useState(localStorage.getItem("auth") || "")
@@ -48,6 +49,10 @@ function App() {
 
       <Route exact path="/register">
         <RegisterPage auth={auth} login={login} logout={logout} register={register}/>
+      </Route>
+
+      <Route exact path="/editor">
+        <EditorPage auth={auth} login={login} logout={logout} register={register}/>
       </Route>
 
       <Route exact path="/test">

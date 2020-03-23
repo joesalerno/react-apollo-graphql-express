@@ -21,7 +21,7 @@ module.exports = text => {
   // rad - corner radius
   // corners - a combination of which corners are rounded
   // x<corners> is omitted if all corners are rounded
-  if (text.match(/^rect[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?xr[1-9]+[0-9]*(\.[0-9]+)?(x[0-8])?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded rectangle"
+  if (text.match(/^rect[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?xr[1-9]+[0-9]*(\.[0-9]+)?(x1?2?3?4?)?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded rectangle"
 
   // Chamfered Rectangle: rect<w>x<h>xc<rad>x<corners>
   // w - rectangle width
@@ -29,7 +29,7 @@ module.exports = text => {
   // rad - corner radius
   // corners - a combination of which corners are rounded
   // x<corners> is omitted if all corners are rounded
-  if (text.match(/^rect[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?xc[1-9]+[0-9]*(\.[0-9]+)?(x[0-8])?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "chamfered rectangle"
+  if (text.match(/^rect[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?xc[1-9]+[0-9]*(\.[0-9]+)?(x1?2?3?4?)?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "chamfered rectangle"
 
   // Oval: oval<w>x<h>
   // w - oval width
@@ -68,7 +68,7 @@ module.exports = text => {
   // rad - corner radius
   // corners - a combination of which corners are rounded
   // x<corners> is omitted if all corners are rounded
-  if (text.match(/^donut_s[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?(x[0-8])?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded square donut"
+  if (text.match(/^donut_s[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?(x1?2?3?4?)?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded square donut"
 
   // Rectangle Donut: donut_rc<ow>x<oh>x<lw>
   // ow - outer width
@@ -82,7 +82,7 @@ module.exports = text => {
   // lw - line width
   // rad - corner radius
   // corners - a combination ofwhich corners are rounded
-  if (text.match(/^donut_rc[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?(x[0-8])?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded rectangle donut"
+  if (text.match(/^donut_rc[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?(x1?2?3?4?)?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded rectangle donut"
 
   // Oval Donut: donut_o<ow>x<oh>x<lw>
   // ow - outer width
@@ -191,7 +191,7 @@ module.exports = text => {
   // rad -corner radius
   // corners - a combination of which corners are rounded
   // x<corners> is omitted if all corners are rounded
-  if (text.match(/^s_ths[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9])x[1-9]+[0-9]*x[1-9]+[0-9]*(\.[0-9]+)?xr[1-9]+[0-9]*(\.[0-9]+)?(x[0-8])?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded square thermal"
+  if (text.match(/^s_ths[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9])x[1-9]+[0-9]*x[1-9]+[0-9]*(\.[0-9]+)?xr[1-9]+[0-9]*(\.[0-9]+)?(x1?2?3?4?)?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded square thermal"
 
   // Rounded Rectangle Thermal: rc_ths<ow>x<oh>x<angle>x<num_spokes>x<gap>x<lw>xr<rad>x<corners>
   // ow - outer width
@@ -203,7 +203,7 @@ module.exports = text => {
   // rad -corner radius
   // corners - a combination ofwhich corners are rounded
   // x<corners> is omitted if all corners are rounded
-  if (text.match(/^rc_ths[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9])x[1-9]+[0-9]*x[1-9]+[0-9]*(\.[0-9]+)?xr[1-9]+[0-9]*(\.[0-9]+)?(x[0-8])?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded rectangle thermal"
+  if (text.match(/^rc_ths[1-9]+[0-9]*(\.[0-9]+)?x[1-9]+[0-9]*(\.[0-9]+)?x(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9])x[1-9]+[0-9]*x[1-9]+[0-9]*(\.[0-9]+)?xr[1-9]+[0-9]*(\.[0-9]+)?(x1?2?3?4?)?(_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9]))?$/mg)) return "rounded rectangle thermal"
 
   // Oval Thermal: o_ths<ow>x<oh>x<angle>x<num_spokes>x<gap>x<lw>
   // ow - outer width

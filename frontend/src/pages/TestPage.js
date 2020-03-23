@@ -23,6 +23,7 @@ import SquareRoundThermal from "../components/paths/SquareRoundThermal"
 import RoundDonut from "../components/paths/RoundDonut"
 import SquareDonut from "../components/paths/SquareDonut"
 import SquareRoundDonut from "../components/paths/SquareRoundDonut"
+import Ellipse from "../components/paths/Ellipse"
 
 const degreeToRadian = degree => degree * Math.PI / 180
 
@@ -95,7 +96,7 @@ const TestPage = ({auth, login, logout}) => {
           <RoundedRectangle x={185} y={50} w={30} h={50} rad={4}/>
           <ChamferedRectangle x={225} y={50} w={30} h={50} rad={4}/>
           <Diamond x={265} y={50} w={30} h={50} rad={4}/>
-          {/* Octagon is redundant, meh */}
+          {/* Octagon is just shorthand ChamferedRectangle */}
           <RoundDonut x={395} y={110} od={50} id={30}/>
           <SquareDonut x={455} y={110} os={50} is={30}/>
           <SquareRoundDonut x={455} y={170} od={50} id={30}/>
@@ -109,6 +110,7 @@ const TestPage = ({auth, login, logout}) => {
           <SquaredRoundThermal x={95} y={170} od={50} id={30} angle={0} num_spokes={2} gap={6}/>
           <SquareThermal x={35} y={170} os={50} is={30} angle={0} num_spokes={7} gap={6}/>
           <SquareRoundThermal x={35} y={110} os={50} id={30} angle={0} num_spokes={3} gap={6}/>
+          <Ellipse x={185} y={170} w={30} h={50} />
         </g>
       </svg>
       

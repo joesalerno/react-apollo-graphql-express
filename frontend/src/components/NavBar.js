@@ -57,7 +57,7 @@ const NavBar = ({ auth, logout, login, links }) => {
       <MenuItem onClick={() => {handleUserMenuClose(); logout()}}> Logout </MenuItem>
     </Menu>
 
-    {!userFromToken(auth) && <div>
+    {(!auth || !userFromToken(auth)) && <div>
       <TextField
         id="user"
         label="Username"
@@ -95,12 +95,12 @@ const NavBar = ({ auth, logout, login, links }) => {
 
     </div>}
 
-    {userFromToken(auth) && <Button variant="outlined" onClick={handleUserMenuClick} style={{ margin: "0" }}>
+    {auth && userFromToken(auth) && <Button variant="outlined" onClick={handleUserMenuClick} style={{ margin: "0" }}>
       {userFromToken(auth)}
       <AccountCircleIcon fontSize="inherit" style={{margin: "5px 0px 5px 5px"}}/>
     </Button>}
 
-    {userFromToken(auth) && <Button
+    {auth && userFromToken(auth) && <Button
       variant="contained"
       color="primary"
       onClick={()=>{ setUser(""); setPass(""); logout(); }}

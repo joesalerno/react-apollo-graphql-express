@@ -2,7 +2,12 @@ const validOdbSymbol = require("./modules/validOdbSymbol");
 
 const invalidSymbols = [
   undefined,
-  "dog",
+  null,
+  true,
+  {},
+  [],
+  0,
+  1,
   "cat",
   "rectangle",
   "r1.0.0",

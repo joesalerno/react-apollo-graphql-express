@@ -27,14 +27,14 @@ const lowerOnRightSide = (rad1, rad2) => {
 const sectionLines = (pointsX, pointsY, r) => {
   let string = `M ${pointsX[0]} ${pointsY[0]} `
   string += `A ${r} ${r} 0 0 1 ${pointsX[1]} ${pointsY[1]} `
-  for (let i = 1; i < pointsX.length; i++) {
+  for (let i = 2; i < pointsX.length; i++) {
     string += `L ${pointsX[i]} ${pointsY[i]} `
   }
   string += "Z "
   return string
 }
 
-export default ({x, y, os, id, angle, num_spokes, gap}) => {
+export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
   const halfIn = id / 2
   const halfOut = os / 2
   const halfGapRad = (gap / 2 / (Math.PI * halfIn)) * Math.PI
@@ -43,6 +43,7 @@ export default ({x, y, os, id, angle, num_spokes, gap}) => {
   const segmentRad = num_spokes ? pi2 / num_spokes : 0
   
   const sections = []
+  const points = []
   for (let i = 0; i < num_spokes; i++) { //place inner point and outer point, then any needed corners, then last two points and draw
     let rad, inX1, inY1, inX2, inY2, outX1, outY1, outX2, outY2, halfGapDistance
     const pointsX = [], pointsY = []
@@ -292,7 +293,13 @@ export default ({x, y, os, id, angle, num_spokes, gap}) => {
     sections.push([pointsX, pointsY])
   }
   
-  return <path d={sections.reduce((acc, [pointsX, pointsY]) => `${acc}
-    ${sectionLines(pointsX, pointsY, halfIn)}
-  `, ``)}/>
+  for (const section of sections) {
+    for (let i = 0; i < section[0].length; i++) {
+      points.push([section[0][i], section[1][i]])
+    }
+  }
+
+  return <path points={JSON.stringify(points)} {...rest} d={sections.reduce((acc, [pointsX, pointsY]) => `${acc}
+    ${sectionLines(pointsX, pointsY, halfIn)}`
+  , ``)}/>
 }

@@ -6,7 +6,7 @@ const radFromSides = (a, b, opposite) => {
   return Math.acos( ((opposite**2) -(a**2) -(b**2))/( -2*a*b ) )
 }
 
-export default ({x, y, od, id, angle, num_spokes, gap}) => {
+export default ({x, y, od, id, angle, num_spokes, gap, ...rest}) => {
   const ir = id / 2
   const or = od / 2
   const startRad = angle * Math.PI / 180
@@ -14,7 +14,10 @@ export default ({x, y, od, id, angle, num_spokes, gap}) => {
   const outerHalfGapRad = radFromSides(or, or, gap / 2)
   const segmentRad = num_spokes ? (pi2) / num_spokes : 0
 
+  // console.log({startRad, innerHalfGapRad, outerHalfGapRad, segmentRad})
+
   const sections = []
+  const points = []
   for (let i = 0, rad; i < num_spokes; i++) {
     const section = {}
 
@@ -49,11 +52,18 @@ export default ({x, y, od, id, angle, num_spokes, gap}) => {
     sections.push(section)
   }
 
-  return <path d={sections.reduce((acc, s) => `${acc}
+  for (const section of sections) {
+    points.push([section.in1x, section.in1y])
+    points.push([section.in2x, section.in2y])
+    points.push([section.out3x, section.out3y])
+    points.push([section.out4x, section.out4y])
+  }
+
+  return <path points={JSON.stringify(points)} {...rest} d={sections.reduce((acc, s) => `${acc}
     M ${s.in1x}  ${s.in1y}
     A ${ir}      ${ir}     0 0 1 ${s.in2x} , ${s.in2y}
     L ${s.out3x} ${s.out3y}
     A ${or}      ${or}     0 0 0 ${s.out4x}, ${s.out4y}
-    Z
-  `, ``)}/>
+    Z`
+  ,``)}/>
 }
