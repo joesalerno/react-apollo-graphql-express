@@ -92,7 +92,7 @@ const EditorPage = ({auth, login, logout}) => {
   const [snapToEdges, setSnapToEdges] = useState(true)
   const [snapToCenter, setSnapToCenter] = useState(false)
 
-  const [hoveredFeature, setHoveredFeature] = useState(false)
+  const [hoveredFeature, setHoveredFeature] = useState("none")
   const [selectedFeatures, setSelectedFeatures] = useState([])
 
   const [viewbox, setViewbox] = useState({x:0, y:0, width:0, height:0})
@@ -439,16 +439,37 @@ const EditorPage = ({auth, login, logout}) => {
           type={f.type} symbol={f.symbol} x={f.x} y={f.y} xs={f.xs} ys={f.ys} xe={f.xe} ye={f.ye} xc={f.xc} yc={f.yc} ccw={f.ccw}
           fill={getFeatureColor(i)}
           onMouseEnter={()=> setHoveredFeature(i)}
-          onMouseLeave={()=> {if (hoveredFeature===i) setHoveredFeature(false)}}
+          onMouseLeave={()=> {if (hoveredFeature===i) setHoveredFeature("none")}}
           onClick={()=>{
             if (!activeTool) {
               setSelectedFeatures(selectedFeatures.length && selectedFeatures[0]=== i ? [] : [i])
             }
           }}
         />)}
+
+        {hoveredFeature !== "none" && <Feature
+          key={`__hovered__feature__`}
+          id={`__hovered__feature__`}
+          type={layers[0][hoveredFeature].type}
+          symbol={layers[0][hoveredFeature].symbol}
+          x={layers[0][hoveredFeature].x}
+          y={layers[0][hoveredFeature].y}
+          xs={layers[0][hoveredFeature].xs}
+          ys={layers[0][hoveredFeature].ys}
+          xe={layers[0][hoveredFeature].xe}
+          ye={layers[0][hoveredFeature].ye}
+          xc={layers[0][hoveredFeature].xc}
+          yc={layers[0][hoveredFeature].yc}
+          r={layers[0][hoveredFeature].r}
+          ccw={layers[0][hoveredFeature].ccw}
+          fill={getFeatureColor(hoveredFeature)}
+          opacity={.5}
+          pointerEvents="none"
+        />}
+
         {activeTool === "measure-distance" && measureDistancePointer()}
         {activeTool === "measure-distance" && measureDistanceSvgText()}
-
+        
         {/* custom pointer */}
         {/* <Circle x={pointerPosition.x} y={pointerPosition.y} r={3} fill="none" stroke="#F00"/> */}
       </svg>

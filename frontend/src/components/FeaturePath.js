@@ -25,7 +25,7 @@ import ArcRound from "./paths/ArcRound"
 
 const getSymbolParams = symbol => symbol.match(/[0-9]+(\.[0-9]*)?/g).map(text => parseFloat(text))
 
-export default ({type, symbol, x, y, xs, ys, xe, ye, xc, yc, ccw, rotation, ...rest}) => {
+export default ({type, symbol, x, y, xs, ys, xe, ye, xc, yc, rad, ccw, rotation, ...rest}) => {
   const feature = validOdbSymbol(symbol)
   if (!feature) return console.log({SymbolError: symbol, x, y})
 
@@ -65,7 +65,7 @@ export default ({type, symbol, x, y, xs, ys, xe, ye, xc, yc, ccw, rotation, ...r
   if (type === "arc") {
     if (feature === "round") {
       const [ d ] = getSymbolParams(symbol)
-      return <ArcRound xs={xs} ys={ys} xe={xe} ye={ye} xc={xc} yc={yc} ccw={ccw} r={d/2}/>
+      return <ArcRound xs={xs} ys={ys} xe={xe} ye={ye} xc={xc} yc={yc} rad={d/2} ccw={ccw}/>
     }
     if (feature === "square") {
 

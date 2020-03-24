@@ -5,7 +5,7 @@ import React from "react"
 // const bottom = Math.PI * 1.5
 const pi2 = Math.PI * 2
 
-export default ({xs, ys, xe, ye, xc, yc, ccw, r, ...rest}) => {
+export default ({xs, ys, xe, ye, xc, yc, ccw, rad, ...rest}) => {
   const d2 = (xs-xc)*(xs-xc)+(ys-yc)*(ys-yc) // distance from start to center ^ 2
   const arcRadius = Math.sqrt(d2)
 
@@ -31,25 +31,25 @@ export default ({xs, ys, xe, ye, xc, yc, ccw, r, ...rest}) => {
   const isInvertedArc = (aboveC && movingLeft  && ((leftofC && movingDown)||(rightofC && movingUp)))
                      || (belowC && movingRight && ((leftofC && movingDown)||(rightofC && movingUp)))
 
-  const ir = arcRadius - r
-  const or = arcRadius + r
+  const ir = arcRadius - rad
+  const or = arcRadius + rad
   const startRadians = Math.atan2(yc-m_ys, xc-m_xs)
   const endRadians = Math.atan2(yc-m_ye, xc-m_xe)
 
   let points = [
-    [ m_xs - r * Math.cos(startRadians), m_ys - r * Math.sin(startRadians) ],
-    [ m_xe - r * Math.cos(endRadians),   m_ye - r * Math.sin(endRadians) ],
-    [ m_xe + r * Math.cos(endRadians),   m_ye + r * Math.sin(endRadians) ],
-    [ m_xs + r * Math.cos(startRadians), m_ys + r * Math.sin(startRadians) ],
+    [ m_xs - rad * Math.cos(startRadians), m_ys - rad * Math.sin(startRadians) ],
+    [ m_xe - rad * Math.cos(endRadians),   m_ye - rad * Math.sin(endRadians) ],
+    [ m_xe + rad * Math.cos(endRadians),   m_ye + rad * Math.sin(endRadians) ],
+    [ m_xs + rad * Math.cos(startRadians), m_ys + rad * Math.sin(startRadians) ],
   ]
 
-  points.push([m_xs - r * Math.cos(startRadians + (Math.PI/2) % pi2), m_ys - r * Math.sin(startRadians + (Math.PI/2) % pi2)])
-  points.push([m_xe - r * Math.cos(endRadians + (Math.PI/2) % pi2),   m_ye - r * Math.sin(endRadians + (Math.PI/2) % pi2)])
+  points.push([m_xs - rad * Math.cos(startRadians + (Math.PI/2) % pi2), m_ys - rad * Math.sin(startRadians + (Math.PI/2) % pi2)])
+  points.push([m_xe - rad * Math.cos(endRadians + (Math.PI/2) % pi2),   m_ye - rad * Math.sin(endRadians + (Math.PI/2) % pi2)])
   
-  console.log(startRadians)
-  console.log(endRadians)
-  console.log(startRadians + endRadians)
-  console.log((startRadians + endRadians)/2)
+  // console.log(startRadians)
+  // console.log(endRadians)
+  // console.log(startRadians + endRadians)
+  // console.log((startRadians + endRadians)/2)
   // console.log(Math.cos((startRadians + endRadians)/2))
   // console.log(Math.sin((startRadians + endRadians)/2))
 
@@ -61,9 +61,9 @@ export default ({xs, ys, xe, ye, xc, yc, ccw, r, ...rest}) => {
   return <path points={JSON.stringify(points)} {...rest} d={
    `M ${points[0][0]} ${points[0][1]}
     A ${or} ${or} 0 ${isInvertedArc ? 1 : 0} 0 ${points[1][0]} ${points[1][1]}
-    A ${r} ${r} 0 0 0 ${points[2][0]} ${points[2][1]}
+    A ${rad} ${rad} 0 0 0 ${points[2][0]} ${points[2][1]}
     A ${ir} ${ir} 0 ${isInvertedArc ? 1 : 0} 1 ${points[3][0]} ${points[3][1]}
-    A ${r} ${r} 0 0 0 ${points[0][0]} ${points[0][1]}
+    A ${rad} ${rad} 0 0 0 ${points[0][0]} ${points[0][1]}
     `
   }/>
 }
