@@ -55,7 +55,7 @@ const testLayer = [
   {type: "arc", symbol:"r10",          xs:800, xe:900, ys:200, ye:300, xc:800, yc:300},
   {type: "arc", symbol:"r10",          xs:700, xe:800, ys:300, ye:200, xc:800, yc:300},
   // // {/* <HalfOval x={} y={} w={} h={} /> */}
-  {type: "arc", symbol:"r10",          xs:800, xe:900, ys:100, ye:0, xc:900, yc:100},
+  {type: "arc", symbol:"r10",          xs:800, xe:900, ys:100, ye:0, xc:900, yc:100, ccw:1},
 
   // {type: "arc", symbol:"r10", xs:100, xe:0,   ys:0,   ye:100, xc:100, yc:100},
   // {type: "arc", symbol:"r10", xs:0,   xe:100, ys:100, ye:200, xc:100, yc:100},
