@@ -35,28 +35,26 @@ const testLayer = [
   {type: "pad", symbol:"bfs50",                  x:445, y:50},
   {type: "pad", symbol:"donut_s50x30",           x:445, y:110},
   {type: "pad", symbol:"donut_sr50x30",          x:445, y:170},
+    // // {/* <HalfOval x={} y={} w={} h={} /> */}
   {type: "line", symbol:"r10",          xs:-25, xe:495, ys:0, ye:0},
   {type: "line", symbol:"r10",          xs:-25, xe:-25, ys:0, ye:220},
   {type: "line", symbol:"r10",          xs:-25, xe:200, ys:220, ye:220},
-  {type: "arc", symbol: "r10",          xs:270, ys: 220, xe: 200, ye: 220, xc: 235, yc: 220},
+  {type: "arc", symbol: "r10",          xs:200, ys: 220, xe: 270, ye: 220, xc: 235, yc: 220, ccw:1},
   {type: "line", symbol:"r10",          xs:270, xe:495, ys:220, ye:220},
   {type: "line", symbol:"r10",          xs:495, xe:495, ys:0, ye:220},
-  {type: "arc", symbol:"r10",          xs:600, xe:700, ys:100, ye:200, xc:700, yc:100},
-  {type: "arc", symbol:"r10",          xs:700, xe:800, ys:200, ye:100, xc:700, yc:100},
-  {type: "arc", symbol:"r10",          xs:800, xe:700, ys:100, ye:0, xc:700, yc:100},
-  {type: "arc", symbol:"r10",          xs:700, xe:600, ys:0, ye:100, xc:700, yc:100},
-  {type: "arc", symbol:"r10",          xs:700, xe:600, ys:400, ye:300, xc:700, yc:300},
-  {type: "arc", symbol:"r10",          xs:800, xe:700, ys:300, ye:400, xc:700, yc:300},
-  {type: "arc", symbol:"r10",          xs:700, xe:800, ys:200, ye:300, xc:700, yc:300},
-  {type: "arc", symbol:"r10",          xs:600, xe:700, ys:300, ye:200, xc:700, yc:300},
-  {type: "arc", symbol:"r10",          xs:800, xe:700, ys:400, ye:300, xc:800, yc:300, ccw: 1},
-  // //also works
-  {type: "arc", symbol:"r10",          xs:900, xe:800, ys:300, ye:400, xc:800, yc:300},
-  {type: "arc", symbol:"r10",          xs:800, xe:900, ys:200, ye:300, xc:800, yc:300},
-  {type: "arc", symbol:"r10",          xs:700, xe:800, ys:300, ye:200, xc:800, yc:300},
-  // // {/* <HalfOval x={} y={} w={} h={} /> */}
-  {type: "arc", symbol:"r10",          xs:800, xe:900, ys:100, ye:0, xc:900, yc:100, ccw:1},
-
+  // {type: "arc", symbol:"r10",          xs:600, xe:700, ys:100, ye:200, xc:700, yc:100},
+  // {type: "arc", symbol:"r10",          xs:700, xe:800, ys:200, ye:100, xc:700, yc:100},
+  // {type: "arc", symbol:"r10",          xs:800, xe:700, ys:100, ye:0, xc:700, yc:100},
+  // {type: "arc", symbol:"r10",          xs:700, xe:600, ys:0, ye:100, xc:700, yc:100},
+  // {type: "arc", symbol:"r10",          xs:700, xe:600, ys:400, ye:300, xc:700, yc:300},
+  // {type: "arc", symbol:"r10",          xs:800, xe:700, ys:300, ye:400, xc:700, yc:300},
+  // {type: "arc", symbol:"r10",          xs:700, xe:800, ys:200, ye:300, xc:700, yc:300},
+  // {type: "arc", symbol:"r10",          xs:600, xe:700, ys:300, ye:200, xc:700, yc:300},
+  // {type: "arc", symbol:"r10",          xs:800, xe:700, ys:400, ye:300, xc:800, yc:300, ccw: 1},
+  // {type: "arc", symbol:"r10",          xs:900, xe:800, ys:300, ye:400, xc:800, yc:300},
+  // {type: "arc", symbol:"r10",          xs:800, xe:900, ys:200, ye:300, xc:800, yc:300},
+  // {type: "arc", symbol:"r10",          xs:700, xe:800, ys:300, ye:200, xc:800, yc:300},
+  // {type: "arc", symbol:"r10",          xs:800, xe:900, ys:100, ye:0, xc:900, yc:100, ccw:1},
   // {type: "arc", symbol:"r10", xs:100, xe:0,   ys:0,   ye:100, xc:100, yc:100},
   // {type: "arc", symbol:"r10", xs:0,   xe:100, ys:100, ye:200, xc:100, yc:100},
   // {type: "arc", symbol:"r10", xs:100, xe:200, ys:200, ye:100, xc:100, yc:100},
@@ -67,7 +65,12 @@ const testLayer = [
   // {type: "arc", symbol:"r10", xs:200, xe:300, ys:100, ye:0,   xc:300, yc:100},
 ]
 
-
+// todo fixme js
+//
+// add on hover feature draw same feature on top at half opacity so you can see what is underneath other features
+// refactor points into snapPoints and add centerPoints (for arc center snapping)
+// fix zooming in so x,y of cursor stays same
+// 
 
 const preventDefault = e => e.preventDefault()
 
