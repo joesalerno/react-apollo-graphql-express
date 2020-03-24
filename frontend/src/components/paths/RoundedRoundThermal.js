@@ -12,7 +12,12 @@ export default ({x, y, od, id, angle, num_spokes, gap, ...rest}) => {
   const ir = id / 2
   const or = od / 2
   const startRad = angle * Math.PI / 180
-  const halfGapRad = radFromSides(avgR, avgR, gap/2)
+
+  const halfGap = gap/2
+  
+  const halfGapRadius = Math.sqrt((avgR*avgR) - (halfGap*halfGap))
+  const halfGapRad = radFromSides(avgR, halfGapRadius, halfGap)
+
   const smallArcRad = radFromSides(avgR, avgR, halfLw)
   const segmentRad = num_spokes ? (pi2) / num_spokes : 0
 

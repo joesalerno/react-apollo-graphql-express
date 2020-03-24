@@ -33,11 +33,22 @@ const sectionLines = (pointsX, pointsY, r) => {
   string += "Z "
   return string
 }
+const radFromSides = (a, b, opposite) => {
+  if (!a || !b) return 0
+  return Math.acos( ((opposite**2) -(a**2) -(b**2))/( -2*a*b ) )
+}
 
 export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
-  const halfIn = id / 2
-  const halfOut = os / 2
-  const halfGapRad = (gap / 2 / (Math.PI * halfIn)) * Math.PI
+  const ir = id / 2
+  const or = os / 2
+
+  const halfGap = gap/2
+  
+  const halfGapRadius = Math.sqrt((ir*ir) - (halfGap*halfGap))
+  const halfGapRad = radFromSides(ir, halfGapRadius, halfGap)
+
+  // const halfGapRad = (halfGap / (Math.PI * ir)) * Math.PI
+
   const outCornerDistance = squareCenterToEdge(Math.PI / 4, os)
   const startRad = angle * Math.PI / 180
   const segmentRad = num_spokes ? pi2 / num_spokes : 0
@@ -53,8 +64,8 @@ export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
                     + segmentRad * i
                     + halfGapRad
                     % pi2
-    inX1 = x + halfIn * Math.cos(innerRad1)
-    inY1 = y + halfIn * Math.sin(innerRad1)
+    inX1 = x + ir * Math.cos(innerRad1)
+    inY1 = y + ir * Math.sin(innerRad1)
 
     // Get 'first' outer gap point
     rad = startRad
@@ -82,21 +93,21 @@ export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
     }
 
     // Wrap around edges
-    if (outY2 > y + halfOut) {
-      outX2 -= outY2 - (y + halfOut)
-      outY2 = y + halfOut
+    if (outY2 > y + or) {
+      outX2 -= outY2 - (y + or)
+      outY2 = y + or
     }
-    if (outX2 < x - halfOut) {
-      outY2 -= (x - halfOut) - outX2
-      outX2 = x - halfOut
+    if (outX2 < x - or) {
+      outY2 -= (x - or) - outX2
+      outX2 = x - or
     }
-    if (outY2 < y - halfOut) {
-      outX2 += (y - halfOut) - outY2
-      outY2 = y - halfOut
+    if (outY2 < y - or) {
+      outX2 += (y - or) - outY2
+      outY2 = y - or
     }
-    if (outX2 > x + halfOut) {
-      outY2 += outX2 - (x + halfOut)
-      outX2 = x + halfOut
+    if (outX2 > x + or) {
+      outY2 += outX2 - (x + or)
+      outX2 = x + or
     }
 
     // Get first inner point
@@ -104,8 +115,8 @@ export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
                     + segmentRad * (i + 1)
                     - halfGapRad
                     % pi2
-    inX2 = x + halfIn * Math.cos(innerRad2)
-    inY2 = y + halfIn * Math.sin(innerRad2)
+    inX2 = x + ir * Math.cos(innerRad2)
+    inY2 = y + ir * Math.sin(innerRad2)
 
     // Get 'second' outer gap point
     rad = startRad
@@ -133,21 +144,21 @@ export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
     }
 
     // Wrap around edges
-    if (outY1 < y - halfOut) {
-      outX1 -= (y - halfOut) - outY1
-      outY1 = y - halfOut
+    if (outY1 < y - or) {
+      outX1 -= (y - or) - outY1
+      outY1 = y - or
     }
-    if (outX1 > x + halfOut) {
-      outY1 -= outX1 - (x + halfOut)
-      outX1 = x + halfOut
+    if (outX1 > x + or) {
+      outY1 -= outX1 - (x + or)
+      outX1 = x + or
     }
-    if (outY1 > y + halfOut) {
-      outX1 +=  outY1 - (y + halfOut)
-      outY1 = y + halfOut
+    if (outY1 > y + or) {
+      outX1 +=  outY1 - (y + or)
+      outY1 = y + or
     }
-    if (outX1 < x - halfOut) {
-      outY1 += (x - halfOut) - outX1 
-      outX1 = x - halfOut
+    if (outX1 < x - or) {
+      outY1 += (x - or) - outX1 
+      outX1 = x - or
     }
     
     // Get side of moved point to determine how many corner points to add
@@ -300,6 +311,6 @@ export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
   }
 
   return <path points={JSON.stringify(points)} {...rest} d={sections.reduce((acc, [pointsX, pointsY]) => `${acc}
-    ${sectionLines(pointsX, pointsY, halfIn)}`
+    ${sectionLines(pointsX, pointsY, ir)}`
   , ``)}/>
 }

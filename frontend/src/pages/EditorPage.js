@@ -447,6 +447,25 @@ const EditorPage = ({auth, login, logout}) => {
           }}
         />)}
 
+        {selectedFeatures.length && <Feature
+          key={`__selected__feature__`}
+          id={`__selected__feature__`}
+          type={layers[0][selectedFeatures[0]].type}
+          symbol={layers[0][selectedFeatures[0]].symbol}
+          x={layers[0][selectedFeatures[0]].x}
+          y={layers[0][selectedFeatures[0]].y}
+          xs={layers[0][selectedFeatures[0]].xs}
+          ys={layers[0][selectedFeatures[0]].ys}
+          xe={layers[0][selectedFeatures[0]].xe}
+          ye={layers[0][selectedFeatures[0]].ye}
+          xc={layers[0][selectedFeatures[0]].xc}
+          yc={layers[0][selectedFeatures[0]].yc}
+          r={layers[0][selectedFeatures[0]].r}
+          ccw={layers[0][selectedFeatures[0]].ccw}
+          fill={getFeatureColor(selectedFeatures[0])}
+          pointerEvents="none"
+        />}
+
         {hoveredFeature !== "none" && <Feature
           key={`__hovered__feature__`}
           id={`__hovered__feature__`}
@@ -469,7 +488,7 @@ const EditorPage = ({auth, login, logout}) => {
 
         {activeTool === "measure-distance" && measureDistancePointer()}
         {activeTool === "measure-distance" && measureDistanceSvgText()}
-        
+
         {/* custom pointer */}
         {/* <Circle x={pointerPosition.x} y={pointerPosition.y} r={3} fill="none" stroke="#F00"/> */}
       </svg>
