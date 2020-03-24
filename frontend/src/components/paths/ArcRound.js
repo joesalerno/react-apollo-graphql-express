@@ -1,40 +1,63 @@
 import React from "react"
-// const radFromSides = (a, b, opposite) => {
-//   if (!a || !b) return 0
-//   return Math.acos( ((opposite**2) -(a**2) -(b**2))/( -2*a*b ) )
-// }
+// const right = 0
+// const top = Math.PI * .5
+// const left = Math.PI
+// const bottom = Math.PI * 1.5
+
 export default ({xs, ys, xe, ye, xc, yc, r, ...rest}) => {
-  // const d1 = xs-xc**2 + ys-yc**2
-  // const d2 = xe-xc**2 + ye-yc**2
-  // const d3 = xs-xe**2 + ys-ye**2
-  // const arcRadians = radFromSides(d1, d2, d3)
-
-  // distance from start to center
-
-  const d2 = (xs-xc)*(xs-xc)+(ys-yc)*(ys-yc)
+  const d2 = (xs-xc)*(xs-xc)+(ys-yc)*(ys-yc) // distance from start to center ^ 2
   const arcRadius = Math.sqrt(d2)
-  // console.log({xs, ys, xe, ye, xc, yc, r, d2, arcRadius})
 
-  const largeArc = xe <= xc ? 0 : 1
+  // const m = (ye-ys) / (xe-xs)
+  // const b =  ys + (-m * xs)
+  // const isCenterUnderLine = 1
 
-  // const ir = arcRadians - r
-  // const or = arcRadians + r
-  // const startRad = ""
+  const rightofC = xs >= xc
+  const leftofC = xs <= xc
+  const belowC = ys <= yc
+  const aboveC = ys >= yc
+  const movingDown = ye <= ys
+  const movingUp = ye >= ys
+  const movingLeft = xe <= xs
+  const movingRight = xe >= xs
 
-  // radiusX
-  // radiusY
-  // in/out
+  const isInvertedArc = (aboveC && movingLeft  && ((leftofC && movingDown)||(rightofC && movingUp))) ||
+                        (belowC && movingRight && ((leftofC && movingDown)||(rightofC && movingUp)))
 
-  // inStart, inEnd
-  // outStart, outEnd
+  const ir = arcRadius - r
+  const or = arcRadius + r
+  const startRadians = Math.atan2(yc-ys, xc-xs)
+  const endRadians = Math.atan2(ye-yc, xe-xc)
+
+  let points = [
+    [
+      xs - r * Math.cos(startRadians) * (1 ? 1 : -1),
+      ys - r * Math.sin(startRadians) * (1 ? 1 : -1)
+    ],
+    [
+      xe + r * Math.cos(endRadians) * (1 ? 1 : -1),
+      ye + r * Math.sin(endRadians) * (1 ? 1 : -1)
+    ],
+    [
+     xe - r * Math.cos(endRadians) * (1 ? 1 : -1),
+     ye - r * Math.sin(endRadians) * (1 ? 1 : -1)
+    ],
+    [
+     xs + r * Math.cos(startRadians) * (1 ? 1 : -1),
+     ys + r * Math.sin(startRadians) * (1 ? 1 : -1)
+    ],
+  ]
+
+  points.push([xs - r * Math.cos(startRadians + (Math.PI/2) % (Math.PI * 2)), ys - r * Math.sin(startRadians + (Math.PI/2) % (Math.PI * 2))])
+  points.push([xe - r * Math.cos(endRadians + (Math.PI/2) % (Math.PI * 2)), ye - r * Math.sin(endRadians + (Math.PI/2) % (Math.PI * 2))])
 
 
-
-  const points = [ [xs, ys], [xe, ye] ]
   return <path points={JSON.stringify(points)} {...rest} d={
-   `M ${xs} ${ys}
-    A ${arcRadius} ${arcRadius} 0 0 ${largeArc} ${xe} ${ye}
-    L ${xc} ${yc}
-    Z`
+   `M ${points[0][0]} ${points[0][1]}
+    A ${or} ${or} 0 ${isInvertedArc ? 1 : 0} 0 ${points[1][0]} ${points[1][1]}
+    A ${r} ${r} 0 0 0 ${points[2][0]} ${points[2][1]}
+    A ${ir} ${ir} 0 ${isInvertedArc ? 1 : 0} 1 ${points[3][0]} ${points[3][1]}
+    A ${r} ${r} 0 0 0 ${points[0][0]} ${points[0][1]}
+    `
   }/>
 }

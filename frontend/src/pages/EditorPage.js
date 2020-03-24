@@ -39,8 +39,40 @@ const testLayer = [
   {type: "line", symbol:"r10",          xs:-25, xe:-25, ys:0, ye:220},
   {type: "line", symbol:"r10",          xs:-25, xe:495, ys:220, ye:220},
   {type: "line", symbol:"r10",          xs:495, xe:495, ys:0, ye:220},
-  // {type: "arc", symbol:"r10",          xs:500, xe:600, ys:100, ye:200, xc:500, yc:200},
-  // {/* <HalfOval x={} y={} w={} h={} /> */}
+  {type: "arc", symbol:"r10",          xs:500, xe:600, ys:100, ye:200, xc:500, yc:200},
+  {type: "arc", symbol:"r10",          xs:600, xe:700, ys:100, ye:200, xc:700, yc:100},
+  {type: "arc", symbol:"r10",          xs:700, xe:800, ys:200, ye:100, xc:700, yc:100},
+  {type: "arc", symbol:"r10",          xs:800, xe:700, ys:100, ye:0, xc:700, yc:100},
+
+  // //doesn't
+  {type: "arc", symbol:"r10",          xs:700, xe:600, ys:0, ye:100, xc:700, yc:100},
+
+  {type: "arc", symbol:"r10",          xs:700, xe:600, ys:400, ye:300, xc:700, yc:300},
+
+
+  // //works
+  {type: "arc", symbol:"r10",          xs:800, xe:700, ys:300, ye:400, xc:700, yc:300},
+
+  {type: "arc", symbol:"r10",          xs:700, xe:800, ys:200, ye:300, xc:700, yc:300},
+  {type: "arc", symbol:"r10",          xs:600, xe:700, ys:300, ye:200, xc:700, yc:300},
+
+  {type: "arc", symbol:"r10",          xs:800, xe:700, ys:400, ye:300, xc:800, yc:300, ccw: 1},
+
+  // //also works
+  {type: "arc", symbol:"r10",          xs:900, xe:800, ys:300, ye:400, xc:800, yc:300},
+  {type: "arc", symbol:"r10",          xs:800, xe:900, ys:200, ye:300, xc:800, yc:300},
+  {type: "arc", symbol:"r10",          xs:700, xe:800, ys:300, ye:200, xc:800, yc:300},
+  // // {/* <HalfOval x={} y={} w={} h={} /> */}
+  {type: "arc", symbol:"r10",          xs:800, xe:900, ys:100, ye:0, xc:900, yc:100},
+
+  // {type: "arc", symbol:"r10", xs:100, xe:0,   ys:0,   ye:100, xc:100, yc:100},
+  // {type: "arc", symbol:"r10", xs:0,   xe:100, ys:100, ye:200, xc:100, yc:100},
+  // {type: "arc", symbol:"r10", xs:100, xe:200, ys:200, ye:100, xc:100, yc:100},
+  // {type: "arc", symbol:"r10", xs:200, xe:100, ys:100, ye:0,   xc:100, yc:100},
+  // {type: "arc", symbol:"r10", xs:300, xe:400, ys:0,   ye:100, xc:300, yc:100},
+  // {type: "arc", symbol:"r10", xs:400, xe:300, ys:100, ye:200, xc:300, yc:100},
+  // {type: "arc", symbol:"r10", xs:300, xe:200, ys:200, ye:100, xc:300, yc:100},
+  // {type: "arc", symbol:"r10", xs:200, xe:300, ys:100, ye:0,   xc:300, yc:100},
 ]
 
 
@@ -409,7 +441,7 @@ const EditorPage = ({auth, login, logout}) => {
         {testLayer.map((f, i) => <Feature
           key={`__layer__0__feature__${i}__`}
           id={`__layer__0__feature__${i}__`}
-          type={f.type} symbol={f.symbol} x={f.x} y={f.y} xs={f.xs} ys={f.ys} xe={f.xe} ye={f.ye} xc={f.xc} yc={f.yc}
+          type={f.type} symbol={f.symbol} x={f.x} y={f.y} xs={f.xs} ys={f.ys} xe={f.xe} ye={f.ye} xc={f.xc} yc={f.yc} ccw={f.ccw}
           fill={getFeatureColor(i)}
           onMouseEnter={()=> setHoveredFeature(i)}
           onMouseLeave={()=> {if (hoveredFeature===i) setHoveredFeature(false)}}
