@@ -36,12 +36,12 @@ const testLayer = [
   {type: "pad", symbol:"donut_s50x30",           x:445, y:110},
   {type: "pad", symbol:"donut_sr50x30",          x:445, y:170},
     // // {/* <HalfOval x={} y={} w={} h={} /> */}
-  {type: "line", symbol:"r10",          xs:-25, xe:495, ys:0, ye:0},
-  {type: "line", symbol:"r10",          xs:-25, xe:-25, ys:0, ye:220},
-  {type: "line", symbol:"r10",          xs:-25, xe:200, ys:220, ye:220},
-  {type: "arc", symbol: "r10",          xs:200, ys: 220, xe: 270, ye: 220, xc: 235, yc: 220, ccw:1},
-  {type: "line", symbol:"r10",          xs:270, xe:495, ys:220, ye:220},
-  {type: "line", symbol:"r10",          xs:495, xe:495, ys:0, ye:220},
+  // {type: "line", symbol:"r10",          xs:-25, xe:495, ys:0, ye:0},
+  // {type: "line", symbol:"r10",          xs:-25, xe:-25, ys:0, ye:220},
+  // {type: "line", symbol:"r10",          xs:-25, xe:200, ys:220, ye:220},
+  // {type: "arc", symbol: "r10",          xs:200, ys: 220, xe: 270, ye: 220, xc: 235, yc: 220, ccw:1},
+  // {type: "line", symbol:"r10",          xs:270, xe:495, ys:220, ye:220},
+  // {type: "line", symbol:"r10",          xs:495, xe:495, ys:0, ye:220},
   // {type: "arc", symbol:"r10",          xs:600, xe:700, ys:100, ye:200, xc:700, yc:100},
   // {type: "arc", symbol:"r10",          xs:700, xe:800, ys:200, ye:100, xc:700, yc:100},
   // {type: "arc", symbol:"r10",          xs:800, xe:700, ys:100, ye:0, xc:700, yc:100},
@@ -65,10 +65,17 @@ const testLayer = [
   // {type: "arc", symbol:"r10", xs:200, xe:300, ys:100, ye:0,   xc:300, yc:100},
 ]
 
+const testLayer2 = [
+  {type: "line", symbol:"r10",          xs:-25, xe:495, ys:0, ye:0},
+  {type: "line", symbol:"r10",          xs:-25, xe:-25, ys:0, ye:220},
+  {type: "line", symbol:"r10",          xs:-25, xe:200, ys:220, ye:220},
+  {type: "arc", symbol: "r10",          xs:200, ys: 220, xe: 270, ye: 220, xc: 235, yc: 220, ccw:1},
+  {type: "line", symbol:"r10",          xs:270, xe:495, ys:220, ye:220},
+  {type: "line", symbol:"r10",          xs:495, xe:495, ys:0, ye:220},
+]
+
 // todo fixme js
 //
-// add on hover feature draw same feature on top at half opacity so you can see what is underneath other features
-// refactor points into snapPoints and add centerPoints (for arc center snapping)
 // fix zooming in so x,y of cursor stays same
 // 
 
@@ -77,9 +84,9 @@ const preventDefault = e => e.preventDefault()
 const EditorPage = ({auth, login, logout}) => {
   const svgRef = useRef(null)    
   
-  const [layers, setLayers] = useState([testLayer])
+  const [layers, setLayers] = useState([testLayer, testLayer2])
   const [activeLayer, setActiveLayer] = useState(0)
-  
+
   const [cursorStyle, setCursorStyle] = useState("crosshair")
   const [isPointerInWindow, setIsPointerInWindow] = useState(false)
   const [isPointerDown, setIsPointerDown] = useState(false)
@@ -100,6 +107,8 @@ const EditorPage = ({auth, login, logout}) => {
   const [flipY, setFlipY] = useState(false)
   const [showNavBar, setShowNavBar] = useState(true)
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF")
+  const [layerColors, setLayerColors] = useState({default: "#005291", 1:"#529100"})
+
 
   const resetZoom = () => {
     const bbox = svgRef.current.getBBox()
@@ -107,10 +116,27 @@ const EditorPage = ({auth, login, logout}) => {
     setViewbox(bbox)
   }
 
-  const getFeatureColor = index => {
-    if (selectedFeatures.includes(index)) return "#FF00FF"
-    if (hoveredFeature === index) return "#007BD9"
-    return "#005291"
+  const changeLightness = (colorhash, multiplier) => {
+    const [ , numbers ] = colorhash.split(/#/g)
+    console.log(colorhash, multiplier)
+    let n1 = parseInt(`0x${numbers.substr(0, 2)}`)
+    let n2 = parseInt(`0x${numbers.substr(2, 2)}`)
+    let n3 = parseInt(`0x${numbers.substr(4, 2)}`)
+    n1 = parseInt(n1 * multiplier > 255 ? 255 : n1 * multiplier).toString(16)
+    n2 = parseInt(n2 * multiplier > 255 ? 255 : n2 * multiplier).toString(16)
+    n3 = parseInt(n3 * multiplier > 255 ? 255 : n3 * multiplier).toString(16)
+    if (n1.length < 2) n1 = `0${n1}`
+    if (n2.length < 2) n2 = `0${n2}`
+    if (n3.length < 2) n3 = `0${n3}`
+    console.log(n1, n2, n3)
+    return `#${n1}${n2}${n3}`.toUpperCase()
+  }
+
+  const getFeatureColor = (layerIndex, featureIndex) => {
+    const baseColor = layerColors[layerIndex] || layerColors.default || "#005291"
+    if (selectedFeatures.some(f => f[0] === layerIndex && f[1] === featureIndex)) return "#FF00FF"
+    if (hoveredFeature[0] === layerIndex && hoveredFeature[1] === featureIndex) return changeLightness(baseColor, 1.5)
+    return baseColor
   }
 
   const getPointFromEvent = event => {
@@ -144,8 +170,6 @@ const EditorPage = ({auth, login, logout}) => {
         setSelectedPoints([closestPathPoint(pointerPosition.x, pointerPosition.y)])
       }
     }
-
-    
   }
 
   const onPointerUp = () => setIsPointerDown(false)
@@ -222,7 +246,10 @@ const EditorPage = ({auth, login, logout}) => {
 
     if (snapToEdges) {
       for (const group of svgRef.current.children) {
-        let layerFeatRegEx = RegExp(`__layer__${activeLayer}__feature__.*__`)
+        
+        let layerFeatRegEx = RegExp(`__layer__.+__feature__.+__`)
+        // let layerFeatRegEx = RegExp(`__layer__${activeLayer}__feature__.*__`)
+
         if (!group.id.match(layerFeatRegEx)) continue
 
         let transform = false
@@ -238,6 +265,7 @@ const EditorPage = ({auth, login, logout}) => {
         //   closest = d
         //   point = thisClosest
         // }
+
         const snapPoints = group.children[0].getAttribute("points")
         if (snapPoints) {
           const points = JSON.parse(snapPoints)
@@ -345,12 +373,8 @@ const EditorPage = ({auth, login, logout}) => {
       textPosition.x = viewbox.x + viewbox.width
       textAnchor = "end"
     }
-
-
     if (flipX) textPosition.x = -textPosition.x
     if (!flipY) textPosition.y = -textPosition.y
-
-
 
     return <g opacity="0.7" pointerEvents="none">
       <text style={{font: `${Math.max(viewbox.height / 18, .01)}px sans-serif`, textAnchor}}
@@ -363,31 +387,6 @@ const EditorPage = ({auth, login, logout}) => {
   }
 
   // const selectedFeatureSVGText = () => {}
-
-
-
-
-  // const measureDistanceSvgText = () => {
-  //   if (!pointerPosition) return
-  //   const closest = closestPathPoint(pointerPosition.x, pointerPosition.y)
-  //   if (!closest) return
-  //   const startPoint = selectedPoints.length > 0 ? selectedPoints[0] : [pointerPosition.x, pointerPosition.y]
-  //   const distance = pointDistance(startPoint, closest)
-  //   const textPosition = svgRef.current.createSVGPoint()
-  //   textPosition.x = (closest[0] + startPoint[0]) / 2
-  //   textPosition.y = (closest[1] + startPoint[1]) / 2
-  //   if (flipX) textPosition.x = -textPosition.x
-  //   if (!flipY) textPosition.y = -textPosition.y
-
-  //   return <g opacity="0.7" pointerEvents="none">
-  //     <text style={{font: "13px sans-serif", textAnchor: "middle"}}
-  //       fill={getTextColor(backgroundColor)}
-  //       transform={`scale(${flipX ? -1 : 1} ${flipY ? 1 : -1})`}
-  //       x={`${textPosition.x}`} 
-  //       y={`${textPosition.y}`}
-  //     >{`${distance.x.toFixed(3)} ${distance.y.toFixed(3)} ${distance.d.toFixed(3)}`}</text>
-  //   </g>
-  // }
 
   useEffect(()=>{
     resetZoom()
@@ -419,86 +418,91 @@ const EditorPage = ({auth, login, logout}) => {
         </div>
       </div>
     </div>
-    {/* <div style={{backgroundColor, overflowY: "hidden", height:"100%"}}> */}
-      <svg
-        height="100vh"
-        width="100%"
-        onMouseMove={onPointerMove}
-        onMouseDown={onPointerDown}
-        onMouseUp={onPointerUp}
-        onMouseLeave={onPointerLeave}
-        onMouseEnter={onPointerEnter}
-        ref={svgRef}
-        transform={`scale(${flipX ? -1 : 1} ${flipY ? 1 : -1})`}
-        style={{cursor: cursorStyle, backgroundColor}}
-      >
-        {testLayer.map((f, i) => <Feature
-          key={`__layer__0__feature__${i}__`}
-          id={`__layer__0__feature__${i}__`}
-          type={f.type} symbol={f.symbol} x={f.x} y={f.y} xs={f.xs} ys={f.ys} xe={f.xe} ye={f.ye} xc={f.xc} yc={f.yc} ccw={f.ccw}
-          fill={getFeatureColor(i)}
-          onMouseEnter={()=> setHoveredFeature(i)}
-          onMouseLeave={()=> {if (hoveredFeature===i) setHoveredFeature("none")}}
-          onClick={()=>{
-            if (!activeTool) {
-              setSelectedFeatures(selectedFeatures.length && selectedFeatures[0]=== i ? [] : [i])
-            }
-          }}
-        />)}
+    <svg
+      height="100vh"
+      width="100%"
+      onMouseMove={onPointerMove}
+      onMouseDown={onPointerDown}
+      onMouseUp={onPointerUp}
+      onMouseLeave={onPointerLeave}
+      onMouseEnter={onPointerEnter}
+      ref={svgRef}
+      transform={`scale(${flipX ? -1 : 1} ${flipY ? 1 : -1})`}
+      style={{cursor: cursorStyle, backgroundColor}}
+    >
+      {layers.map((l, iL) => l.map((f, iF) => <Feature
+        key={`__layer__${iL}__feature__${iF}__`}
+        id={`__layer__${iL}__feature__${iF}__`}
+        type={f.type} symbol={f.symbol} x={f.x} y={f.y} xs={f.xs} ys={f.ys} xe={f.xe} ye={f.ye} xc={f.xc} yc={f.yc} ccw={f.ccw}
+        fill={getFeatureColor(iL, iF)}
+        onMouseEnter={()=> setHoveredFeature([iL, iF])}
+        onMouseLeave={()=> {if (hoveredFeature[0]===iL && hoveredFeature[1]===iF) setHoveredFeature("none")}}
+        onClick={()=>{
+          if (!activeTool) {
+            setSelectedFeatures(selectedFeatures.length && selectedFeatures[0][0]=== iL && selectedFeatures[0][1] === iF  ? [] : [[iL, iF]])
+          }
+        }}
+      />))}
 
-        {selectedFeatures.length && <Feature
-          key={`__selected__feature__`}
-          id={`__selected__feature__`}
-          type={layers[0][selectedFeatures[0]].type}
-          symbol={layers[0][selectedFeatures[0]].symbol}
-          x={layers[0][selectedFeatures[0]].x}
-          y={layers[0][selectedFeatures[0]].y}
-          xs={layers[0][selectedFeatures[0]].xs}
-          ys={layers[0][selectedFeatures[0]].ys}
-          xe={layers[0][selectedFeatures[0]].xe}
-          ye={layers[0][selectedFeatures[0]].ye}
-          xc={layers[0][selectedFeatures[0]].xc}
-          yc={layers[0][selectedFeatures[0]].yc}
-          r={layers[0][selectedFeatures[0]].r}
-          ccw={layers[0][selectedFeatures[0]].ccw}
-          fill={getFeatureColor(selectedFeatures[0])}
-          pointerEvents="none"
-        />}
+      {/* {testLayer.map((f, i) => <Feature
+        key={`__layer__0__feature__${i}__`}
+        id={`__layer__0__feature__${i}__`}
+        type={f.type} symbol={f.symbol} x={f.x} y={f.y} xs={f.xs} ys={f.ys} xe={f.xe} ye={f.ye} xc={f.xc} yc={f.yc} ccw={f.ccw}
+        fill={getFeatureColor(i)}
+        onMouseEnter={()=> setHoveredFeature(i)}
+        onMouseLeave={()=> {if (hoveredFeature===i) setHoveredFeature("none")}}
+        onClick={()=>{
+          if (!activeTool) {
+            setSelectedFeatures(selectedFeatures.length && selectedFeatures[0]=== i ? [] : [i])
+          }
+        }}
+      />)} */}
 
-        {hoveredFeature !== "none" && <Feature
-          key={`__hovered__feature__`}
-          id={`__hovered__feature__`}
-          type={layers[0][hoveredFeature].type}
-          symbol={layers[0][hoveredFeature].symbol}
-          x={layers[0][hoveredFeature].x}
-          y={layers[0][hoveredFeature].y}
-          xs={layers[0][hoveredFeature].xs}
-          ys={layers[0][hoveredFeature].ys}
-          xe={layers[0][hoveredFeature].xe}
-          ye={layers[0][hoveredFeature].ye}
-          xc={layers[0][hoveredFeature].xc}
-          yc={layers[0][hoveredFeature].yc}
-          r={layers[0][hoveredFeature].r}
-          ccw={layers[0][hoveredFeature].ccw}
-          fill={getFeatureColor(hoveredFeature)}
-          opacity={.5}
-          pointerEvents="none"
-        />}
+      {selectedFeatures.length && <Feature
+        key={`__selected__feature__`}
+        id={`__selected__feature__`}
+        type={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].type}
+        symbol={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].symbol}
+        x={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].x}
+        y={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].y}
+        xs={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].xs}
+        ys={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].ys}
+        xe={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].xe}
+        ye={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].ye}
+        xc={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].xc}
+        yc={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].yc}
+        r={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].r}
+        ccw={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].ccw}
+        fill={getFeatureColor(selectedFeatures[0][0], selectedFeatures[0][1])}
+        pointerEvents="none"
+      />}
 
-        {activeTool === "measure-distance" && measureDistancePointer()}
-        {activeTool === "measure-distance" && measureDistanceSvgText()}
+      {hoveredFeature !== "none" && <Feature
+        key={`__hovered__feature__`}
+        id={`__hovered__feature__`}
+        type={layers[hoveredFeature[0]][hoveredFeature[1]].type}
+        symbol={layers[hoveredFeature[0]][hoveredFeature[1]].symbol}
+        x={layers[hoveredFeature[0]][hoveredFeature[1]].x}
+        y={layers[hoveredFeature[0]][hoveredFeature[1]].y}
+        xs={layers[hoveredFeature[0]][hoveredFeature[1]].xs}
+        ys={layers[hoveredFeature[0]][hoveredFeature[1]].ys}
+        xe={layers[hoveredFeature[0]][hoveredFeature[1]].xe}
+        ye={layers[hoveredFeature[0]][hoveredFeature[1]].ye}
+        xc={layers[hoveredFeature[0]][hoveredFeature[1]].xc}
+        yc={layers[hoveredFeature[0]][hoveredFeature[1]].yc}
+        r={layers[hoveredFeature[0]][hoveredFeature[1]].r}
+        ccw={layers[hoveredFeature[0]][hoveredFeature[1]].ccw}
+        fill={getFeatureColor(hoveredFeature[0], hoveredFeature[1])}
+        opacity={.5}
+        pointerEvents="none"
+      />}
 
-        {/* custom pointer */}
-        {/* <Circle x={pointerPosition.x} y={pointerPosition.y} r={3} fill="none" stroke="#F00"/> */}
-      </svg>
-      {/* <div style={{
-        position: "relative",
-        zIndex: 2,
-        background: "#FFF0",
-        height: 0,
-        bottom: 21
-      }}>
-      </div> */}
+      {activeTool === "measure-distance" && measureDistancePointer()}
+      {activeTool === "measure-distance" && measureDistanceSvgText()}
+
+      {/* custom pointer */}
+      {/* <Circle x={pointerPosition.x} y={pointerPosition.y} r={3} fill="none" stroke="#F00"/> */}
+    </svg>
   </BasicLayout>
 }
 
