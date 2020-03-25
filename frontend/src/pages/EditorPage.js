@@ -269,8 +269,7 @@ const EditorPage = ({auth, login, logout}) => {
           featurePoint = [feature.x, feature.y]
         }
         else if (feature.type === "arc") {
-          console.log('fixme')
-          featurePoint = [0,0]
+          featurePoint = [feature.xc, feature.yc]
         }
         const d = pointDistance2([x, y], featurePoint)
         if (d < closest) {

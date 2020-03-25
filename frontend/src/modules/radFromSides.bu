@@ -1,0 +1,4 @@
+const radFromSides = (a, b, opposite) => {
+  if (!a || !b) return 0
+  return Math.acos( ((opposite**2) -(a**2) -(b**2))/( -2*a*b ) )
+}

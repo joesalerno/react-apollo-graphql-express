@@ -33,10 +33,6 @@ const sectionLines = (pointsX, pointsY, r) => {
   string += "Z "
   return string
 }
-const radFromSides = (a, b, opposite) => {
-  if (!a || !b) return 0
-  return Math.acos( ((opposite**2) -(a**2) -(b**2))/( -2*a*b ) )
-}
 
 export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
   const ir = id / 2
@@ -44,9 +40,9 @@ export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
 
   const halfGap = gap/2
   
-  const halfGapRadius = Math.sqrt((ir*ir) - (halfGap*halfGap))
-  const halfGapRad = radFromSides(ir, halfGapRadius, halfGap)
-
+  // const halfGapRadius = Math.sqrt((ir*ir) - (halfGap*halfGap))
+  const halfGapRad = Math.asin(halfGap/ir)
+  // const halfGapRad = radFromSides(ir, halfGapRadius, halfGap)
   // const halfGapRad = (halfGap / (Math.PI * ir)) * Math.PI
 
   const outCornerDistance = squareCenterToEdge(Math.PI / 4, os)

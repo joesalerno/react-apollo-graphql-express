@@ -35,28 +35,19 @@ export default ({xs, ys, xe, ye, xc, yc, ccw, rad, ...rest}) => {
   const or = arcRadius + rad
   const startRadians = Math.atan2(yc-m_ys, xc-m_xs)
   const endRadians = Math.atan2(yc-m_ye, xc-m_xe)
+  const centerRad = (((startRadians + endRadians) / 2) + (ccw ? Math.PI : 0)) % pi2
 
-  let points = [
+  const points = [
     [ m_xs - rad * Math.cos(startRadians), m_ys - rad * Math.sin(startRadians) ],
     [ m_xe - rad * Math.cos(endRadians),   m_ye - rad * Math.sin(endRadians) ],
     [ m_xe + rad * Math.cos(endRadians),   m_ye + rad * Math.sin(endRadians) ],
     [ m_xs + rad * Math.cos(startRadians), m_ys + rad * Math.sin(startRadians) ],
+    // additional snap points
+    [ m_xs - rad * Math.cos(startRadians + (Math.PI/2) % pi2), m_ys - rad * Math.sin(startRadians + (Math.PI/2) % pi2) ],
+    [ m_xe - rad * Math.cos(endRadians + (Math.PI/2) % pi2),   m_ye - rad * Math.sin(endRadians + (Math.PI/2) % pi2) ],
+    [ xc + ir * Math.cos(centerRad), yc + ir * Math.sin(centerRad) ],
+    [ xc + or * Math.cos(centerRad), yc + or * Math.sin(centerRad) ]
   ]
-
-  points.push([m_xs - rad * Math.cos(startRadians + (Math.PI/2) % pi2), m_ys - rad * Math.sin(startRadians + (Math.PI/2) % pi2)])
-  points.push([m_xe - rad * Math.cos(endRadians + (Math.PI/2) % pi2),   m_ye - rad * Math.sin(endRadians + (Math.PI/2) % pi2)])
-  
-  // console.log(startRadians)
-  // console.log(endRadians)
-  // console.log(startRadians + endRadians)
-  // console.log((startRadians + endRadians)/2)
-  // console.log(Math.cos((startRadians + endRadians)/2))
-  // console.log(Math.sin((startRadians + endRadians)/2))
-
-  const centerRad = (((startRadians + endRadians) / 2) + (ccw ? Math.PI : 0)) % pi2
-
-  points.push([xc + ir * Math.cos(centerRad), yc + ir * Math.sin(centerRad)])
-  points.push([xc + or * Math.cos(centerRad), yc + or * Math.sin(centerRad)])
 
   return <path points={JSON.stringify(points)} {...rest} d={
    `M ${points[0][0]} ${points[0][1]}
