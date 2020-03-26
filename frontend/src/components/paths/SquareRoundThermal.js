@@ -24,9 +24,9 @@ const lowerOnRightSide = (rad1, rad2) => {
   if (mod2 >= Math.PI * 1.75 && mod1 <= Math.PI * 0.25) return true
   return false
 }
-const sectionLines = (pointsX, pointsY, r) => {
+const sectionLines = (pointsX, pointsY, r, num_spokes) => {
   let string = `M ${pointsX[0]} ${pointsY[0]} `
-  string += `A ${r} ${r} 0 0 1 ${pointsX[1]} ${pointsY[1]} `
+  string += `A ${r} ${r} 0 ${num_spokes === 1 ? 1 : 0} 1 ${pointsX[1]} ${pointsY[1]} `
   for (let i = 2; i < pointsX.length; i++) {
     string += `L ${pointsX[i]} ${pointsY[i]} `
   }
@@ -307,6 +307,6 @@ export default ({x, y, os, id, angle, num_spokes, gap, ...rest}) => {
   }
 
   return <path points={JSON.stringify(points)} {...rest} d={sections.reduce((acc, [pointsX, pointsY]) => `${acc}
-    ${sectionLines(pointsX, pointsY, ir)}`
+    ${sectionLines(pointsX, pointsY, ir, num_spokes)}`
   , ``)}/>
 }

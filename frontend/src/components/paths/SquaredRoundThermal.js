@@ -64,9 +64,9 @@ export default ({x, y, od, id, angle, num_spokes, gap, ...rest}) => {
 
   return <path points={JSON.stringify(points)} {...rest} d={sections.reduce((acc, s) => `${acc}
     M ${s.in1x}  ${s.in1y}
-    A ${ir}      ${ir}     0 0 1 ${s.in2x} , ${s.in2y}
+    A ${ir}      ${ir}     0 ${num_spokes === 1 ? 1 : 0} 1 ${s.in2x} , ${s.in2y}
     L ${s.out3x} ${s.out3y}
-    A ${or}      ${or}     0 0 0 ${s.out4x}, ${s.out4y}
+    A ${or}      ${or}     0 ${num_spokes === 1 ? 1 : 0} 0 ${s.out4x}, ${s.out4y}
     Z`
   ,``)}/>
 }
