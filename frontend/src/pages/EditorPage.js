@@ -194,7 +194,6 @@ const EditorPage = ({auth, login, logout}) => {
 
   const changeLightness = (colorhash, multiplier) => {
     const [ , numbers ] = colorhash.split(/#/g)
-    console.log(colorhash, multiplier)
     let n1 = parseInt(`0x${numbers.substr(0, 2)}`)
     let n2 = parseInt(`0x${numbers.substr(2, 2)}`)
     let n3 = parseInt(`0x${numbers.substr(4, 2)}`)
@@ -204,7 +203,6 @@ const EditorPage = ({auth, login, logout}) => {
     if (n1.length < 2) n1 = `0${n1}`
     if (n2.length < 2) n2 = `0${n2}`
     if (n3.length < 2) n3 = `0${n3}`
-    console.log(n1, n2, n3)
     return `#${n1}${n2}${n3}`.toUpperCase()
   }
 

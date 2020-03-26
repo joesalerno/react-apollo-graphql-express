@@ -1,10 +1,8 @@
 import React from "react"
-const pi2 = Math.PI * 2
 
 export default ({x, y, polygons, ...rest}) => {
-  const points = []
   let pathString = ""
-  console.log(polygons)
+  const points = []
 
   const drawPolygon = polygon => {
     pathString += `M ${polygon.points[0].x} ${polygon.points[0].y} `
