@@ -21,16 +21,21 @@ import SquareThermal from "./paths/SquareThermal"
 import SquareRoundThermal from "./paths/SquareRoundThermal"
 import Ellipse from "./paths/Ellipse"
 import RoundedRectangleDonut from "./paths/RoundedRectangleDonut"
-import ArcRound from "./paths/ArcRound"
+import Arc from "./paths/Arc"
+import Surface from "./paths/Surface"
 
 const getSymbolParams = symbol => symbol.match(/[0-9]+(\.[0-9]*)?/g).map(text => parseFloat(text))
 
-export default ({type, symbol, x, y, xs, ys, xe, ye, xc, yc, rad, ccw, rotation, ...rest}) => {
+export default ({type, symbol, x, y, xs, ys, xe, ye, xc, yc, rad, ccw, rotation, polygons, ...rest}) => {
+  if (type === "surface") {
+    return <Surface x={x} y={y} polygons={polygons}/>
+  }
+
   const feature = validOdbSymbol(symbol)
   if (!feature) return console.log({SymbolError: symbol, x, y})
 
   let [ sym_rotation] = symbol.match(/_(3[0-5][0-9]|[12][0-9][0-9]|[1-9]?[0-9])$/g) || [ false ]
-  if (sym_rotation) { // remove the _
+  if (sym_rotation) { // remove the _ and floatify
     sym_rotation = parseFloat(sym_rotation.substr(1, sym_rotation.length))
   }
 
@@ -65,7 +70,7 @@ export default ({type, symbol, x, y, xs, ys, xe, ye, xc, yc, rad, ccw, rotation,
   if (type === "arc") {
     if (feature === "round") {
       const [ d ] = getSymbolParams(symbol)
-      return <ArcRound xs={xs} ys={ys} xe={xe} ye={ye} xc={xc} yc={yc} rad={d/2} ccw={ccw}/>
+      return <Arc xs={xs} ys={ys} xe={xe} ye={ye} xc={xc} yc={yc} rad={d/2} ccw={ccw}/>
     }
     if (feature === "square") {
 

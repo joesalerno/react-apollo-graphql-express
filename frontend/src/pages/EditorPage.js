@@ -12,7 +12,7 @@ import Circle from "../components/paths/Circle"
 import Feature from "../components/Feature"
 import FeaturePath from "../components/FeaturePath"
 
-const testLayer = [
+const testLayer0 = [
   {type: "pad", symbol:"r50",                    x:25,  y:50},
   {type: "pad", symbol:"sr_ths50x30x0x7x6",      x:25,  y:110},
   {type: "pad", symbol:"s_ths50x30x0x7x6",       x:25,  y:170},
@@ -36,6 +36,9 @@ const testLayer = [
   {type: "pad", symbol:"donut_s50x30",           x:445, y:110},
   {type: "pad", symbol:"donut_sr50x30",          x:445, y:170},
     // // {/* <HalfOval x={} y={} w={} h={} /> */}
+
+
+
   // {type: "line", symbol:"r10",          xs:-25, xe:495, ys:0, ye:0},
   // {type: "line", symbol:"r10",          xs:-25, xe:-25, ys:0, ye:220},
   // {type: "line", symbol:"r10",          xs:-25, xe:200, ys:220, ye:220},
@@ -65,6 +68,79 @@ const testLayer = [
   // {type: "arc", symbol:"r10", xs:200, xe:300, ys:100, ye:0,   xc:300, yc:100},
 ]
 
+const testLayer1 = [
+  {type: "surface", x: 600, y:600, polygons: [{
+    points: [
+      {x: 0, y:10},
+      {x: 50, y: 110},
+      {x: 100, y: 10},
+      // {x: 0, y:0},
+    ],
+    polygons: [{
+      points: [
+        {x: 5, y: 15},
+        {x: 95, y: 15},
+        {x: 50, y: 105},
+      ],
+      polygons: [{
+        points: [
+          {x: 25, y: 35},
+          {xe: 50, ye: 10, xc:50, yc: 35},
+        ]
+      }]
+    }]
+  }]},
+
+  {type: "surface", x: 600, y:600, polygons: [{
+    points: [
+      {x: 0, y:110},
+      {x: 50, y: 210},
+      {x: 100, y: 110},
+    ],
+    polygons: [{
+      points: [
+        {x: 50, y: 110},
+        {xc: 50, yc: 135, xe: 25, ye: 135, ccw: 1},
+      ]
+    }]
+  }]},
+
+  {type: "surface", x: 600, y:600, polygons: [{
+    points: [
+      {x: 200, y:110},
+      {x: 250, y: 210},
+      {x: 300, y: 110},
+    ],
+    polygons: [{
+      points: [
+        {x: 225, y: 135},
+        {xe: 250, ye: 110, xc: 250, yc: 160, ccw: 1},
+      ]
+    }]
+  }]},
+
+  {type: "surface", x: 600, y:600, polygons: [{
+    points: [
+      {x: 200, y:10},
+      {x: 250, y: 110},
+      {x: 300, y: 10},
+    ],
+    polygons: [{
+      points: [
+        {x: 205, y:15},
+        {x: 295, y: 15},
+        {x: 250, y: 105},
+      ],
+      polygons: [{
+        points: [
+          {x: 250, y: 10},
+          {xc: 250, yc: 35, xe: 225, ye: 35},
+        ]
+      }]
+    }]
+  }]},
+]
+
 const testLayer2 = [
   {type: "line", symbol:"r10",          xs:-25, xe:495, ys:0, ye:0},
   {type: "line", symbol:"r10",          xs:-25, xe:-25, ys:0, ye:220},
@@ -84,7 +160,7 @@ const preventDefault = e => e.preventDefault()
 const EditorPage = ({auth, login, logout}) => {
   const svgRef = useRef(null)    
   
-  const [layers, setLayers] = useState([testLayer, testLayer2])
+  const [layers, setLayers] = useState([testLayer0, testLayer1, testLayer2])
   const [activeLayer, setActiveLayer] = useState(0)
 
   const [cursorStyle, setCursorStyle] = useState("crosshair")
@@ -107,7 +183,7 @@ const EditorPage = ({auth, login, logout}) => {
   const [flipY, setFlipY] = useState(false)
   const [showNavBar, setShowNavBar] = useState(true)
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF")
-  const [layerColors, setLayerColors] = useState({default: "#005291", 1:"#529100"})
+  const [layerColors, setLayerColors] = useState({default: "#005291", 1:"#a30000", 2:"#529100"})
 
 
   const resetZoom = () => {
@@ -293,7 +369,7 @@ const EditorPage = ({auth, login, logout}) => {
         if (feature.type === "line") {
           featurePoint = [(feature.xs + feature.xe) / 2, (feature.ys + feature.ye) / 2]
         }
-        else if (feature.type === "pad") {
+        else if (feature.type === "pad" || feature.type === "surface") {
           featurePoint = [feature.x, feature.y]
         }
         else if (feature.type === "arc") {
@@ -433,7 +509,7 @@ const EditorPage = ({auth, login, logout}) => {
       {layers.map((l, iL) => l.map((f, iF) => <Feature
         key={`__layer__${iL}__feature__${iF}__`}
         id={`__layer__${iL}__feature__${iF}__`}
-        type={f.type} symbol={f.symbol} x={f.x} y={f.y} xs={f.xs} ys={f.ys} xe={f.xe} ye={f.ye} xc={f.xc} yc={f.yc} ccw={f.ccw}
+        type={f.type} symbol={f.symbol} x={f.x} y={f.y} xs={f.xs} ys={f.ys} xe={f.xe} ye={f.ye} xc={f.xc} yc={f.yc} ccw={f.ccw} polygons={f.polygons}
         fill={getFeatureColor(iL, iF)}
         onMouseEnter={()=> setHoveredFeature([iL, iF])}
         onMouseLeave={()=> {if (hoveredFeature[0]===iL && hoveredFeature[1]===iF) setHoveredFeature("none")}}
@@ -473,6 +549,7 @@ const EditorPage = ({auth, login, logout}) => {
         yc={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].yc}
         r={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].r}
         ccw={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].ccw}
+        polygons={layers[selectedFeatures[0][0]][selectedFeatures[0][1]].polygons}
         fill={getFeatureColor(selectedFeatures[0][0], selectedFeatures[0][1])}
         pointerEvents="none"
       />}
@@ -492,6 +569,7 @@ const EditorPage = ({auth, login, logout}) => {
         yc={layers[hoveredFeature[0]][hoveredFeature[1]].yc}
         r={layers[hoveredFeature[0]][hoveredFeature[1]].r}
         ccw={layers[hoveredFeature[0]][hoveredFeature[1]].ccw}
+        polygons={layers[hoveredFeature[0]][hoveredFeature[1]].polygons}
         fill={getFeatureColor(hoveredFeature[0], hoveredFeature[1])}
         opacity={.5}
         pointerEvents="none"
