@@ -84,8 +84,8 @@ const testLayer1 = [
       ],
       polygons: [{
         points: [
-          {x: 25, y: 35},
-          {xe: 50, ye: 10, xc:50, yc: 35},
+          {x: 25, y: 45},
+          {xe: 50, ye: 20, xc:50, yc: 45},
         ]
       }]
     }]
@@ -133,8 +133,8 @@ const testLayer1 = [
       ],
       polygons: [{
         points: [
-          {x: 250, y: 10},
-          {xc: 250, yc: 35, xe: 225, ye: 35},
+          {x: 250, y: 20},
+          {xc: 250, yc: 45, xe: 225, ye: 45},
         ]
       }]
     }]
@@ -184,7 +184,6 @@ const EditorPage = ({auth, login, logout}) => {
   const [showNavBar, setShowNavBar] = useState(true)
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF")
   const [layerColors, setLayerColors] = useState({default: "#005291", 1:"#a30000", 2:"#529100"})
-
 
   const resetZoom = () => {
     const bbox = svgRef.current.getBBox()
