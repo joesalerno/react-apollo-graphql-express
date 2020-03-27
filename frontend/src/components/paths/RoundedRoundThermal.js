@@ -42,7 +42,7 @@ export default ({x, y, od, id, angle, num_spokes, gap, ...rest}) => {
     points.push([section.out3x, section.out3y])
     points.push([section.out4x, section.out4y])
     points.push([(x + avgR*Math.cos(rad)) + halfLw*Math.cos(gapPointMoveRad),
-                 (y + avgR*Math.sin(rad)) + halfLw*Math.sin(gapPointMoveRad)])
+                 (y + avgR*Math.sin(rad)) + halfLw*Math.sin(gapPointMoveRad) * (num_spokes === 1 ? -1 : 1)])
 
     rad = startRad
         + segmentRad * (i+0.5)

@@ -68,7 +68,9 @@ const testLayer0 = [
   // {type: "arc", symbol:"r10", xs:200, xe:300, ys:100, ye:0,   xc:300, yc:100},
 ]
 
-const testLayer1 = [
+const testLayer1 = []
+
+const _testLayer1 = [
   {type: "surface", x: 600, y:600, polygons: [{
     points: [
       {x: 0, y:10},
