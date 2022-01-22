@@ -18,7 +18,7 @@
     "express": "^4.17.1",
     "graphql": "^14.6.0",
     "jsonwebtoken": "^8.5.1",
-    "nanoid": "^2.1.11",
+    "nanoid": "^3.1.31",
     "nodemon": "^2.0.2",
     "proper-lockfile": "^4.1.1"
   }
