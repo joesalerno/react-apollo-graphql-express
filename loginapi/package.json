@@ -15,7 +15,7 @@
     "bcrypt": "^3.0.8",
     "better-sqlite3": "^5.4.3",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "graphql": "^14.6.0",
     "jsonwebtoken": "^8.5.1",
     "nanoid": "^2.1.11",
